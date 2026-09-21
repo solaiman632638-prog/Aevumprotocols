@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ReconCalculator } from "@/components/calc/ReconCalculator";
 import { GuideBody } from "@/components/protocols/GuideBody";
 import { getGuide, guides, type Guide } from "@/lib/data/guides";
-import { getEntry, sourceUrl } from "@/lib/data/library";
+import { getEntry } from "@/lib/data/library";
 import { categoryName, getProtocol, protocols, storeUrl } from "@/lib/data/protocols";
 
 type Props = {
@@ -50,33 +50,11 @@ export default async function ProtocolPage({ params }: Props) {
         <p className="mt-2 text-sm text-mute">{protocol.synonyms.join(", ")}</p>
       ) : null}
       <p className="mt-5 max-w-3xl">{protocol.summary}</p>
-      {protocol.sourceUrl ? (
-        <p className="mt-3 text-sm text-mute">
-          Science paraphrased from{" "}
-          <a
-            href={protocol.sourceUrl}
-            className="text-pine-deep underline decoration-rule underline-offset-2"
-            rel="noreferrer"
-            target="_blank"
-          >
-            Pepipedia
-          </a>
-          {protocol.researchScore != null
-            ? ` · literature ${protocol.researchScore}/100`
-            : null}
-          . Amounts on this sheet are NovaEvum vial math, not a Pepipedia dose.
-          {protocol.pepipediaSlug && getEntry(protocol.pepipediaSlug) ? (
-            <>
-              {" "}
-              <Link
-                href={`/peptides/${protocol.pepipediaSlug}`}
-                className="text-pine-deep underline decoration-rule underline-offset-2"
-              >
-                Library entry
-              </Link>
-              .
-            </>
-          ) : null}
+      {protocol.pepipediaSlug && getEntry(protocol.pepipediaSlug) ? (
+        <p className="mt-3">
+          <Link href={`/peptides/${protocol.pepipediaSlug}`} className="text-sm text-pine-deep no-underline hover:underline">
+            Library entry →
+          </Link>
         </p>
       ) : null}
 
@@ -102,7 +80,7 @@ export default async function ProtocolPage({ params }: Props) {
         {protocol.legal ? <Meta label="Status" value={protocol.legal} /> : null}
         {protocol.evidence ? <Meta label="Evidence" value={protocol.evidence} /> : null}
         {protocol.researchScore != null ? (
-          <Meta label="Pepipedia score" value={`${protocol.researchScore} / 100`} />
+          <Meta label="Research score" value={`${protocol.researchScore} / 100`} />
         ) : null}
       </dl>
 
@@ -276,24 +254,10 @@ function GuidePage({ guide }: { guide: Guide }) {
       {entry ? (
         <>
           <p className="mt-5 max-w-3xl text-mute">{entry.summary}</p>
-          <p className="mt-3 text-sm text-mute">
-            Science paraphrased from{" "}
-            <a
-              href={sourceUrl(entry.slug)}
-              className="text-pine-deep underline decoration-rule underline-offset-2"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Pepipedia
-            </a>{" "}
-            · literature {entry.researchScore}/100 · {entry.legal}.{" "}
-            <Link
-              href={`/peptides/${entry.slug}`}
-              className="text-pine-deep underline decoration-rule underline-offset-2"
-            >
-              Library entry
+          <p className="mt-3">
+            <Link href={`/peptides/${entry.slug}`} className="text-sm text-pine-deep no-underline hover:underline">
+              Library entry →
             </Link>
-            .
           </p>
         </>
       ) : null}

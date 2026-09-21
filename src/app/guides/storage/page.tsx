@@ -18,7 +18,7 @@ export default function StorageGuidePage() {
         Storage
       </h1>
       <p className="mt-4 max-w-prose">
-        Two states, two rules, taken from Pepipedia’s reconstitution guide. Dry
+        Two states, two rules. Dry
         powder is stable if it stays dry and cold. Once water is in the vial, the
         clock starts.
       </p>

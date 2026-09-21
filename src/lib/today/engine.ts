@@ -589,7 +589,7 @@ function card(entry: CompoundSource, goal: GoalId, context: UserContext): Compou
     why: [
       { label: "Your goal", value: goalLabel(goal) },
       { label: "Risk tolerance", value: context.tolerance, effect: "sets which evidence levels appear" },
-      { label: "Pepipedia research score", value: `${entry.researchScore}/100` },
+      { label: "Research score", value: `${entry.researchScore}/100` },
       { label: "Today's wearable data", value: "Not used", effect: "compounds are never picked from daily metrics" },
     ],
   };

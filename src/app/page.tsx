@@ -12,7 +12,7 @@ export default function Home() {
   );
 
   const stats = [
-    { value: library.length, label: "Pepipedia monographs" },
+    { value: library.length, label: "Library peptides" },
     { value: protocols.length + guides.filter((g) => !getProtocol(g.slug)).length, label: "Protocols" },
     { value: systems.length, label: "Body systems" },
     { value: stacks.length, label: "Stack sheets" },
@@ -104,9 +104,8 @@ export default function Home() {
               Looking for something else?
             </h2>
             <p className="mt-5 max-w-xl text-mute">
-              The library carries all {library.length} Pepipedia monographs:
-              mechanism, evidence, status, and safety for every peptide they
-              cover.
+              The library covers {library.length} peptides: mechanism,
+              evidence, regulatory status, and safety for each one.
             </p>
           </div>
           <Link href="/peptides" className="btn-primary self-start lg:self-auto">

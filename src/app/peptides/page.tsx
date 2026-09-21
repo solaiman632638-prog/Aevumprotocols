@@ -5,7 +5,7 @@ import { library, toRow, worksheetFor } from "@/lib/data/library";
 export const metadata: Metadata = {
   title: "Peptide library",
   description:
-    "Every Pepipedia monograph: mechanism, evidence, regulatory status, and safety.",
+    "173 peptides: mechanism, evidence, regulatory status, and safety.",
 };
 
 export default function PeptidesPage() {
@@ -19,16 +19,7 @@ export default function PeptidesPage() {
         Peptide library
       </h1>
       <p className="mt-3 max-w-2xl text-mute">
-        All {library.length} monographs on{" "}
-        <a
-          href="https://www.pepipedia.com/peptides"
-          className="text-pine-deep underline decoration-rule underline-offset-2"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Pepipedia
-        </a>
-        , from research chemicals to approved drugs. Reference only — no
+        All {library.length} peptides, from research chemicals to approved drugs. Reference only — no
         doses. Compounds on the NovaEvum catalog are listed first and link to
         their worksheet.
       </p>

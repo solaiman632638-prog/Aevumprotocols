@@ -37,7 +37,6 @@ export type Protocol = {
   notes: string[];
   related: string[];
   pepipediaSlug?: string;
-  sourceUrl?: string;
   primaryUse?: string;
   mechanism?: string;
   safety?: string;

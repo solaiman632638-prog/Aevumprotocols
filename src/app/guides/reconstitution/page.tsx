@@ -20,8 +20,7 @@ export default function ReconstitutionGuidePage() {
       <p className="mt-4 max-w-prose">
         Lyophilized peptides are a dry cake. Bacteriostatic water turns that
         cake into a solution you can measure. The calculator does the arithmetic;
-        this page is the bench method behind every sheet, paraphrased from
-        Pepipedia’s reconstitution guide.
+        this page is the bench method behind every sheet.
       </p>
 
       <ol className="mt-8 space-y-6">
@@ -55,9 +54,8 @@ export default function ReconstitutionGuidePage() {
         {pepipediaStorage.reconstituted} {pepipediaStorage.bacWater} Sterile
         water without preservative is single-use. Glutathione is the thiol
         exception on this site — use it promptly even if the molecule’s safety
-        file is otherwise quiet. Pepipedia withholds investigational dosing on
-        research-chemical monographs; amounts on the protocol sheets are
-        reconstitution math for the NovaEvum vial.
+        file is otherwise quiet. Amounts on the protocol sheets are
+        reconstitution math, not a recommendation.
       </p>
     </div>
   );

@@ -21,7 +21,7 @@ export function Header() {
         Skip to content
       </a>
       <p className="bg-pine px-4 py-1.5 text-center text-xs text-on-accent">
-        The library now covers all {library.length} Pepipedia peptides.{" "}
+        The library now covers {library.length} peptides.{" "}
         <Link href="/peptides" className="text-on-accent underline underline-offset-2">
           Browse it
         </Link>

@@ -111,7 +111,3 @@ export function worksheetFor(slug: string): string | undefined {
     protocols.find((protocol) => protocol.pepipediaSlug === slug)?.slug
   );
 }
-
-export function sourceUrl(slug: string): string {
-  return `https://www.pepipedia.com/peptides/${slug}`;
-}

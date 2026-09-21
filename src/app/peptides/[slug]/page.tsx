@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import {
   getEntry,
   library,
-  sourceUrl,
   statusName,
   systemName,
   worksheetFor,
@@ -65,16 +64,7 @@ export default async function PeptidePage({ params }: Props) {
       ) : null}
       <p className="mt-5 max-w-3xl">{entry.summary}</p>
       <p className="mt-3 text-sm text-mute">
-        Paraphrased from{" "}
-        <a
-          href={sourceUrl(entry.slug)}
-          className="text-pine-deep underline decoration-rule underline-offset-2"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Pepipedia
-        </a>{" "}
-        · literature {entry.researchScore}/100. Reference only, not a dose.
+        Research score {entry.researchScore}/100. Reference only, not a dose.
       </p>
 
       {entry.boxedWarning ? (
@@ -100,10 +90,10 @@ export default async function PeptidePage({ params }: Props) {
         <Meta label="US status" value={entry.legal} />
         <Meta label="Approval" value={entry.approval} />
         <Meta label="Evidence" value={entry.evidence} />
-        <Meta label="Pepipedia score" value={`${entry.researchScore} / 100`} />
+        <Meta label="Research score" value={`${entry.researchScore} / 100`} />
         {entry.indication ? <Meta label="Indication" value={entry.indication} /> : null}
         {entry.origin ? <Meta label="Origin" value={entry.origin} /> : null}
-        <Meta label="Pepipedia category" value={entry.pepipediaCategory} />
+        <Meta label="Source category" value={entry.pepipediaCategory} />
         <Meta label="Status group" value={statusName(entry.status)} />
       </dl>
 
@@ -116,7 +106,7 @@ export default async function PeptidePage({ params }: Props) {
             <p className="mt-3 max-w-prose">
               {entry.mechanism || (
                 <span className="text-mute">
-                  Pepipedia’s mechanism text for this entry describes a
+                  The published mechanism text for this entry describes a
                   different compound, so it is left out here.
                 </span>
               )}

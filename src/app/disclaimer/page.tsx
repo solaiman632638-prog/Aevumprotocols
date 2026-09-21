@@ -19,12 +19,11 @@ export default function DisclaimerPage() {
           or on a person or animal.
         </p>
         <p>
-          Mechanism, safety, legal status, and literature scores are paraphrased
-          from Pepipedia monographs. Pepipedia withholds investigational dosing
-          on research-chemical pages. Amounts, schedules, and cycle lengths on
-          these worksheets are reconstitution math for NovaEvum vials, not a
-          Pepipedia dose and not a claim that any compound is safe or effective
-          for any purpose.
+          Mechanism, safety, legal status, and research scores summarise the
+          published literature. Amounts, schedules, and cycle lengths on these
+          worksheets are reconstitution math and commonly reported protocols,
+          not a recommendation and not a claim that any compound is safe or
+          effective for any purpose.
         </p>
         <p>
           Products referenced here are sold for laboratory research. They are

@@ -79,7 +79,7 @@ export function ProtocolIndex({ protocols }: { protocols: RegisterRow[] }) {
               <th className="px-4 py-3 font-medium">Category</th>
               <th className="px-4 py-3 font-medium">Typical amount</th>
               <th className="px-4 py-3 font-medium">Route</th>
-              <th className="px-4 py-3 font-medium">Pepipedia</th>
+              <th className="px-4 py-3 font-medium">Research score</th>
             </tr>
           </thead>
           <tbody>
