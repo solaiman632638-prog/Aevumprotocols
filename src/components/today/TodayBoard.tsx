@@ -133,7 +133,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
         <div className="rounded-3xl border border-rule bg-sheet p-6 sm:p-8">
           <h2 className="font-display text-3xl font-light tracking-[-0.03em]">No wearable connected</h2>
           <p className="mt-2 max-w-prose text-mute">
-            Connect Whoop or Google Fit on the Monitor page, or skip the strap
+            Connect a heart rate monitor on the Monitor page, or skip it
             and answer a few questions each morning instead. Both feed the same
             scores.
           </p>

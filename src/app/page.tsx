@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div>
       <section className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pt-28 lg:pb-24">
-        <p className="eyebrow">Goals · risk · catalog vials · optional Whoop / Google Fit</p>
+        <p className="eyebrow">Goals · risk · catalog vials · optional heart rate monitor</p>
         <h1 className="mt-5 max-w-7xl font-display text-6xl font-light leading-[0.9] tracking-[-0.04em] sm:text-8xl lg:text-[7.5rem]">
           Tell it the goal. Get the vial, the draw, the plan.
         </h1>

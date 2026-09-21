@@ -4,7 +4,7 @@ import { MonitorBoard } from "@/components/wearables/MonitorBoard";
 
 export const metadata: Metadata = {
   title: "Monitor",
-  description: "Connect Whoop or Google Fit and overlay recovery on your worksheet.",
+  description: "Connect a heart rate monitor and overlay recovery on your worksheet.",
 };
 
 export default function MonitorPage() {
