@@ -29,10 +29,22 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
         <Link
           href="/"
-          className="text-xl font-light uppercase tracking-[0.28em] text-ink no-underline"
+          className="flex items-baseline text-xl font-light uppercase tracking-[0.28em] text-ink no-underline"
           aria-label="Aevum Protocols home"
         >
-          Aevum
+          {/* Crossbar-less A, drawn so it matches Figtree's light cap height. */}
+          <svg
+            aria-hidden
+            viewBox="0 0 10 10"
+            className="mr-[0.28em] h-[0.7em] w-[0.72em] self-center overflow-visible"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.9"
+            strokeLinejoin="miter"
+          >
+            <path d="M0.4 10 L5 0.3 L9.6 10" />
+          </svg>
+          <span aria-hidden>evum</span>
         </Link>
         <Link href="/plan" className="btn-primary !min-h-0 !px-5 !py-2.5 lg:order-last">
           Build a plan
