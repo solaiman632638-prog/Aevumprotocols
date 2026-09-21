@@ -42,8 +42,8 @@ export function Header() {
           </svg>
           <span aria-hidden>evum</span>
         </Link>
-        <Link href="/plan" className="btn-primary !min-h-0 !px-5 !py-2.5 lg:order-last">
-          Build a plan
+        <Link href="/today" className="btn-primary !min-h-0 !px-5 !py-2.5 lg:order-last">
+          Start today
         </Link>
         <nav
           aria-label="Primary"

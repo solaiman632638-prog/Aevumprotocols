@@ -21,6 +21,13 @@
   --color-warn-tint: #2a1414;
   --color-on-accent: #ffffff;
 
+  /* Metric identity on #1e1e1e panels. Validated dark-mode categorical set;
+     always paired with a text label, never color alone. */
+  --color-recovery: #0ea27a;
+  --color-sleep: #6f78ff;
+  --color-strain: #c67a20;
+  --color-panel: #1e1e1e;
+
   --font-display: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
