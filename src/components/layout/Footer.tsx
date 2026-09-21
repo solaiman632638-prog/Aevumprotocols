@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { storeHome } from "@/lib/data/protocols";
 
 export function Footer() {
   return (
@@ -23,15 +22,7 @@ export function Footer() {
           .
         </p>
         <p className="text-xs text-mute">
-          Aevum Protocols · companion to the{" "}
-          <a
-            href={storeHome}
-            className="text-pine-deep underline decoration-rule underline-offset-2"
-            rel="noreferrer"
-            target="_blank"
-          >
-            NovaEvum catalog
-          </a>
+          Aevum Protocols
         </p>
       </div>
     </footer>

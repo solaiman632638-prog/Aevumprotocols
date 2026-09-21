@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · Aevum Protocols",
   },
   description:
-    "Reconstitution worksheets and research protocol sheets for the NovaEvum peptide catalog.",
+    "Peptide protocols, reconstitution math, a 173-peptide research library, and a daily recovery readout.",
   icons: {
     icon: "/favicon.svg",
   },

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ReconCalculator } from "@/components/calc/ReconCalculator";
 import { library, systems } from "@/lib/data/library";
-import { categoryName, protocols, stacks } from "@/lib/data/protocols";
+import { guides } from "@/lib/data/guides";
+import { categoryName, getProtocol, protocols, stacks } from "@/lib/data/protocols";
 
 export default function Home() {
   const featured = protocols.filter((protocol) =>
@@ -12,7 +13,7 @@ export default function Home() {
 
   const stats = [
     { value: library.length, label: "Pepipedia monographs" },
-    { value: protocols.length, label: "Catalog worksheets" },
+    { value: protocols.length + guides.filter((g) => !getProtocol(g.slug)).length, label: "Protocols" },
     { value: systems.length, label: "Body systems" },
     { value: stacks.length, label: "Stack sheets" },
   ];
@@ -20,15 +21,10 @@ export default function Home() {
   return (
     <div>
       <section className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pt-28 lg:pb-24">
-        <p className="eyebrow">Goals · risk · catalog vials · optional heart rate monitor</p>
+        <p className="eyebrow">Goals · risk · vial math · optional heart rate monitor</p>
         <h1 className="mt-5 max-w-7xl font-display text-6xl font-light leading-[0.9] tracking-[-0.04em] sm:text-8xl lg:text-[7.5rem]">
           Tell it the goal. Get the vial, the draw, the plan.
         </h1>
-        <p className="mt-8 max-w-xl text-lg text-mute">
-          A matcher against the NovaEvum catalog, not a clinic. Conservative
-          stays at one compound. Aggressive can stack. A connected strap tells
-          you when to hold a pulse.
-        </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link href="/plan" className="btn-primary">
             Build a worksheet
@@ -105,7 +101,7 @@ export default function Home() {
         <div className="flex flex-col gap-8 rounded-[1.875rem] bg-[#1e1e1e] px-6 py-12 sm:px-12 lg:flex-row lg:items-end lg:justify-between lg:py-16">
           <div>
             <h2 className="font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-6xl">
-              Not on the catalog?
+              Looking for something else?
             </h2>
             <p className="mt-5 max-w-xl text-mute">
               The library carries all {library.length} Pepipedia monographs:
