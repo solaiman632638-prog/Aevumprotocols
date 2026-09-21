@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Announcement } from "@/components/layout/Announcement";
 import { library } from "@/lib/data/library";
 
 const links = [
@@ -13,19 +14,14 @@ const links = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-white/15 bg-black/40 backdrop-blur-md">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:bg-sheet focus:px-3 focus:py-2"
       >
         Skip to content
       </a>
-      <p className="bg-pine px-4 py-1.5 text-center text-xs text-on-accent">
-        The library now covers {library.length} peptides.{" "}
-        <Link href="/peptides" className="text-on-accent underline underline-offset-2">
-          Browse it
-        </Link>
-      </p>
+      <Announcement count={library.length} />
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
         <Link
           href="/"
