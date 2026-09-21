@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+/**
+ * Aevum Protocols — performance tokens.
+ *
+ * Black stage, graphite panels, one electric-blue accent, a signal green
+ * for labels. Big light headlines, uppercase buttons, generous radii.
+ * Token names predate the dark theme: "pine" is the accent fill,
+ * "pine-deep" the accent as text, "brass" the signal green.
+ */
+@theme {
+  --color-paper: #000000;
+  --color-sheet: #161616;
+  --color-ink: #ffffff;
+  --color-mute: #a1a1a1;
+  --color-pine: #4a53ff;
+  --color-pine-deep: #9ba1ff;
+  --color-brass: #00f19f;
+  --color-rule: #2c2c2c;
+  --color-warn: #ff6b6b;
+  --color-warn-tint: #2a1414;
+  --color-on-accent: #ffffff;
+
+  --font-display: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --default-transition-duration: 160ms;
+}
+
+/* Uppercase, letter-spaced buttons with soft corners. */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 1rem;
+  background-color: var(--color-pine);
+  color: var(--color-on-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  &:hover {
+    background-color: #353de6;
+  }
+}
+
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-rule);
+  background-color: var(--color-sheet);
+  color: var(--color-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  &:hover {
+    border-color: var(--color-ink);
+  }
+}
+
+/* Small uppercase label above headings and in table groups. */
+@utility eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-brass);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-pine) 55%, var(--color-paper));
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a {
+    cursor: pointer;
+  }
+
+  button,
+  [type="button"],
+  [type="submit"] {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-pine);
+    outline-offset: 3px;
+  }
+
+  input:focus-visible,
+  select:focus-visible {
+    outline-offset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
