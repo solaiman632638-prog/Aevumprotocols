@@ -8,21 +8,24 @@ const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
 const display = "font-display font-light tracking-[-0.04em]";
 const sectionHeading = `${display} text-5xl leading-[0.95] sm:text-7xl lg:text-8xl`;
 
-/** Illustrative day for the product preview. Labelled "Sample" wherever shown. */
+/**
+ * Illustrative morning from a manual check-in, no wearable. Labelled "Sample"
+ * wherever shown. Scores match what the Today engine returns for these inputs.
+ */
 const sample = {
-  recovery: 77,
-  sleep: 84,
-  strain: 11.2,
-  vitals: [
-    { label: "HRV", value: "58", unit: "ms" },
-    { label: "Resting HR", value: "54", unit: "bpm" },
-    { label: "Sleep", value: "7.6", unit: "h" },
-    { label: "Respiratory rate", value: "14.8", unit: "/min" },
+  recovery: 85,
+  sleep: 95,
+  logged: [
+    { label: "Slept", value: "7.6", unit: "h" },
+    { label: "Energy", value: "4", unit: "/ 5" },
+    { label: "Soreness", value: "2", unit: "/ 5" },
+    { label: "Weight", value: "86.2", unit: "kg" },
   ],
+  goal: { name: "Body composition", verdict: "On track", detail: "−0.5 kg a week toward 82 kg" },
   plan: [
-    { label: "Training", value: "Moderate intensity" },
+    { label: "Training", value: "Go hard if planned" },
     { label: "Protein", value: "165 g" },
-    { label: "Hydration", value: "3.4 L" },
+    { label: "Hydration", value: "3.0 L" },
     { label: "Sleep target", value: "8 h" },
   ],
 };
@@ -32,7 +35,7 @@ const pillars = [
     metric: "Recovery",
     measure: "Daily score · 0–100",
     color: "var(--color-recovery)",
-    body: "How ready your body is to take on strain, from HRV, resting heart rate, sleep, and how you feel.",
+    body: "How ready you are for a hard day, from your sleep and how you feel. Add resting heart rate or HRV if you track them.",
   },
   {
     metric: "Sleep",
@@ -41,35 +44,35 @@ const pillars = [
     body: "Hours against what you actually need, sleep quality, and the debt you are carrying into tonight.",
   },
   {
-    metric: "Strain",
-    measure: "Training load · 0–21",
+    metric: "Training",
+    measure: "Readiness · low to high",
     color: "var(--color-strain)",
-    body: "Training load from your monitor or check-in, so hard days are planned, not stacked on top of each other.",
+    body: "Log yesterday's session and get today's intensity, so hard days are planned, not stacked.",
   },
   {
-    metric: "Heart health",
-    measure: "Against your baseline",
-    body: "Resting heart rate, HRV, and respiratory rate against your own baseline, flagged when they drift.",
+    metric: "Goals",
+    measure: "Progress · week by week",
+    body: "Fat loss, muscle, sleep, recovery, focus. Log your weight and see whether you are on track, stalled, or going too fast.",
   },
   {
     metric: "Fuel",
     measure: "Daily targets",
-    body: "Protein, calories, and hydration targets set from your body, your goal, and today's load.",
+    body: "Protein, calories, and hydration set from your body, your goal, and today's training.",
   },
 ];
 
 const steps = [
   {
-    title: "Tell it about you",
-    body: "Age, body, goals, training week, medications, and anything a plan should work around. Stored on your device only.",
+    title: "Set your goals",
+    body: "What you are working toward, your body, your training week, and anything a plan should work around. Stored on your device only.",
   },
   {
-    title: "Check in each morning",
-    body: "Connect a heart rate monitor, or answer five questions in thirty seconds. Both feed the same scores.",
+    title: "Log your morning",
+    body: "Sleep, energy, soreness, stress, and weight. Thirty seconds, no device needed. Connect a heart rate monitor later if you want.",
   },
   {
     title: "Get today's plan",
-    body: "Recovery, sleep, and readiness scores, plus what to eat, drink, and train. Baselines sharpen after three days.",
+    body: "Recovery and sleep scores, training intensity, and what to eat and drink. Your baseline sharpens after three check-ins.",
   },
 ];
 
@@ -122,7 +125,7 @@ export default function Home() {
       {/* Hero */}
       <section className={`${wrap} pb-16 pt-20 sm:pt-28`}>
         <Reveal>
-          <p className="eyebrow">Recovery · Sleep · Heart health</p>
+          <p className="eyebrow">Goals · Recovery · Sleep</p>
         </Reveal>
         <Reveal delay={100}>
           <h1 className={`mt-6 max-w-6xl ${display} text-6xl leading-[0.9] sm:text-8xl lg:text-[8.5rem]`}>
@@ -131,9 +134,9 @@ export default function Home() {
         </Reveal>
         <Reveal delay={200}>
           <p className="mt-8 max-w-xl text-lg text-mute">
-            Aevum reads your sleep, heart rate, and training load and turns them
-            into a clear plan for today. Use a heart rate monitor, or a
-            thirty-second check-in.
+            Set your goals, log how you slept and how you feel, and Aevum turns
+            it into a clear plan for today. Thirty seconds a morning. No device
+            needed.
           </p>
         </Reveal>
         <Reveal delay={300}>
@@ -161,19 +164,25 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 items-center justify-items-center gap-10 sm:grid-cols-3">
               <Ring label="Recovery" value={sample.recovery} max={100} display={`${sample.recovery}%`} color="var(--color-recovery)" />
               <Ring label="Sleep" value={sample.sleep} max={100} display={`${sample.sleep}%`} color="var(--color-sleep)" />
-              <Ring label="Strain" value={sample.strain} max={21} display={sample.strain.toFixed(1)} color="var(--color-strain)" />
+              <div className="w-full max-w-56 rounded-2xl border border-rule p-5 text-center sm:text-left">
+                <p className="eyebrow !text-mute">Goal</p>
+                <p className="mt-2 text-lg">{sample.goal.name}</p>
+                <p className={`mt-1 ${display} text-4xl`}>{sample.goal.verdict}</p>
+                <p className="mt-2 text-sm text-mute">{sample.goal.detail}</p>
+              </div>
             </div>
 
-            <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-rule lg:grid-cols-4">
-              {sample.vitals.map((vital) => (
-                <div key={vital.label} className="bg-panel p-5">
-                  <dt className="text-sm text-mute">{vital.label}</dt>
+            <p className="eyebrow mt-12">Logged this morning</p>
+            <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-rule lg:grid-cols-4">
+              {sample.logged.map((item) => (
+                <div key={item.label} className="bg-panel p-5">
+                  <dt className="text-sm text-mute">{item.label}</dt>
                   <dd className={`mt-1 ${display} text-4xl`}>
-                    {vital.value}
-                    <span className="ml-1 text-base text-mute">{vital.unit}</span>
+                    {item.value}
+                    <span className="ml-1 text-base text-mute">{item.unit}</span>
                   </dd>
                 </div>
               ))}
@@ -199,8 +208,8 @@ export default function Home() {
         <dl className={`${wrap} grid grid-cols-2 lg:grid-cols-4`}>
           {[
             { value: "30s", label: "Daily check-in" },
-            { value: "5", label: "Scores every morning" },
-            { value: "0", label: "Wearables required" },
+            { value: "8", label: "Goals to choose from" },
+            { value: "0", label: "Devices required" },
             { value: String(library.length), label: "Compounds researched" },
           ].map((stat) => (
             <div key={stat.label} className="py-10 pr-4">
@@ -276,8 +285,8 @@ export default function Home() {
             <h2 className={sectionHeading}>Every number, explained.</h2>
             <p className="mt-8 max-w-md text-lg text-mute">
               No black box. Tap &ldquo;Why am I seeing this?&rdquo; on any score
-              or recommendation and see exactly which data moved it, and by how
-              much.
+              or recommendation and see exactly which of your answers moved it,
+              and by how much. Add heart-rate data and it shows up here too.
             </p>
           </Reveal>
           <Reveal delay={150}>
@@ -287,17 +296,15 @@ export default function Home() {
                 <span className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-mute">Sample</span>
               </div>
               <p className={`mt-3 ${display} text-7xl`}>
-                77<span className="text-2xl text-mute">/100</span>
+                85<span className="text-2xl text-mute">/100</span>
               </p>
               <p className="mt-6 text-xs font-semibold uppercase tracking-[0.08em] text-mute">
                 Why am I seeing this?
               </p>
               <dl className="mt-3 divide-y divide-rule text-sm">
                 {[
-                  ["HRV vs baseline", "58 vs 52 ms", "73 × 30%"],
-                  ["Resting HR vs baseline", "54 vs 56 bpm", "64 × 20%"],
-                  ["Sleep vs need", "7.6 of 8 h", "95 × 25%"],
-                  ["How you feel", "energy 4, soreness 2", "75 × 25%"],
+                  ["Sleep vs need", "7.6 of 8 h", "95 × 50%"],
+                  ["How you feel", "quality 4, energy 4, soreness 2, stress 2", "75 × 50%"],
                 ].map(([label, value, effect]) => (
                   <div key={label} className="flex flex-wrap items-baseline justify-between gap-x-4 py-3">
                     <dt className="text-mute">{label}</dt>

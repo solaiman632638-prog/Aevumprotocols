@@ -93,14 +93,14 @@ export function MonitorBoard() {
       <div className="grid gap-3 sm:grid-cols-2">
         <ProviderCard
           name="Whoop"
-          body="Recovery, HRV, resting heart rate, and sleep. Live OAuth when WHOOP_CLIENT_ID is set."
+          body="Recovery, HRV, resting heart rate, and sleep."
           busy={busy === "whoop"}
           connected={connection?.provider === "whoop"}
           onConnect={() => connect("whoop")}
         />
         <ProviderCard
           name="Google Fit"
-          body="Heart rate and sleep via Google Fit. Live OAuth when GOOGLE_CLIENT_ID is set. Android Health Connect can replace this later."
+          body="Heart rate and sleep from Google Fit."
           busy={busy === "google-fit"}
           connected={connection?.provider === "google-fit"}
           onConnect={() => connect("google-fit")}
@@ -162,8 +162,8 @@ export function MonitorBoard() {
         </>
       ) : (
         <p className="text-mute">
-          Connect Whoop or Google Fit to overlay recovery on the peptide worksheet.
-          Without API keys you still get a demo feed so the loop can be tested.
+          Nothing connected. That is fine: the manual check-in on Today gives you
+          the same daily scores.
         </p>
       )}
     </div>

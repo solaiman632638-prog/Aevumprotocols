@@ -7,9 +7,9 @@ const links = [
   { href: "/peptides", label: "Library" },
   { href: "/protocols", label: "Protocols" },
   { href: "/stacks", label: "Stacks" },
-  { href: "/monitor", label: "Monitor" },
   { href: "/calculator", label: "Calculator" },
   { href: "/guides", label: "Guides" },
+  { href: "/monitor", label: "Devices" },
 ];
 
 export function Header() {

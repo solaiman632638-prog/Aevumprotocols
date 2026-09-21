@@ -6,7 +6,7 @@ import { compoundsByGoal, type CompoundSource } from "@/lib/today/engine";
 export const metadata: Metadata = {
   title: "Today",
   description:
-    "Daily recovery, sleep, and readiness from a wearable or a manual check-in, with lifestyle, supplement, and compound research guidance.",
+    "Daily recovery, sleep, and readiness from a thirty-second check-in or an optional device, with guidance for your goals.",
 };
 
 /** Only the monographs the engine can surface, trimmed to what the cards show. */
@@ -42,9 +42,10 @@ export default function TodayPage() {
         Today
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
-        Recovery, sleep, and readiness from your wearable, or from a
-        thirty-second check-in if you do not wear one. Every recommendation
-        shows the data behind it.
+        Log how you slept and how you feel in thirty seconds, and get
+        recovery, sleep, and readiness scores plus a plan for your goals.
+        Have a heart rate monitor? Connect it for extra detail. Every
+        recommendation shows the data behind it.
       </p>
       <p className="mt-4 max-w-2xl rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
         Educational, not medical advice. Compound information is never a

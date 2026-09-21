@@ -102,18 +102,18 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
     source === "wearable"
       ? wearable
         ? snapshotFor(wearable.provider).label
-        : "No wearable connected"
+        : "No device connected"
       : `Manual check-in · ${checkins.length} day${checkins.length === 1 ? "" : "s"} logged`;
 
   return (
     <div className="space-y-10">
       <div className="flex flex-col gap-4 rounded-3xl border border-rule bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Data source">
-          <SourceButton active={source === "wearable"} onClick={() => saveSource("wearable")}>
-            Wearable
-          </SourceButton>
           <SourceButton active={source === "manual"} onClick={() => saveSource("manual")}>
             Manual check-in
+          </SourceButton>
+          <SourceButton active={source === "wearable"} onClick={() => saveSource("wearable")}>
+            Device
           </SourceButton>
           <span className="px-2 text-sm text-mute">{sourceLabel}</span>
         </div>
@@ -131,14 +131,14 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
       {source === "wearable" && !wearable ? (
         <div className="rounded-3xl border border-rule bg-sheet p-6 sm:p-8">
-          <h2 className="font-display text-3xl font-light tracking-[-0.03em]">No wearable connected</h2>
+          <h2 className="font-display text-3xl font-light tracking-[-0.03em]">No device connected</h2>
           <p className="mt-2 max-w-prose text-mute">
-            Connect a heart rate monitor on the Monitor page, or skip it
+            Connect a heart rate monitor on the Devices page, or skip it
             and answer a few questions each morning instead. Both feed the same
             scores.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/monitor" className="btn-primary">Connect a wearable</Link>
+            <Link href="/monitor" className="btn-primary">Connect a device</Link>
             <button type="button" onClick={() => saveSource("manual")} className="btn-secondary">
               Use manual check-in
             </button>
