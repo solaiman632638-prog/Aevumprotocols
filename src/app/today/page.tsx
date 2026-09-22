@@ -42,14 +42,16 @@ export default function TodayPage() {
         Today
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
-        Log how you slept and how you feel in thirty seconds, and get
-        recovery, sleep, and readiness scores plus a plan for your goals.
-        Every recommendation shows the data behind it.
+        Log how you slept, how you feel, and the peptides you took. Get
+        recovery and sleep scores, protocol guidance for each peptide,
+        interaction warnings, and injection-site tracking. Every
+        recommendation shows the data behind it.
       </p>
       <p className="mt-4 max-w-2xl rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
-        Educational, not medical advice. Compound information is never a
-        suggestion to take anything, and no amounts are given. Dosing and
-        treatment decisions belong with a clinician.
+        Educational, not medical advice. Peptide guidance restates published
+        protocols against what you log; it never goes above a protocol&apos;s
+        maximum and is not a prescription. Confirm dosing and treatment
+        decisions with a clinician.
       </p>
       <div className="mt-10">
         <TodayBoard pool={compoundPool()} />

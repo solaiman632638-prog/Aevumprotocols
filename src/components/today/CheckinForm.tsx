@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { DayState, UserContext } from "@/lib/today/types";
+import { PeptideLog } from "@/components/peptides/PeptideLog";
+import type { SiteId } from "@/lib/peptides/catalog";
+import type { DayState, DoseEntry, Reaction, UserContext } from "@/lib/today/types";
 
 const LB_PER_KG = 2.20462;
 
@@ -29,10 +31,12 @@ export function CheckinForm({
   previous,
   onSave,
   onCancel,
+  siteSuggestion,
 }: {
   date: string;
   profile: UserContext;
   previous?: DayState;
+  siteSuggestion?: SiteId;
   onSave: (day: DayState) => void;
   onCancel?: () => void;
 }) {
@@ -48,6 +52,8 @@ export function CheckinForm({
   const [weight, setWeight] = useState(
     sameDay && previous?.weightKg != null ? (imperial ? (previous.weightKg * LB_PER_KG).toFixed(1) : String(previous.weightKg)) : "",
   );
+  const [doses, setDoses] = useState<DoseEntry[]>(sameDay ? previous?.doses ?? [] : []);
+  const [reactions, setReactions] = useState<Reaction[]>(sameDay ? previous?.reactions ?? [] : []);
   const [error, setError] = useState<string | null>(null);
 
   function num(value: string, min: number, max: number): number | undefined | null {
@@ -66,8 +72,10 @@ export function CheckinForm({
     if (restingHr === null) return setError("Resting heart rate should be between 30 and 120 bpm.");
     if (variability === null) return setError("HRV should be between 5 and 250 ms.");
     if (rawWeight === null) return setError("Weight is out of range.");
-    if (hours === undefined && Object.keys(values).length === 0) {
-      return setError("Log at least your sleep or one of the sliders.");
+    const incomplete = doses.find((dose) => !dose.compound || !(dose.amount > 0));
+    if (incomplete) return setError("Each peptide needs a name and an amount, or remove the empty row.");
+    if (hours === undefined && Object.keys(values).length === 0 && doses.length === 0) {
+      return setError("Log your sleep, one of the sliders, or a peptide.");
     }
     setError(null);
     onSave({
@@ -79,6 +87,8 @@ export function CheckinForm({
       rhr: restingHr,
       hrv: variability,
       weightKg: rawWeight === undefined ? undefined : Math.round((imperial ? rawWeight / LB_PER_KG : rawWeight) * 10) / 10,
+      doses: doses.length ? doses : undefined,
+      reactions: reactions.length ? reactions : undefined,
     });
   }
 
@@ -88,8 +98,8 @@ export function CheckinForm({
         <p className="eyebrow">Check-in · {date}</p>
         <h2 className="mt-2 font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl">How did you wake up?</h2>
         <p className="mt-2 max-w-prose text-sm text-mute">
-          Thirty seconds. Check in daily and the scores start comparing you
-          against your own baseline after three days.
+          How you slept, how you feel, and the peptides you took. Check in
+          daily and your scores and dose guidance build from your own history.
         </p>
       </div>
 
@@ -145,6 +155,8 @@ export function CheckinForm({
           ))}
         </div>
       </fieldset>
+
+      <PeptideLog doses={doses} reactions={reactions} onDoses={setDoses} onReactions={setReactions} suggestion={siteSuggestion} />
 
       <details className="rounded-2xl border border-rule px-4 py-3">
         <summary className="cursor-pointer text-sm">Optional: heart rate, HRV, weight</summary>

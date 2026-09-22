@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { CheckinForm } from "@/components/today/CheckinForm";
 import { TrendChart, type TrendPoint } from "@/components/today/TrendChart";
 import { buildReport } from "@/lib/today/engine";
+import { getCompound, type SiteId } from "@/lib/peptides/catalog";
 import type { DayState, UserContext } from "@/lib/today/types";
 
 const LB_PER_KG = 2.20462;
@@ -30,12 +31,14 @@ export function HistoryPanel({
   today,
   manual,
   onSaveDay,
+  siteSuggestion,
 }: {
   profile: UserContext;
   history: DayState[];
   today: string;
   manual: boolean;
   onSaveDay: (day: DayState) => void;
+  siteSuggestion?: SiteId;
 }) {
   const [range, setRange] = useState<(typeof RANGES)[number]>(7);
   const [backfill, setBackfill] = useState<string | null>(null);
@@ -119,6 +122,7 @@ export function HistoryPanel({
             date={backfill}
             profile={profile}
             previous={entries.get(backfill)}
+            siteSuggestion={siteSuggestion}
             onSave={(day) => {
               onSaveDay(day);
               setBackfill(null);
@@ -149,7 +153,7 @@ export function HistoryPanel({
           <p className="mt-3 text-mute">No check-ins in the last {range} days yet.</p>
         ) : (
           <div className="mt-4 overflow-x-auto rounded-3xl border border-rule">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <table className="w-full min-w-[48rem] text-left text-sm">
               <thead className="border-b border-rule bg-sheet text-mute">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium">Day</th>
@@ -159,6 +163,7 @@ export function HistoryPanel({
                   <th scope="col" className="px-4 py-3 font-medium">Soreness</th>
                   <th scope="col" className="px-4 py-3 font-medium">Stress</th>
                   <th scope="col" className="px-4 py-3 font-medium">Weight</th>
+                  <th scope="col" className="px-4 py-3 font-medium">Peptides</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,6 +177,11 @@ export function HistoryPanel({
                     <td className="px-4 py-3">{day.stress ?? "—"}</td>
                     <td className="px-4 py-3">
                       {day.weightKg != null ? `${(Math.round(toUnit(day.weightKg) * 10) / 10).toString()} ${imperial ? "lb" : "kg"}` : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {day.doses?.length
+                        ? day.doses.map((dose) => `${getCompound(dose.compound)?.name ?? dose.compound} ${dose.amount} ${dose.unit}`).join(", ")
+                        : "—"}
                     </td>
                   </tr>
                 ))}

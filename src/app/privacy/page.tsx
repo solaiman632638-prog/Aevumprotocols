@@ -29,7 +29,9 @@ export default function PrivacyPage() {
           The Today page asks for health information: age, sex, height, weight,
           goals, training habits, health conditions, medications, supplements,
           allergies, and daily check-ins such as sleep, energy, soreness,
-          stress, heart rate, and weight. We treat all of it as sensitive.
+          stress, heart rate, weight, the peptides you log with their amounts
+          and injection sites, and side effects. We treat all of it as
+          sensitive.
         </p>
         <p>
           <strong>If you do not sign in,</strong> this information is saved only

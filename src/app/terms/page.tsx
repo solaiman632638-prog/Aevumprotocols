@@ -33,6 +33,17 @@ export default function TermsPage() {
       </section>
 
       <section>
+        <h2>Peptide guidance</h2>
+        <p>
+          The peptide check-in compares what you log with the published protocol
+          for each compound and flags side effects and combinations. It is
+          general information, not a prescription or a recommendation to use
+          any compound, and it can be wrong. You are responsible for what you
+          take; confirm doses and combinations with a qualified clinician.
+        </p>
+      </section>
+
+      <section>
         <h2>Research compounds</h2>
         <p>
           The library and protocol pages describe compounds that are

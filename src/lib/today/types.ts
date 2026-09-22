@@ -1,4 +1,5 @@
 import type { GoalId } from "@/lib/plan/types";
+import type { SiteId, SymptomId } from "@/lib/peptides/catalog";
 
 export const sexes = [
   { id: "female", label: "Female" },
@@ -70,6 +71,25 @@ export type DayState = {
   soreness?: number;
   /** 1 (calm) – 5 (very stressed). Manual only. */
   stress?: number;
+  /** Peptides taken that day. */
+  doses?: DoseEntry[];
+  /** Side effects noticed that day. */
+  reactions?: Reaction[];
+};
+
+export type DoseEntry = {
+  id: string;
+  /** Compound slug from the peptide catalog. */
+  compound: string;
+  amount: number;
+  unit: "mg" | "mcg";
+  site?: SiteId;
+};
+
+export type Reaction = {
+  symptom: SymptomId;
+  /** 1 mild, 2 moderate, 3 severe. */
+  severity: 1 | 2 | 3;
 };
 
 export type Level = "Low" | "Moderate" | "High";

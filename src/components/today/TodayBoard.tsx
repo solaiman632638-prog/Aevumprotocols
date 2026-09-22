@@ -5,10 +5,12 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import { CheckinForm } from "@/components/today/CheckinForm";
 import { AccountPrompt } from "@/components/today/AccountPrompt";
 import { DailyReminder } from "@/components/today/DailyReminder";
+import { PeptidePanel } from "@/components/peptides/PeptidePanel";
 import { Dashboard } from "@/components/today/Dashboard";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
 import { WEARABLE_KEY, type WearableState } from "@/lib/plan/storage";
+import { peptideReport } from "@/lib/peptides/engine";
 import { buildReport, type CompoundSource } from "@/lib/today/engine";
 import {
   keys,
@@ -82,6 +84,11 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
   const history = source === "wearable" ? wearableDays : checkins;
   const checkedInToday = checkins.at(-1)?.date === date;
+
+  const peptides = useMemo(
+    () => (profile && date ? peptideReport(profile, checkins, date) : null),
+    [profile, checkins, date],
+  );
 
   const report = useMemo(() => {
     if (!profile || !history || history.length === 0) return null;
@@ -163,6 +170,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
             history={history ?? []}
             today={date}
             manual={source === "manual"}
+            siteSuggestion={peptides?.sites.suggestion}
             onSaveDay={saveCheckin}
           />
         ) : (
@@ -188,6 +196,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           key={`${date}-${editing}`}
           date={date}
           profile={profile}
+          siteSuggestion={peptides?.sites.suggestion}
           previous={checkins.at(-1)}
           onSave={(day) => {
             saveCheckin(day);
@@ -198,7 +207,10 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
       ) : report ? (
         <>
           <AccountPrompt />
-          <Dashboard report={report} />
+          <Dashboard
+            report={report}
+            peptides={peptides ? <PeptidePanel report={peptides} today={date} /> : null}
+          />
           <DailyReminder />
         </>
       ) : null}

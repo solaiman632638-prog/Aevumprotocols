@@ -15,7 +15,7 @@ const toneFill: Record<Score["tone"], string> = {
   missing: "bg-rule",
 };
 
-export function Dashboard({ report }: { report: DailyReport }) {
+export function Dashboard({ report, peptides }: { report: DailyReport; peptides?: React.ReactNode }) {
   return (
     <div className="space-y-14">
       <section aria-labelledby="scores-heading">
@@ -58,6 +58,8 @@ export function Dashboard({ report }: { report: DailyReport }) {
           ))}
         </ul>
       </section>
+
+      {peptides}
 
       <RecList id="lifestyle" title="Recommended today" eyebrow="Lifestyle" items={report.lifestyle} />
       <RecList
