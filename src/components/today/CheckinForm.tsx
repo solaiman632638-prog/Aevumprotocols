@@ -85,11 +85,11 @@ export function CheckinForm({
   return (
     <form onSubmit={submit} className="space-y-8 rounded-3xl border border-rule bg-sheet p-5 sm:p-8" noValidate>
       <div>
-        <p className="eyebrow">Manual check-in · {date}</p>
+        <p className="eyebrow">Check-in · {date}</p>
         <h2 className="mt-2 font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl">How did you wake up?</h2>
         <p className="mt-2 max-w-prose text-sm text-mute">
-          Thirty seconds, no wearable needed. Check in daily and the scores
-          start comparing you against your own baseline after three days.
+          Thirty seconds. Check in daily and the scores start comparing you
+          against your own baseline after three days.
         </p>
       </div>
 
@@ -149,8 +149,8 @@ export function CheckinForm({
       <details className="rounded-2xl border border-rule px-4 py-3">
         <summary className="cursor-pointer text-sm">Optional: heart rate, HRV, weight</summary>
         <p className="mt-2 text-xs text-mute">
-          From a watch, ring, or phone app you have not connected. These unlock
-          the cardiovascular score and the weight trend.
+          If you track them with a watch, ring, or phone app. These unlock the
+          cardiovascular score and the weight trend.
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>

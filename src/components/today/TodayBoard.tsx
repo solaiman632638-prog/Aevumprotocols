@@ -111,7 +111,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
       ? feed
         ? feed.label
         : "No device connected"
-      : `Manual check-in · ${checkins.length} day${checkins.length === 1 ? "" : "s"} logged`;
+      : `${checkins.length} day${checkins.length === 1 ? "" : "s"} logged`;
 
   return (
     <div className="space-y-10">
@@ -135,7 +135,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           {site.devicesEnabled ? (
             <>
           <SourceButton active={source === "manual"} onClick={() => saveSource("manual")}>
-            Manual check-in
+            Check-in
           </SourceButton>
           <SourceButton active={source === "wearable"} onClick={() => saveSource("wearable")}>
             Device
@@ -166,7 +166,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
             onSaveDay={saveCheckin}
           />
         ) : (
-          <p className="text-mute">Connect a device or switch to manual check-in to build a history.</p>
+          <p className="text-mute">Connect a device or switch to check-ins to build a history.</p>
         )
       ) : source === "wearable" && !wearable ? (
         <div className="rounded-3xl border border-rule bg-sheet p-6 sm:p-8">
@@ -179,7 +179,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/monitor" className="btn-primary">Connect a device</Link>
             <button type="button" onClick={() => saveSource("manual")} className="btn-secondary">
-              Use manual check-in
+              Use daily check-in
             </button>
           </div>
         </div>
