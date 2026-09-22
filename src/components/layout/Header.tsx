@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountLink } from "@/components/layout/AccountLink";
 import { Announcement } from "@/components/layout/Announcement";
 import { library } from "@/lib/data/library";
 
@@ -10,8 +11,9 @@ const links = [
   { href: "/calculator", label: "Calculator" },
   { href: "/guides", label: "Guides" },
   { href: "/monitor", label: "Devices" },
-  { href: "/account", label: "Account" },
 ];
+
+const navLink = "text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-ink/80 no-underline hover:text-ink";
 
 export function Header() {
   return (
@@ -51,14 +53,11 @@ export function Header() {
           className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 lg:w-auto lg:gap-x-8"
         >
           {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-ink/80 no-underline hover:text-ink"
-            >
+            <Link key={link.href} href={link.href} className={navLink}>
               {link.label}
             </Link>
           ))}
+          <AccountLink className={navLink} />
         </nav>
       </div>
     </header>

@@ -40,7 +40,9 @@ export default function PrivacyPage() {
           <strong>If you create an account,</strong> we store your email
           address, your profile, and your check-ins with our database provider
           so you can use them on more than one device. Access is restricted so
-          that only your signed-in account can read or change your records.
+          that only your signed-in account can read or change your records. If
+          you choose a password, it is stored only as a secure hash by our
+          authentication provider; we never see it.
         </p>
       </section>
 

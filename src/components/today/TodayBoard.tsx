@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { CheckinForm } from "@/components/today/CheckinForm";
+import { AccountPrompt } from "@/components/today/AccountPrompt";
 import { DailyReminder } from "@/components/today/DailyReminder";
 import { Dashboard } from "@/components/today/Dashboard";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
@@ -191,6 +192,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
         />
       ) : report ? (
         <>
+          <AccountPrompt />
           <Dashboard report={report} />
           <DailyReminder />
         </>
