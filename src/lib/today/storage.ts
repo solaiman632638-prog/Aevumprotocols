@@ -3,6 +3,7 @@ import type { DayState, UserContext } from "@/lib/today/types";
 const PROFILE_KEY = "aevum-today-profile";
 const CHECKINS_KEY = "aevum-checkins";
 const SOURCE_KEY = "aevum-today-source";
+const PROFILE_UPDATED_KEY = "aevum-today-profile-updated";
 
 export type DataSource = "wearable" | "manual";
 
@@ -52,12 +53,35 @@ export const keys = {
   source: SOURCE_KEY,
 } as const;
 
+/** Where saves are mirrored when the user is signed in. Set by SyncBridge. */
+type Remote = {
+  pushProfile: (profile: UserContext, updatedAt: string) => void;
+  pushCheckin: (day: DayState) => void;
+};
+let remote: Remote | null = null;
+
+export function registerRemote(next: Remote | null) {
+  remote = next;
+}
+
 export function loadProfile(): UserContext | null {
   return read<UserContext>(PROFILE_KEY);
 }
 
-export function saveProfile(profile: UserContext) {
+export function profileUpdatedAt(): string | null {
+  return read<string>(PROFILE_UPDATED_KEY);
+}
+
+/** Local write only. Sync uses this to apply downloaded data without echoing it back. */
+export function storeProfile(profile: UserContext, updatedAt: string) {
   write(PROFILE_KEY, profile);
+  write(PROFILE_UPDATED_KEY, updatedAt);
+}
+
+export function saveProfile(profile: UserContext) {
+  const updatedAt = new Date().toISOString();
+  storeProfile(profile, updatedAt);
+  remote?.pushProfile(profile, updatedAt);
 }
 
 /** Manual check-ins keyed by ISO date, newest wins. */
@@ -66,10 +90,33 @@ export function loadCheckins(): DayState[] {
   return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export function saveCheckin(day: DayState) {
-  const map = read<Record<string, DayState>>(CHECKINS_KEY) ?? {};
-  map[day.date] = day;
+export function loadCheckinMap(): Record<string, DayState> {
+  return read<Record<string, DayState>>(CHECKINS_KEY) ?? {};
+}
+
+/** Local write only; see storeProfile. */
+export function storeCheckins(map: Record<string, DayState>) {
   write(CHECKINS_KEY, map);
+}
+
+export function saveCheckin(day: DayState) {
+  const stamped = { ...day, updatedAt: new Date().toISOString() };
+  const map = loadCheckinMap();
+  map[stamped.date] = stamped;
+  storeCheckins(map);
+  remote?.pushCheckin(stamped);
+}
+
+/** Removes everything Today keeps in this browser. */
+export function clearLocalData() {
+  for (const key of [PROFILE_KEY, PROFILE_UPDATED_KEY, CHECKINS_KEY, SOURCE_KEY]) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      // Nothing stored or storage blocked.
+    }
+  }
+  window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
 export function loadSource(): DataSource | null {

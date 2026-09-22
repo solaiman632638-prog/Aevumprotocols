@@ -21,7 +21,7 @@ const sample = {
     { label: "Soreness", value: "2", unit: "/ 5" },
     { label: "Weight", value: "86.2", unit: "kg" },
   ],
-  goal: { name: "Body composition", verdict: "On track", detail: "−0.5 kg a week toward 82 kg" },
+  goal: { name: "Lose fat", verdict: "On track", detail: "−0.5 kg a week toward 82 kg" },
   plan: [
     { label: "Training", value: "Go hard if planned" },
     { label: "Protein", value: "165 g" },

@@ -10,6 +10,7 @@ const links = [
   { href: "/calculator", label: "Calculator" },
   { href: "/guides", label: "Guides" },
   { href: "/monitor", label: "Devices" },
+  { href: "/account", label: "Account" },
 ];
 
 export function Header() {

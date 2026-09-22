@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { MonitorBoard } from "@/components/wearables/MonitorBoard";
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function MonitorPage() {
         HRV, resting heart rate, and sleep fill in automatically.
       </p>
       <div className="mt-8">
-        <MonitorBoard />
+        <Suspense fallback={<p className="text-mute">Loading…</p>}>
+          <MonitorBoard />
+        </Suspense>
       </div>
     </div>
   );

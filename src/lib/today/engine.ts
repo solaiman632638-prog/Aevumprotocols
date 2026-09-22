@@ -481,7 +481,7 @@ function supplements(context: UserContext, today: DayState, days: DayState[], sl
 
   const omegaWhy: Driver[] = [];
   if (context.goals.includes("recovery")) omegaWhy.push({ label: "Goal", value: "Recovery" });
-  if (context.goals.includes("longevity")) omegaWhy.push({ label: "Goal", value: "Cellular health" });
+  if (context.goals.includes("longevity")) omegaWhy.push({ label: "Goal", value: "Healthy ageing" });
   if (cardio.level && cardio.level !== "Low") omegaWhy.push({ label: "Cardiovascular stress", value: cardio.level });
   if (omegaWhy.length) {
     const cautions: string[] = [];

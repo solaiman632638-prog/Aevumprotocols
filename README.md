@@ -17,10 +17,10 @@ Next.js 16 · TypeScript · Tailwind v4. No component library.
 
 ```
 /                      Home
-/today                 Daily scores + recommendations (wearable or manual check-in)
-/plan                  Intake: goals, risk, flags
-/plan/results          Matched peptides + supplements + syringe math
-/monitor               Whoop / Google Fit (demo feed without API keys)
+/today                 Daily check-in, scores, recommendations, and history
+/account               Optional sign-in and sync; export and delete data
+/privacy, /terms       Legal pages (review with a lawyer before relying on them)
+/monitor               Devices: optional Whoop (live with keys) / Google Fit (demo)
 /peptides              Library: every Pepipedia monograph (no doses)
 /peptides/[slug]       Monograph + link to worksheet when stocked
 /protocols             Register: 20 NovaEvum worksheets + 23 protocol-only compounds
@@ -42,3 +42,21 @@ medical advice. Compound science is paraphrased from
 their public `/api/getAllPeptides` and `/api/getPeptide` endpoints, 2026-09-21).
 Status, evidence, and side-effect fields are theirs; summary, mechanism, and
 safety text is paraphrased.
+
+## Accounts and sync (optional)
+
+Everything works without accounts; data stays in the browser. To switch on
+sign-in and cross-device sync:
+
+1. Create a Supabase project (Vercel → Storage → Supabase sets the
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` variables).
+2. Run `supabase/schema.sql` in the Supabase SQL editor.
+3. Supabase → Authentication → URL configuration: set the Site URL to the
+   production domain and add `https://<domain>/account` as a redirect URL.
+4. Redeploy.
+
+## Live Whoop data
+
+Set `WHOOP_CLIENT_ID` and `WHOOP_CLIENT_SECRET` from developer.whoop.com and
+register `https://<domain>/api/wearables/whoop/callback` as the redirect URL.
+Without them, Devices shows a demo feed.

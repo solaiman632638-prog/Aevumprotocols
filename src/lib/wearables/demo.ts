@@ -7,6 +7,17 @@ export type DaySample = {
   strain: number;
 };
 
+/** One day from a live device feed; any field can be missing. */
+export type LiveDay = {
+  date: string;
+  recovery?: number;
+  hrv?: number;
+  rhr?: number;
+  sleepHours?: number;
+  strain?: number;
+  respRate?: number;
+};
+
 export type WearableSnapshot = {
   source: "whoop" | "google-fit" | "demo";
   label: string;
@@ -69,25 +80,13 @@ export function snapshotFor(
   return data;
 }
 
-export function latest(snapshot: WearableSnapshot): DaySample {
-  return snapshot.days[snapshot.days.length - 1];
-}
 
 export function recoveryAdvice(recovery: number): { tone: "hold" | "steady" | "green"; text: string } {
   if (recovery < 34) {
-    return {
-      tone: "hold",
-      text: "Hard recovery day. Skip extra pulses and extra stacks. Do not double tomorrow.",
-    };
+    return { tone: "hold", text: "Low recovery. Keep today easy: a walk, mobility, and an early night." };
   }
   if (recovery < 67) {
-    return {
-      tone: "steady",
-      text: "Ordinary recovery. Run the matched worksheet as written. Do not add a fourth vial.",
-    };
+    return { tone: "steady", text: "Moderate recovery. Train as planned, but keep the intensity in check." };
   }
-  return {
-    tone: "green",
-    text: "Recovery is high. That is not a reason to raise amounts. Keep the plan you already matched.",
-  };
+  return { tone: "green", text: "High recovery. A good day for your hardest planned session." };
 }

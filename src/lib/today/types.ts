@@ -49,6 +49,8 @@ export type UserContext = {
 export type DayState = {
   date: string;
   source: "wearable" | "manual";
+  /** ISO timestamp of the last local edit; sync keeps the newer copy. */
+  updatedAt?: string;
   /** Wearable-computed recovery, 0–100, when the device supplies one. */
   recovery?: number;
   hrv?: number;

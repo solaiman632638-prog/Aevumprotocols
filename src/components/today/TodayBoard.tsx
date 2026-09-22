@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { CheckinForm } from "@/components/today/CheckinForm";
+import { DailyReminder } from "@/components/today/DailyReminder";
 import { Dashboard } from "@/components/today/Dashboard";
+import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
 import { WEARABLE_KEY, type WearableState } from "@/lib/plan/storage";
 import { buildReport, type CompoundSource } from "@/lib/today/engine";
@@ -18,7 +20,7 @@ import {
   type DataSource,
 } from "@/lib/today/storage";
 import type { DayState, UserContext } from "@/lib/today/types";
-import { snapshotFor } from "@/lib/wearables/demo";
+import { useDeviceDays } from "@/lib/wearables/useDeviceDays";
 
 function useStored<T>(key: string): T | null {
   const raw = useSyncExternalStore(subscribe, () => readRaw(key), () => null);
@@ -48,6 +50,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   const storedSource = useStored<DataSource>(keys.source);
   const wearable = useStored<WearableState>(WEARABLE_KEY);
   const [editing, setEditing] = useState<"profile" | "checkin" | null>(null);
+  const [view, setView] = useState<"today" | "history">("today");
 
   const date = hydrated ? todayIso() : "";
   const source: DataSource = storedSource ?? (wearable ? "wearable" : "manual");
@@ -57,20 +60,23 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
     [checkinMap],
   );
 
-  // Straps do not weigh you: weights logged in manual check-ins fill the gap.
+  const feed = useDeviceDays(wearable);
+
+  // Devices do not weigh you: weights logged in manual check-ins fill the gap.
   const wearableDays = useMemo<DayState[] | null>(() => {
-    if (!wearable) return null;
-    return snapshotFor(wearable.provider).days.map((day) => ({
+    if (!feed) return null;
+    return feed.days.map((day) => ({
       date: day.date,
       source: "wearable",
       recovery: day.recovery,
       hrv: day.hrv,
       rhr: day.rhr,
-      sleepHours: Math.round(day.sleepHours * 10) / 10,
+      respRate: day.respRate,
+      sleepHours: day.sleepHours != null ? Math.round(day.sleepHours * 10) / 10 : undefined,
       strain: day.strain,
       weightKg: checkinMap?.[day.date]?.weightKg,
     }));
-  }, [wearable, checkinMap]);
+  }, [feed, checkinMap]);
 
   const history = source === "wearable" ? wearableDays : checkins;
   const checkedInToday = checkins.at(-1)?.date === date;
@@ -100,13 +106,28 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
   const sourceLabel =
     source === "wearable"
-      ? wearable
-        ? snapshotFor(wearable.provider).label
+      ? feed
+        ? feed.label
         : "No device connected"
       : `Manual check-in · ${checkins.length} day${checkins.length === 1 ? "" : "s"} logged`;
 
   return (
     <div className="space-y-10">
+      <div className="flex gap-2" role="tablist" aria-label="Today or history">
+        {(["today", "history"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={view === tab}
+            onClick={() => setView(tab)}
+            className={`font-display text-2xl font-light tracking-[-0.02em] sm:text-3xl ${view === tab ? "text-ink underline decoration-pine decoration-2 underline-offset-8" : "text-mute hover:text-ink"} px-1`}
+          >
+            {tab === "today" ? "Today" : "History"}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-col gap-4 rounded-3xl border border-rule bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Data source">
           <SourceButton active={source === "manual"} onClick={() => saveSource("manual")}>
@@ -129,7 +150,19 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
         </div>
       </div>
 
-      {source === "wearable" && !wearable ? (
+      {view === "history" ? (
+        history && history.length > 0 || source === "manual" ? (
+          <HistoryPanel
+            profile={profile}
+            history={history ?? []}
+            today={date}
+            manual={source === "manual"}
+            onSaveDay={saveCheckin}
+          />
+        ) : (
+          <p className="text-mute">Connect a device or switch to manual check-in to build a history.</p>
+        )
+      ) : source === "wearable" && !wearable ? (
         <div className="rounded-3xl border border-rule bg-sheet p-6 sm:p-8">
           <h2 className="font-display text-3xl font-light tracking-[-0.03em]">No device connected</h2>
           <p className="mt-2 max-w-prose text-mute">
@@ -157,7 +190,10 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           onCancel={checkedInToday ? () => setEditing(null) : undefined}
         />
       ) : report ? (
-        <Dashboard report={report} />
+        <>
+          <Dashboard report={report} />
+          <DailyReminder />
+        </>
       ) : null}
     </div>
   );

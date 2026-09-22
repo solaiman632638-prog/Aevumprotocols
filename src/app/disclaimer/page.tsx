@@ -12,9 +12,9 @@ export default function DisclaimerPage() {
       </h1>
       <div className="mt-6 max-w-prose space-y-4">
         <p>
-          Aevum Protocols publishes educational reconstitution worksheets,
-          a goal-and-risk matcher, and optional heart-rate overlays for compounds
-          listed on the NovaEvum catalog. Nothing on this site is medical advice,
+          Aevum publishes educational health information, daily recovery and
+          sleep scores, and reference material on research compounds. Nothing on
+          this site is medical advice,
           a diagnosis, a prescription, or an instruction to use any substance in
           or on a person or animal.
         </p>

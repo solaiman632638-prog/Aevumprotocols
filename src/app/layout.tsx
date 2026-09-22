@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Figtree, IBM_Plex_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { SyncBridge } from "@/components/sync/SyncBridge";
 import "./globals.css";
 
 const sans = Figtree({
@@ -17,14 +19,20 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aevum Protocols",
-    template: "%s · Aevum Protocols",
+    default: "Aevum · Recovery, sleep, and goals",
+    template: "%s · Aevum",
   },
   description:
-    "Peptide protocols, reconstitution math, a 173-peptide research library, and a daily recovery readout.",
+    "Set your goals, log a thirty-second morning check-in, and get daily recovery, sleep, and training guidance. Plus evidence on 173 research compounds.",
+  appleWebApp: { capable: true, title: "Aevum", statusBarStyle: "black-translucent" },
   icons: {
     icon: "/favicon.svg",
+    apple: "/app-icon/180",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -35,6 +43,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col font-sans">
         <SiteShell>{children}</SiteShell>
+        <SyncBridge />
+        <Analytics />
       </body>
     </html>
   );

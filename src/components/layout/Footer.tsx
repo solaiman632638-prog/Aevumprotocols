@@ -12,9 +12,12 @@ export function Footer() {
           </Link>
           .
         </p>
-        <p className="text-xs text-mute">
-          Aevum Protocols
-        </p>
+        <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-mute">
+          <Link href="/privacy" className="text-mute no-underline hover:text-ink">Privacy</Link>
+          <Link href="/terms" className="text-mute no-underline hover:text-ink">Terms</Link>
+          <Link href="/account" className="text-mute no-underline hover:text-ink">Account</Link>
+          <span>Aevum</span>
+        </nav>
       </div>
     </footer>
   );
