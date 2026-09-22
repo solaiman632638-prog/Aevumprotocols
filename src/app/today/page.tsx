@@ -44,8 +44,7 @@ export default function TodayPage() {
       <p className="mt-4 max-w-2xl text-mute">
         Log how you slept and how you feel in thirty seconds, and get
         recovery, sleep, and readiness scores plus a plan for your goals.
-        Have a heart rate monitor? Connect it for extra detail. Every
-        recommendation shows the data behind it.
+        Every recommendation shows the data behind it.
       </p>
       <p className="mt-4 max-w-2xl rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
         Educational, not medical advice. Compound information is never a

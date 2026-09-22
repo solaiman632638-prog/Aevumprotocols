@@ -35,7 +35,7 @@ const pillars = [
     metric: "Recovery",
     measure: "Daily score · 0–100",
     color: "var(--color-recovery)",
-    body: "How ready you are for a hard day, from your sleep and how you feel. Add resting heart rate or HRV if you track them.",
+    body: "How ready you are for a hard day, from your sleep and how you feel.",
   },
   {
     metric: "Sleep",
@@ -68,7 +68,7 @@ const steps = [
   },
   {
     title: "Log your morning",
-    body: "Sleep, energy, soreness, stress, and weight. Thirty seconds, no device needed. Connect a heart rate monitor later if you want.",
+    body: "Sleep, energy, soreness, stress, and weight. Thirty seconds, no device needed.",
   },
   {
     title: "Get today's plan",
@@ -286,7 +286,7 @@ export default function Home() {
             <p className="mt-8 max-w-md text-lg text-mute">
               No black box. Tap &ldquo;Why am I seeing this?&rdquo; on any score
               or recommendation and see exactly which of your answers moved it,
-              and by how much. Add heart-rate data and it shows up here too.
+              and by how much.
             </p>
           </Reveal>
           <Reveal delay={150}>

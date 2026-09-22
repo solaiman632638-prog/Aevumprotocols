@@ -21,6 +21,7 @@ import {
   type DataSource,
 } from "@/lib/today/storage";
 import type { DayState, UserContext } from "@/lib/today/types";
+import { site } from "@/lib/site";
 import { useDeviceDays } from "@/lib/wearables/useDeviceDays";
 
 function useStored<T>(key: string): T | null {
@@ -54,7 +55,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   const [view, setView] = useState<"today" | "history">("today");
 
   const date = hydrated ? todayIso() : "";
-  const source: DataSource = storedSource ?? (wearable ? "wearable" : "manual");
+  const source: DataSource = site.devicesEnabled ? storedSource ?? (wearable ? "wearable" : "manual") : "manual";
 
   const checkins = useMemo(
     () => Object.values(checkinMap ?? {}).sort((a, b) => a.date.localeCompare(b.date)),
@@ -131,12 +132,16 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
       <div className="flex flex-col gap-4 rounded-3xl border border-rule bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Data source">
+          {site.devicesEnabled ? (
+            <>
           <SourceButton active={source === "manual"} onClick={() => saveSource("manual")}>
             Manual check-in
           </SourceButton>
           <SourceButton active={source === "wearable"} onClick={() => saveSource("wearable")}>
             Device
           </SourceButton>
+            </>
+          ) : null}
           <span className="px-2 text-sm text-mute">{sourceLabel}</span>
         </div>
         <div className="flex flex-wrap gap-2">

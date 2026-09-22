@@ -49,7 +49,8 @@ export default function PrivacyPage() {
       <section>
         <h2>Connected devices</h2>
         <p>
-          If you choose to connect a device such as WHOOP, you sign in with that
+          Device connections are coming soon. When available, if you choose to
+          connect a device such as WHOOP, you sign in with that
           company and grant read access to your recovery, sleep, and training
           data. We keep the access token in a secure, browser-only cookie and
           fetch your data when you open Today. We do not store that data on our
