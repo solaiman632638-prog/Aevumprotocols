@@ -93,16 +93,7 @@ export function CheckinForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-8 rounded-3xl border border-rule bg-sheet p-5 sm:p-8" noValidate>
-      <div>
-        <p className="eyebrow">Check-in · {date}</p>
-        <h2 className="mt-2 font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl">How did you wake up?</h2>
-        <p className="mt-2 max-w-prose text-sm text-mute">
-          How you slept, how you feel, and the peptides you took. Check in
-          daily and your scores and dose guidance build from your own history.
-        </p>
-      </div>
-
+    <form onSubmit={submit} aria-label={`Check-in for ${date}`} className="space-y-8 rounded-3xl border border-rule bg-sheet p-5 sm:p-8" noValidate>
       <div className="max-w-xs">
         <label htmlFor="c-sleep" className="mb-1.5 block text-sm">Hours slept last night</label>
         <input id="c-sleep" inputMode="decimal" value={sleepHours} onChange={(e) => setSleepHours(e.target.value)} placeholder="7.5" className={field} />
