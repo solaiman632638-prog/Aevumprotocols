@@ -9,6 +9,7 @@ import {
   urgentSymptoms,
   type CompoundModel,
 } from "@/lib/peptides/catalog";
+import { bestMatch, phrases } from "@/lib/aevum-ai/match";
 
 /**
  * Retrieval over Aevum's own register. The model is never given database
@@ -37,16 +38,25 @@ const EVIDENCE_QUALITY: Record<CompoundModel["evidence"], string> = {
   community: "No reliable human evidence located",
 };
 
-/** Matches a free-text compound name against the register. */
+/**
+ * Matches free text against the register, forgiving the spelling people
+ * actually type: "tesamorline" and "Tesamorelin" reach the same compound,
+ * while a name that is genuinely absent still misses.
+ */
 export function findCompound(name: string): CompoundModel | undefined {
-  const needle = name.trim().toLowerCase();
-  if (!needle) return undefined;
-  return (
-    getCompound(needle) ??
-    compounds.find((model) => model.name.toLowerCase() === needle) ??
-    compounds.find((model) => model.name.toLowerCase().includes(needle)) ??
-    compounds.find((model) => needle.includes(model.name.toLowerCase()))
-  );
+  const bySlug = getCompound(name.trim().toLowerCase());
+  if (bySlug) return bySlug;
+  return bestMatch(name, compounds, (model) => [model.name, model.slug]) ?? undefined;
+}
+
+/** Every compound a sentence names, however it is spelled. */
+export function compoundsInText(text: string): CompoundModel[] {
+  const found = new Map<string, CompoundModel>();
+  for (const phrase of phrases(text)) {
+    const model = findCompound(phrase);
+    if (model) found.set(model.slug, model);
+  }
+  return [...found.values()];
 }
 
 export function getCompoundProfile(name: string): CompoundProfile | null {

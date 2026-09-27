@@ -8,6 +8,7 @@ import {
   describeExposure,
 } from "../src/lib/regimen/calculations.ts";
 import { detectRedFlags } from "../src/lib/health/red-flags.ts";
+import { bestMatch, normalise, phrases, tolerance } from "../src/lib/aevum-ai/match.ts";
 import { aevumAnswerSchema } from "../src/lib/aevum-ai/schema.ts";
 import { checkRateLimit, resetRateLimits } from "../src/lib/aevum-ai/rate-limit.ts";
 
@@ -120,4 +121,47 @@ test("rate limiting cuts in and is per key", () => {
   for (let i = 0; i < 12; i++) assert.equal(checkRateLimit("a").ok, true);
   assert.equal(checkRateLimit("a").ok, false);
   assert.equal(checkRateLimit("b").ok, true);
+});
+
+// The register names the matcher has to cope with in practice.
+const NAMES = ["Tesamorelin", "Ipamorelin", "Semaglutide", "BPC-157", "TB-500", "GHK-Cu", "Sermorelin", "Retatrutide"];
+const match = (text: string) => bestMatch(text, NAMES, (name) => [name]);
+
+test("a misspelled compound still resolves", () => {
+  assert.equal(match("tesamorline"), "Tesamorelin");
+  assert.equal(match("Tesamorelin"), "Tesamorelin");
+  assert.equal(match("semaglutid"), "Semaglutide");
+  assert.equal(match("ipamorelan"), "Ipamorelin");
+});
+
+test("spacing and punctuation do not matter", () => {
+  assert.equal(match("BPC 157"), "BPC-157");
+  assert.equal(match("bpc157"), "BPC-157");
+  assert.equal(match("ghk cu"), "GHK-Cu");
+});
+
+test("near-identical names are not confused with each other", () => {
+  assert.equal(match("sermorelin"), "Sermorelin");
+  assert.equal(match("tesamorelin"), "Tesamorelin");
+});
+
+test("a name that is genuinely absent still misses", () => {
+  assert.equal(match("aspirin"), null);
+  assert.equal(match("xyzzy"), null);
+  assert.equal(match("ib"), null);
+});
+
+test("names are picked out of a sentence", () => {
+  const found = phrases("what does tesamorline do and how does it compare to ipamorelin")
+    .map(match)
+    .filter(Boolean);
+  assert.ok(found.includes("Tesamorelin"));
+  assert.ok(found.includes("Ipamorelin"));
+});
+
+test("tolerance grows with the length of the name", () => {
+  assert.equal(tolerance(4), 0);
+  assert.equal(tolerance(7), 1);
+  assert.equal(tolerance(11), 2);
+  assert.equal(normalise("BPC-157"), "bpc157");
 });

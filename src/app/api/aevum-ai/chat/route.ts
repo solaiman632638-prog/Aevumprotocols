@@ -3,10 +3,10 @@ import { z } from "zod";
 import { MAX_MESSAGE_CHARS, MAX_OUTPUT_TOKENS, modelFor } from "@/lib/ai/model-config";
 import { aevumAnswerSchema, fallbackAnswer, type AevumAnswer } from "@/lib/aevum-ai/schema";
 import {
+  compoundsInText,
   getCompoundProfile,
   getPairings,
   getReferenceRegimens,
-  registerNames,
   symptomVocabulary,
 } from "@/lib/aevum-ai/evidence";
 import { checkRateLimit } from "@/lib/aevum-ai/rate-limit";
@@ -36,12 +36,14 @@ const bodySchema = z.object({
     .optional(),
 });
 
-/** Compound names the question mentions, matched against the register. */
+/**
+ * Compounds the question is about: whatever the text names, however it is
+ * spelled, plus whatever the person is already running.
+ */
 function mentionedCompounds(message: string, regimen: RegimenEntry[]): string[] {
-  const lower = message.toLowerCase();
-  const hits = registerNames().filter((name) => lower.includes(name.toLowerCase()));
+  const fromText = compoundsInText(message).map((model) => model.name);
   const fromRegimen = regimen.map((entry) => entry.compound);
-  return [...new Set([...hits, ...fromRegimen])].slice(0, 6);
+  return [...new Set([...fromText, ...fromRegimen])].slice(0, 6);
 }
 
 export async function POST(request: Request) {
