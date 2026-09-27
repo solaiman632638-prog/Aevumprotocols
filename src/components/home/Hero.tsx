@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
+import { ReactiveGrid } from "@/components/home/ReactiveGrid";
 
 /**
  * The headline drifts up and dims as the page moves under it, with the
@@ -28,15 +29,7 @@ export function Hero({ compounds }: { compounds: number }) {
           style={{ y: gridY, opacity: gridOpacity }}
           className="pointer-events-none absolute inset-0 -z-10"
         >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, rgba(232,237,242,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(232,237,242,0.05) 1px, transparent 1px)",
-              backgroundSize: "6rem 6rem",
-              maskImage: "radial-gradient(ellipse 75% 60% at 50% 35%, #000 30%, transparent 78%)",
-            }}
-          />
+          <ReactiveGrid />
           <motion.div
             style={{ y: sweepY }}
             className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,transparent,rgba(232,237,242,0.35),transparent)]"
