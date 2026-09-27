@@ -115,13 +115,37 @@ export async function POST(request: Request) {
     if (error instanceof MissingKeyError) {
       return NextResponse.json({ error: "Aevum AI is not configured on this deployment." }, { status: 503 });
     }
-    // Never surface the provider's error text.
-    console.error("aevum-ai: request failed");
-    return NextResponse.json(
-      { error: "Aevum AI couldn't complete this analysis. Please try again." },
-      { status: 502 },
-    );
+    return NextResponse.json(describeFailure(error), { status: 502 });
   }
+}
+
+/**
+ * Turns a provider failure into something actionable without leaking its
+ * text. The status and code are logged for the deployment's own logs; the
+ * browser gets a plain sentence and, where it helps, what to check.
+ */
+function describeFailure(error: unknown): { error: string; reason?: string } {
+  const status = (error as { status?: number })?.status;
+  const code = (error as { code?: string })?.code;
+  console.error(`aevum-ai: provider failed status=${status ?? "none"} code=${code ?? "none"}`);
+
+  if (status === 401) return { error: "Aevum AI could not authenticate.", reason: "The API key was rejected." };
+  if (status === 404) {
+    return {
+      error: "Aevum AI could not reach that model.",
+      reason: "The configured model name was not found on this account. Check OPENAI_MODEL.",
+    };
+  }
+  if (status === 429) {
+    return {
+      error: "Aevum AI is out of capacity right now.",
+      reason: "The account is rate limited or out of credit.",
+    };
+  }
+  if (status === 400) {
+    return { error: "Aevum AI could not complete this analysis.", reason: "The request was rejected by the model." };
+  }
+  return { error: "Aevum AI couldn't complete this analysis. Please try again." };
 }
 
 type Client = ReturnType<typeof openaiClient>;
