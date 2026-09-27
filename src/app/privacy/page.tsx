@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Contact, LegalPage } from "@/components/legal/LegalPage";
 import { site } from "@/lib/site";
 
@@ -7,8 +6,6 @@ export const metadata: Metadata = {
   title: "Privacy policy",
   description: "What Aevum collects, where it is stored, and how to delete it.",
 };
-
-const link = "text-pine-deep underline decoration-rule underline-offset-2";
 
 export default function PrivacyPage() {
   return (
@@ -19,7 +16,7 @@ export default function PrivacyPage() {
           <li>Without an account, everything you enter stays in your browser. We never receive it.</li>
           <li>With an account, your profile and check-ins are stored so they sync across your devices.</li>
           <li>We do not sell your data, show ads, or share it for marketing.</li>
-          <li>You can delete your synced data at any time from the <Link href="/account" className={link}>Account</Link> page.</li>
+          <li>You can ask us to export or delete your data at any time, and we will.</li>
         </ul>
       </section>
 
@@ -70,9 +67,9 @@ export default function PrivacyPage() {
         <h2>Your rights</h2>
         <p>
           You can see, correct, export, or delete your information. Local data is
-          yours to clear in your browser. Synced data can be deleted from the
-          Account page, or by contacting us. We keep synced data until you delete
-          it or close your account.
+          yours to clear in your browser at any time. For synced data, email us
+          at the address below and we will export or delete it. We keep synced
+          data until you ask us to remove it or you close your account.
         </p>
       </section>
 

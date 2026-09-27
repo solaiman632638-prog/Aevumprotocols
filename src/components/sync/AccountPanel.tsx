@@ -5,9 +5,8 @@ import { useState } from "react";
 import { AuthFlow } from "@/components/sync/AuthFlow";
 import { syncClient } from "@/lib/sync/client";
 import { friendly, MIN_PASSWORD } from "@/lib/sync/errors";
-import { deleteAccount, syncNow } from "@/lib/sync/sync";
+import { syncNow } from "@/lib/sync/sync";
 import { useSession } from "@/lib/sync/useSession";
-import { clearLocalData, loadCheckinMap, loadProfile } from "@/lib/today/storage";
 
 type Status = { tone: "ok" | "error"; text: string } | null;
 type Mode = "signup" | "login" | "link" | "reset";
@@ -16,16 +15,6 @@ const field = "w-full rounded-xl border border-rule bg-paper px-3 py-2.5 text-sm
 const card = "rounded-3xl border border-rule bg-sheet p-6 sm:p-8";
 const textLink = "text-pine-deep underline decoration-rule underline-offset-2";
 
-function downloadExport() {
-  const payload = { exportedAt: new Date().toISOString(), profile: loadProfile(), checkins: loadCheckinMap() };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "aevum-data.json";
-  link.click();
-  URL.revokeObjectURL(link.href);
-}
-
 export function AccountPanel() {
   const session = useSession();
   const [mode, setMode] = useState<Mode>("signup");
@@ -33,7 +22,6 @@ export function AccountPanel() {
   const [newPassword, setNewPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
-  const [confirm, setConfirm] = useState<"account" | "local" | null>(null);
 
   const redirectTo = () => `${window.location.origin}/account`;
 
@@ -87,14 +75,6 @@ export function AccountPanel() {
     setStatus({ tone: "ok", text: "Signed out. Your data on this device is still here." });
   }
 
-  async function removeAccount() {
-    setBusy(true);
-    const result = await deleteAccount();
-    setBusy(false);
-    setConfirm(null);
-    setStatus(result.ok ? { tone: "ok", text: "Account and synced data deleted." } : { tone: "error", text: result.message ?? "Could not delete." });
-  }
-
   if (!session.ready) return <p className="text-mute">Loading…</p>;
 
   return (
@@ -103,8 +83,8 @@ export function AccountPanel() {
         <section className={card}>
           <h2 className="font-display text-3xl font-light tracking-[-0.03em]">Accounts are coming soon</h2>
           <p className="mt-3 max-w-prose text-mute">
-            For now everything you enter is saved in this browser only. Use the
-            export below to keep a copy.
+            For now everything you enter is saved in this browser only, and
+            never leaves this device.
           </p>
         </section>
       ) : session.email && session.recovering ? (
@@ -185,50 +165,6 @@ export function AccountPanel() {
         </p>
       ) : null}
 
-      <section className={card}>
-        <h2 className="font-display text-2xl font-light tracking-[-0.02em]">Your data</h2>
-        <p className="mt-2 max-w-prose text-sm text-mute">
-          See what is stored and remove it whenever you like. Details are in the{" "}
-          <Link href="/privacy" className={textLink}>privacy policy</Link>.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={downloadExport} className="btn-secondary">Download my data</button>
-          <button type="button" onClick={() => setConfirm("local")} className="btn-secondary">Clear this device</button>
-          {session.email ? (
-            <button type="button" onClick={() => setConfirm("account")} className="btn-secondary !border-warn/40 !text-warn">
-              Delete account
-            </button>
-          ) : null}
-        </div>
-
-        {confirm ? (
-          <div className="mt-5 rounded-2xl border border-warn/30 bg-warn-tint p-4 text-warn" role="alert">
-            <p>
-              {confirm === "account"
-                ? "This permanently deletes your account and every synced profile and check-in. Data on this device stays until you clear it."
-                : "This removes your profile and check-ins from this browser. Anything synced to your account is kept."}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  if (confirm === "account") void removeAccount();
-                  else {
-                    clearLocalData();
-                    setConfirm(null);
-                    setStatus({ tone: "ok", text: "This device is cleared." });
-                  }
-                }}
-                className="btn-primary !bg-warn hover:!bg-warn/80 disabled:opacity-50"
-              >
-                {confirm === "account" ? "Delete everything" : "Clear this device"}
-              </button>
-              <button type="button" onClick={() => setConfirm(null)} className="btn-secondary">Cancel</button>
-            </div>
-          </div>
-        ) : null}
-      </section>
     </div>
   );
 }
