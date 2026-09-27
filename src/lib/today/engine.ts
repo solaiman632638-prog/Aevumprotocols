@@ -534,6 +534,7 @@ function compounds(context: UserContext, pool: CompoundSource[]): { cards: Compo
       .filter((entry) => !(context.tolerance !== "open" && entry.status === "investigational" && entry.researchScore < 60))
       .filter((entry) => !(cancer && GROWTH_AXIS.has(entry.slug)))
       .filter((entry) => !(heart && (GLP1.has(entry.slug) || entry.slug === "pt-141")))
+      // Best evidenced first: research score is the library's evidence grade.
       .sort((a, b) => b.researchScore - a.researchScore)
       .slice(0, 2);
 

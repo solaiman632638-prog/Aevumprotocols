@@ -3,6 +3,7 @@ import { AddEvaluator } from "@/components/peptides/AddEvaluator";
 import { BodyMap } from "@/components/peptides/BodyMap";
 import { Why } from "@/components/today/Dashboard";
 import { siteLabel } from "@/lib/peptides/catalog";
+import type { RiskTier } from "@/lib/peptides/catalog";
 import type { GuidanceStatus, PeptideReport } from "@/lib/peptides/engine";
 import type { UserContext } from "@/lib/today/types";
 
@@ -28,6 +29,13 @@ const interactionTone = {
   warning: "border-warn/40 bg-warn-tint text-warn",
   caution: "border-[color:var(--color-strain)]/50 text-ink",
   info: "border-rule text-mute",
+};
+
+const tierTone: Record<RiskTier, string> = {
+  "Best evidenced": "border-recovery/60 text-brass",
+  "Reasonable evidence": "border-rule text-mute",
+  "Limited evidence": "border-[color:var(--color-strain)]/60 text-[color:var(--color-strain)]",
+  "Most uncertain": "border-warn/60 text-warn",
 };
 
 const levelTone: Record<string, string> = {
@@ -131,6 +139,12 @@ export function PeptidePanel({
       ) : null}
 
       {report.guidance.length > 0 ? (
+        <>
+        <p className="text-sm text-mute">
+          Ordered by evidence: best-evidenced with the fewest known hazards
+          first, most uncertain last. That order ranks how much is known, not
+          how safe anything is.
+        </p>
         <ul className="grid gap-4 lg:grid-cols-2">
           {report.guidance.map((item) => {
             const style = statusStyle[item.status];
@@ -151,6 +165,12 @@ export function PeptidePanel({
                   <Stat label="Reference exposure" value={item.reference} small />
                   <Stat label="Evidence" value={evidenceLabel[item.evidence]} small />
                 </dl>
+                <p className="mt-3 text-xs text-mute">
+                  <span className={`mr-2 rounded-full border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] ${tierTone[item.risk.tier]}`}>
+                    {item.risk.tier}
+                  </span>
+                  {item.risk.reasons.slice(0, 2).join(". ")}.
+                </p>
                 <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-4">
                   <Link href={`/peptides/${item.slug}`} className="text-sm text-pine-deep no-underline hover:underline">
                     Research and protocol →
@@ -161,6 +181,7 @@ export function PeptidePanel({
             );
           })}
         </ul>
+        </>
       ) : report.withheld ? null : (
         <p className="rounded-3xl border border-rule bg-sheet px-5 py-4 text-mute">No peptides logged in the last week.</p>
       )}

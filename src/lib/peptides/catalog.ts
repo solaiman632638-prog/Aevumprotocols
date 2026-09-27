@@ -193,3 +193,68 @@ export const symptoms = [
 ] as const;
 
 export type SymptomId = (typeof symptoms)[number]["id"];
+
+// ── Risk ranking ─────────────────────────────────────────────────────────
+
+export type RiskTier = "Best evidenced" | "Reasonable evidence" | "Limited evidence" | "Most uncertain";
+
+export type RiskProfile = {
+  /** Lower is better evidenced with fewer known hazards. */
+  score: number;
+  tier: RiskTier;
+  reasons: string[];
+};
+
+const HAZARDS: { cls: string; weight: number; reason: string }[] = [
+  { cls: "igf", weight: 3, reason: "Lowers blood sugar; hypoglycaemia risk" },
+  { cls: "melanocortin", weight: 2, reason: "Nausea, flushing, blood-pressure effects; can darken moles" },
+  { cls: "glp1", weight: 2, reason: "GI effects, gallbladder risk, thyroid C-cell warning in the class" },
+  { cls: "growth-signal", weight: 2, reason: "Promotes growth signalling; unsuitable with a cancer history" },
+  { cls: "copper", weight: 1, reason: "Copper load and injection-site irritation" },
+];
+
+/**
+ * Ranks a compound by how well its human evidence is established and which
+ * hazards are known. It is an evidence ranking, not a safety guarantee: a
+ * low score means less uncertainty, not that a compound is safe.
+ */
+export function riskProfile(model: CompoundModel): RiskProfile {
+  const reasons: string[] = [];
+  let score = 0;
+
+  if (model.evidence === "clinical") {
+    reasons.push("Approved human dosing exists");
+  } else if (model.evidence === "trial") {
+    score += 3;
+    reasons.push("Human trials only, no approved use");
+    } else {
+    score += 5;
+    reasons.push("No established human dosing");
+  }
+
+  const combination = model.combinationEvidence ?? "limited";
+  if (combination === "limited") score += 1;
+  if (combination === "none") {
+    score += 2;
+    reasons.push("No human data on combining it with other compounds");
+  }
+
+  for (const hazard of HAZARDS) {
+    if (model.classes.includes(hazard.cls as never)) {
+      score += hazard.weight;
+      reasons.push(hazard.reason);
+    }
+  }
+
+  if (model.components) {
+    score += 1;
+    reasons.push("A blend: several actives in a fixed ratio you cannot adjust");
+  }
+  if (!model.cycleDays && model.evidence === "community") {
+    score += 1;
+    reasons.push("No researched run length to bound continuous use");
+  }
+
+  const tier: RiskTier = score <= 2 ? "Best evidenced" : score <= 5 ? "Reasonable evidence" : score <= 8 ? "Limited evidence" : "Most uncertain";
+  return { score, tier, reasons };
+}

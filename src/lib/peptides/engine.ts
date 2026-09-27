@@ -3,9 +3,11 @@ import {
   getCompound,
   sites,
   symptoms,
+  riskProfile,
   toUnit,
   urgentSymptoms,
   type CompoundModel,
+  type RiskProfile,
   type SiteId,
 } from "./catalog";
 import type { DayState, Driver, Reaction, UserContext } from "../today/types";
@@ -42,6 +44,7 @@ export type Guidance = {
   /** Reference exposure from research, shown separately from any recommendation. */
   reference: string;
   evidence: CompoundModel["evidence"];
+  risk: RiskProfile;
   why: Driver[];
 };
 
@@ -77,6 +80,9 @@ export type AdditionReview = {
   overlap: "Low" | "Moderate" | "High";
   combinationEvidence: "Some" | "Limited" | "None identified";
   addedComplexity: "Low" | "Moderate" | "High";
+  risk: RiskProfile;
+  /** Compounds for the same goals with better evidence and fewer known hazards. */
+  betterEvidenced: { slug: string; name: string; tier: string }[];
   recommendation: string;
   reasons: string[];
 };
@@ -186,12 +192,14 @@ function guidanceFor(
   const last = doses[doses.length - 1];
   const current = last.amount;
   const unit = model.unit;
+  const risk = riskProfile(model);
   const base = {
     slug: model.slug,
     name: model.name,
     current: `${fmt(current)} ${unit}`,
     reference: referenceText(model),
     evidence: model.evidence,
+    risk,
   };
   const start = runStart(doses);
   const onCycle = days(start, today) + 1;
@@ -202,6 +210,7 @@ function guidanceFor(
     { label: referenceText(model), value: `max reported ${fmt(model.max)} ${unit}` },
     { label: "This run", value: `day ${onCycle}`, effect: model.cycleDays ? `research runs about ${model.cycleDays} days` : undefined },
     { label: "Evidence", value: model.evidence === "clinical" ? "Approved dosing" : model.evidence === "trial" ? "Human trials only" : "No established human dosing" },
+    { label: "Evidence ranking", value: risk.tier, effect: risk.reasons[0] },
   ];
 
   if (context.conditions.includes("cancer") && model.classes.includes("growth-signal")) {
@@ -604,7 +613,18 @@ export function evaluateAddition(slug: string, active: CompoundModel[], context:
     ? `Aevum would not add ${candidate.name} now. ${shared.length ? "It covers ground your regimen already covers" : "It adds exposure"} while the evidence for the combination is ${combinationEvidence.toLowerCase()}. More compounds do not reliably produce better outcomes, and each one makes the others harder to assess.`
     : `If you do add ${candidate.name}, add it on its own, change nothing else, and give it enough time to judge before any further change. ${uncertainty[candidate.evidence]}`;
 
-  return { slug: candidate.slug, name: candidate.name, overlap, combinationEvidence, addedComplexity, recommendation, reasons };
+  const risk = riskProfile(candidate);
+  const running = new Set(active.map((model) => model.slug));
+  const betterEvidenced = compounds
+    .filter((model) => !running.has(model.slug) && model.slug !== candidate.slug)
+    .filter((model) => model.classes.some((cls) => candidate.classes.includes(cls)))
+    .map((model) => ({ model, profile: riskProfile(model) }))
+    .filter(({ profile }) => profile.score < risk.score)
+    .sort((a, b) => a.profile.score - b.profile.score)
+    .slice(0, 3)
+    .map(({ model, profile }) => ({ slug: model.slug, name: model.name, tier: profile.tier }));
+
+  return { slug: candidate.slug, name: candidate.name, overlap, combinationEvidence, addedComplexity, risk, betterEvidenced, recommendation, reasons };
 }
 
 // ── Sites ────────────────────────────────────────────────────────────────
@@ -685,7 +705,11 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
   return {
     urgent: null,
     review: withheld ? null : regimenReview(active, all, history_, today),
-    guidance,
+    // Best evidenced and fewest known hazards first; anything needing action leads.
+    guidance: guidance.toSorted((a, b) => {
+      const urgentRank = (status: GuidanceStatus) => (status === "stop" ? 0 : status === "above-researched" ? 1 : 2);
+      return urgentRank(a.status) - urgentRank(b.status) || a.risk.score - b.risk.score;
+    }),
     interactions: found,
     simplifications: withheld ? [] : simplifications(active, all, today, context),
     sites: sites_,
