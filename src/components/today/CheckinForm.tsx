@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PeptideLog } from "@/components/peptides/PeptideLog";
-import type { SiteId } from "@/lib/peptides/catalog";
+import type { SiteId, UrgentSymptomId } from "@/lib/peptides/catalog";
 import type { DayState, DoseEntry, Reaction, UserContext } from "@/lib/today/types";
 
 const LB_PER_KG = 2.20462;
@@ -54,6 +54,7 @@ export function CheckinForm({
   );
   const [doses, setDoses] = useState<DoseEntry[]>(sameDay ? previous?.doses ?? [] : []);
   const [reactions, setReactions] = useState<Reaction[]>(sameDay ? previous?.reactions ?? [] : []);
+  const [urgent, setUrgent] = useState<UrgentSymptomId[]>(sameDay ? previous?.urgent ?? [] : []);
   const [error, setError] = useState<string | null>(null);
 
   function num(value: string, min: number, max: number): number | undefined | null {
@@ -74,7 +75,7 @@ export function CheckinForm({
     if (rawWeight === null) return setError("Weight is out of range.");
     const incomplete = doses.find((dose) => !dose.compound || !(dose.amount > 0));
     if (incomplete) return setError("Each peptide needs a name and an amount, or remove the empty row.");
-    if (hours === undefined && Object.keys(values).length === 0 && doses.length === 0) {
+    if (hours === undefined && Object.keys(values).length === 0 && doses.length === 0 && urgent.length === 0) {
       return setError("Log your sleep, one of the sliders, or a peptide.");
     }
     setError(null);
@@ -89,6 +90,7 @@ export function CheckinForm({
       weightKg: rawWeight === undefined ? undefined : Math.round((imperial ? rawWeight / LB_PER_KG : rawWeight) * 10) / 10,
       doses: doses.length ? doses : undefined,
       reactions: reactions.length ? reactions : undefined,
+      urgent: urgent.length ? urgent : undefined,
     });
   }
 
@@ -147,7 +149,15 @@ export function CheckinForm({
         </div>
       </fieldset>
 
-      <PeptideLog doses={doses} reactions={reactions} onDoses={setDoses} onReactions={setReactions} suggestion={siteSuggestion} />
+      <PeptideLog
+        doses={doses}
+        reactions={reactions}
+        urgent={urgent}
+        onDoses={setDoses}
+        onReactions={setReactions}
+        onUrgent={setUrgent}
+        suggestion={siteSuggestion}
+      />
 
       <details className="rounded-2xl border border-rule px-4 py-3">
         <summary className="cursor-pointer text-sm">Optional: heart rate, HRV, weight</summary>

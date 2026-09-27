@@ -1,7 +1,7 @@
 "use client";
 
 import { BodyMap } from "@/components/peptides/BodyMap";
-import { getCompound, symptoms, type SiteId, type SymptomId } from "@/lib/peptides/catalog";
+import { getCompound, symptoms, urgentSymptoms, type SiteId, type SymptomId, type UrgentSymptomId } from "@/lib/peptides/catalog";
 import type { DoseEntry, Reaction } from "@/lib/today/types";
 
 const groups: { label: string; slugs: string[] }[] = [
@@ -23,14 +23,18 @@ function newDose(): DoseEntry {
 export function PeptideLog({
   doses,
   reactions,
+  urgent,
   onDoses,
   onReactions,
+  onUrgent,
   suggestion,
 }: {
   doses: DoseEntry[];
   reactions: Reaction[];
+  urgent: UrgentSymptomId[];
   onDoses: (doses: DoseEntry[]) => void;
   onReactions: (reactions: Reaction[]) => void;
+  onUrgent: (urgent: UrgentSymptomId[]) => void;
   suggestion?: SiteId;
 }) {
   const update = (id: string, patch: Partial<DoseEntry>) => onDoses(doses.map((dose) => (dose.id === id ? { ...dose, ...patch } : dose)));
@@ -119,6 +123,29 @@ export function PeptideLog({
       <button type="button" onClick={() => onDoses([...doses, newDose()])} className="btn-secondary">
         + Add a peptide
       </button>
+
+      <div className="rounded-2xl border border-warn/40 bg-warn-tint p-4">
+        <p className="text-sm font-medium text-warn">Anything serious today?</p>
+        <p className="mt-1 text-xs text-warn/90">
+          Tap anything you have had. These need medical care, not a dose change.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {urgentSymptoms.map((symptom) => {
+            const on = urgent.includes(symptom.id);
+            return (
+              <button
+                key={symptom.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => onUrgent(on ? urgent.filter((id) => id !== symptom.id) : [...urgent, symptom.id])}
+                className={`min-h-11 rounded-full border px-4 text-sm ${on ? "border-warn bg-warn text-on-accent" : "border-warn/40 text-warn hover:border-warn"}`}
+              >
+                {symptom.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div>
         <p className="text-sm">Side effects today</p>

@@ -71,14 +71,16 @@ export function Dashboard({ report, peptides }: { report: DailyReport; peptides?
       />
 
       <section aria-labelledby="compounds-heading">
-        <p className="eyebrow">Research compounds · educational</p>
+        <p className="eyebrow">Reference · not a suggestion</p>
         <h2 id="compounds-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
-          Being studied for your goals
+          If you are researching options
         </h2>
         <p className="mt-3 max-w-2xl text-mute">
-          Picked from your goals and risk tolerance, never from today&apos;s
-          metrics. No amounts: whether and how much is a decision for you and a
-          clinician. Take the questions with you.
+          Aevum does not suggest adding any of these. They are the compounds
+          studied for your goals, listed so you can read the evidence and the
+          risks before deciding anything. Adding nothing is often the
+          lower-risk answer, and lifestyle changes come first. No amounts here:
+          whether and how much belongs with a clinician.
         </p>
         {report.compoundsWithheld ? (
           <p className="mt-6 rounded-3xl border border-warn/30 bg-warn-tint px-5 py-4 text-warn">
@@ -86,8 +88,9 @@ export function Dashboard({ report, peptides }: { report: DailyReport; peptides?
           </p>
         ) : report.compounds.length === 0 ? (
           <p className="mt-6 rounded-3xl border border-rule bg-sheet px-5 py-4 text-mute">
-            Nothing clears your risk tolerance for these goals. Lifestyle and
-            supplements above are the whole plan.
+            Nothing clears your risk tolerance for these goals. The lifestyle
+            and supplement guidance above is the whole plan, which is a
+            perfectly good place to stay.
           </p>
         ) : (
           <ul className="mt-6 grid gap-4 lg:grid-cols-2">

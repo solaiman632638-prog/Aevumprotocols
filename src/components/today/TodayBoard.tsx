@@ -10,7 +10,7 @@ import { Dashboard } from "@/components/today/Dashboard";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
 import { WEARABLE_KEY, type WearableState } from "@/lib/plan/storage";
-import { peptideReport } from "@/lib/peptides/engine";
+import { activeCompounds, peptideReport } from "@/lib/peptides/engine";
 import { buildReport, type CompoundSource } from "@/lib/today/engine";
 import {
   keys,
@@ -209,7 +209,16 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           <AccountPrompt />
           <Dashboard
             report={report}
-            peptides={peptides ? <PeptidePanel report={peptides} today={date} /> : null}
+            peptides={
+              peptides ? (
+                <PeptidePanel
+                  report={peptides}
+                  today={date}
+                  context={profile}
+                  activeSlugs={activeCompounds(checkins, date).map((model) => model.slug)}
+                />
+              ) : null
+            }
           />
           <DailyReminder />
         </>

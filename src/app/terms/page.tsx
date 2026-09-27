@@ -35,11 +35,13 @@ export default function TermsPage() {
       <section>
         <h2>Peptide guidance</h2>
         <p>
-          The peptide check-in compares what you log with the published protocol
-          for each compound and flags side effects and combinations. It is
-          general information, not a prescription or a recommendation to use
-          any compound, and it can be wrong. You are responsible for what you
-          take; confirm doses and combinations with a qualified clinician.
+          The peptide check-in compares what you log with published research on
+          each compound, flags overlaps, escalation, and side effects, and
+          suggests lower-risk directions such as changing nothing. It is general
+          information, not a prescription or a recommendation to use any
+          compound, and it can be wrong. For compounds without approved human
+          dosing, no amount is presented as safe. You are responsible for what
+          you take; confirm doses and combinations with a qualified clinician.
         </p>
       </section>
 

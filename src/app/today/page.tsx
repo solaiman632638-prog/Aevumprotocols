@@ -48,10 +48,10 @@ export default function TodayPage() {
         recommendation shows the data behind it.
       </p>
       <p className="mt-4 max-w-2xl rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
-        Educational, not medical advice. Peptide guidance restates published
-        protocols against what you log; it never goes above a protocol&apos;s
-        maximum and is not a prescription. Confirm dosing and treatment
-        decisions with a clinician.
+        Educational, not medical advice. Aevum works to reduce unnecessary
+        exposure: it does not tell you to add compounds, and for compounds
+        without established human dosing it cannot call any amount safe.
+        Dosing and treatment decisions belong with a clinician.
       </p>
       <div className="mt-10">
         <TodayBoard pool={compoundPool()} />

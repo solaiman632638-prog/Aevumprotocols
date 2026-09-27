@@ -1,5 +1,5 @@
 import type { GoalId } from "@/lib/plan/types";
-import type { SiteId, SymptomId } from "@/lib/peptides/catalog";
+import type { SiteId, SymptomId, UrgentSymptomId } from "@/lib/peptides/catalog";
 
 export const sexes = [
   { id: "female", label: "Female" },
@@ -75,6 +75,8 @@ export type DayState = {
   doses?: DoseEntry[];
   /** Side effects noticed that day. */
   reactions?: Reaction[];
+  /** Red-flag symptoms reported that day. */
+  urgent?: UrgentSymptomId[];
 };
 
 export type DoseEntry = {

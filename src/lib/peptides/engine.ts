@@ -1,14 +1,36 @@
-import { compounds, getCompound, sites, symptoms, toUnit, type CompoundModel, type SiteId } from "./catalog";
+import {
+  compounds,
+  getCompound,
+  sites,
+  symptoms,
+  toUnit,
+  urgentSymptoms,
+  type CompoundModel,
+  type SiteId,
+} from "./catalog";
 import type { DayState, Driver, Reaction, UserContext } from "../today/types";
 
 /**
- * Peptide check-in analysis. Guidance restates each compound's published
- * protocol (titration ladder, range, cycle length) against what the user has
- * logged, and holds or stops on side effects. It never goes above a
- * protocol's maximum and never uses heart-rate, sleep, or other metrics.
+ * Peptide regimen analysis, written to reduce unnecessary exposure.
+ *
+ * Three rules shape everything here:
+ * 1. No amount is ever called safe. For compounds without established human
+ *    dosing, schedules are reference data, never a recommendation.
+ * 2. Escalation is never suggested unless the compound has clinical dosing and
+ *    the user's own history and side effects allow it.
+ * 3. Adding nothing, simplifying, and pausing are first-class outcomes.
  */
 
-export type GuidanceStatus = "start" | "keep" | "step-up" | "hold" | "step-down" | "above-max" | "break" | "stop";
+export type GuidanceStatus =
+  | "start"
+  | "keep"
+  | "step-up"
+  | "hold"
+  | "step-down"
+  | "above-researched"
+  | "break"
+  | "stop"
+  | "reference";
 
 export type Guidance = {
   slug: string;
@@ -17,6 +39,9 @@ export type Guidance = {
   headline: string;
   detail: string;
   current: string;
+  /** Reference exposure from research, shown separately from any recommendation. */
+  reference: string;
+  evidence: CompoundModel["evidence"];
   why: Driver[];
 };
 
@@ -27,6 +52,35 @@ export type Interaction = {
   compounds: string[];
 };
 
+export type Simplification = {
+  title: string;
+  detail: string;
+  recommendation: string;
+  compounds: string[];
+};
+
+export type RegimenReview = {
+  active: number;
+  complexity: "Lower" | "Moderate" | "Higher";
+  overlap: "Low" | "Moderate" | "High";
+  combinationEvidence: "Some" | "Limited" | "None identified";
+  longestRun: number;
+  recentChanges: number;
+  escalations: string[];
+  recommendation: string;
+  why: string[];
+};
+
+export type AdditionReview = {
+  slug: string;
+  name: string;
+  overlap: "Low" | "Moderate" | "High";
+  combinationEvidence: "Some" | "Limited" | "None identified";
+  addedComplexity: "Low" | "Moderate" | "High";
+  recommendation: string;
+  reasons: string[];
+};
+
 export type SiteSummary = {
   usage: Partial<Record<SiteId, { lastDate: string; count: number }>>;
   suggestion: SiteId;
@@ -34,8 +88,11 @@ export type SiteSummary = {
 };
 
 export type PeptideReport = {
+  urgent: { labels: string[]; date: string } | null;
+  review: RegimenReview | null;
   guidance: Guidance[];
   interactions: Interaction[];
+  simplifications: Simplification[];
   sites: SiteSummary;
   withheld?: string;
 };
@@ -72,6 +129,20 @@ function recentReactions(days_: DayState[], today: string, window: number): (Rea
 const gi = new Set<string>(symptoms.filter((s) => s.gi).map((s) => s.id));
 const symptomLabel = (id: string) => symptoms.find((s) => s.id === id)?.label ?? id;
 
+/** Reference exposure phrased so it never reads as a recommended dose. */
+function referenceText(model: CompoundModel): string {
+  const range = `${fmt(model.range[0])}–${fmt(model.range[1])} ${model.unit}`;
+  if (model.evidence === "clinical") return `Approved dosing ${range}`;
+  if (model.evidence === "trial") return `Trial exposure ${range}`;
+  return `Reported research exposure ${range}`;
+}
+
+const uncertainty: Record<CompoundModel["evidence"], string> = {
+  clinical: "Dosing comes from an approved label; your prescriber sets it.",
+  trial: "Amounts come from trials, not an approved label. Aevum cannot verify any amount as safe.",
+  community: "No established human dosing exists. Amounts are reported research exposure, not a safe dose.",
+};
+
 /** Start of the current run: walk back until a gap longer than two weeks. */
 function runStart(doses: Dose[]): string {
   let start = doses[doses.length - 1].date;
@@ -93,28 +164,52 @@ function atDoseSince(doses: Dose[]): string {
   return since;
 }
 
-function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction & { date: string })[], today: string, context: UserContext): Guidance {
+/** Increases within the window, newest last. */
+function increases(doses: Dose[], today: string, window: number): { date: string; from: number; to: number }[] {
+  const out: { date: string; from: number; to: number }[] = [];
+  for (let i = 1; i < doses.length; i += 1) {
+    if (days(doses[i].date, today) > window) continue;
+    if (doses[i].amount > doses[i - 1].amount * 1.02) {
+      out.push({ date: doses[i].date, from: doses[i - 1].amount, to: doses[i].amount });
+    }
+  }
+  return out;
+}
+
+function guidanceFor(
+  model: CompoundModel,
+  doses: Dose[],
+  reactions: (Reaction & { date: string })[],
+  today: string,
+  context: UserContext,
+): Guidance {
   const last = doses[doses.length - 1];
   const current = last.amount;
   const unit = model.unit;
-  const base = { slug: model.slug, name: model.name, current: `${fmt(current)} ${unit}` };
+  const base = {
+    slug: model.slug,
+    name: model.name,
+    current: `${fmt(current)} ${unit}`,
+    reference: referenceText(model),
+    evidence: model.evidence,
+  };
   const start = runStart(doses);
   const onCycle = days(start, today) + 1;
   const since = atDoseSince(doses);
   const weeksAtDose = Math.floor((days(since, today) + 1) / 7);
   const why: Driver[] = [
-    { label: "Last dose", value: `${fmt(current)} ${unit}`, effect: last.date },
-    { label: "Protocol range", value: `${fmt(model.range[0])}–${fmt(model.range[1])} ${unit}`, effect: `max ${fmt(model.max)}` },
-    { label: "This run", value: `day ${onCycle}`, effect: model.cycleDays ? `protocol run ${model.cycleDays} days` : undefined },
+    { label: "Last reported", value: `${fmt(current)} ${unit}`, effect: last.date },
+    { label: referenceText(model), value: `max reported ${fmt(model.max)} ${unit}` },
+    { label: "This run", value: `day ${onCycle}`, effect: model.cycleDays ? `research runs about ${model.cycleDays} days` : undefined },
+    { label: "Evidence", value: model.evidence === "clinical" ? "Approved dosing" : model.evidence === "trial" ? "Human trials only" : "No established human dosing" },
   ];
 
-  // The user's health history outranks any protocol step.
   if (context.conditions.includes("cancer") && model.classes.includes("growth-signal")) {
     return {
       ...base,
       status: "stop",
-      headline: "Check with your oncologist first",
-      detail: "This compound promotes growth signalling. With a cancer history, do not continue without your oncologist's approval.",
+      headline: "Check with your oncologist before continuing",
+      detail: "This compound promotes growth signalling. With a cancer history that decision belongs with your oncologist, not with Aevum.",
       why: [...why, { label: "Health history", value: "Cancer" }],
     };
   }
@@ -122,8 +217,8 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
     return {
       ...base,
       status: "hold",
-      headline: "Check with your doctor first",
-      detail: "This compound can raise heart rate or blood pressure. With a heart or blood-pressure condition, get your doctor's go-ahead before continuing.",
+      headline: "Get medical review before continuing",
+      detail: "This compound can raise heart rate or blood pressure, and you have logged a heart or blood-pressure condition.",
       why: [...why, { label: "Health history", value: "Heart or blood pressure" }],
     };
   }
@@ -134,7 +229,7 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
       ...base,
       status: "stop",
       headline: "Pause and get medical advice",
-      detail: `You logged a severe ${symptomLabel(severe[0].symptom).toLowerCase()}. Stop taking anything new, and contact a clinician or urgent care if it does not ease quickly.`,
+      detail: `You logged a severe ${symptomLabel(severe[0].symptom).toLowerCase()}. Stop adding anything, and get medical care if it does not ease quickly.`,
       why: [...why, { label: "Severe side effect", value: symptomLabel(severe[0].symptom), effect: severe[0].date }],
     };
   }
@@ -142,17 +237,17 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
     return {
       ...base,
       status: "hold",
-      headline: "Do not increase: possible low blood sugar",
-      detail: "Shakiness, sweating, or dizziness on a compound that lowers blood sugar needs attention. Eat, check your glucose if you can, and talk to a clinician before the next dose.",
+      headline: "Possible low blood sugar: do not increase",
+      detail: "Shakiness, sweating, or dizziness on a compound that lowers blood sugar needs attention. Eat, check your glucose if you can, and get professional review before the next dose.",
       why: [...why, { label: "Side effect", value: "Shaky, sweaty, or dizzy" }],
     };
   }
   if (current > model.max * 1.02) {
     return {
       ...base,
-      status: "above-max",
-      headline: `Above the protocol maximum of ${fmt(model.max)} ${unit}`,
-      detail: `Published protocols do not go above ${fmt(model.max)} ${unit}. Go back to a dose within ${fmt(model.range[0])}–${fmt(model.range[1])} ${unit}.`,
+      status: "above-researched",
+      headline: `Above the highest reported exposure of ${fmt(model.max)} ${unit}`,
+      detail: `Human data above this level is limited, so Aevum cannot assess the added risk. A risk-minimising step is to go back toward ${fmt(model.range[0])}–${fmt(model.range[1])} ${unit} and get professional review.`,
       why,
     };
   }
@@ -160,20 +255,19 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
     return {
       ...base,
       status: "break",
-      headline: "Time for a break",
-      detail: `You are on day ${onCycle}; the protocol runs about ${model.cycleDays} days, then pauses before another round.`,
+      headline: "Continuous use is past the researched run length",
+      detail: `You are on day ${onCycle}; research runs are about ${model.cycleDays} days. Long-term safety data past that is limited.`,
       why,
     };
   }
 
-  // Spacing rules from the protocols.
   const previous = doses.length > 1 ? doses[doses.length - 2] : undefined;
   if (previous && model.frequency === "weekly" && days(previous.date, last.date) < 5) {
     return {
       ...base,
       status: "hold",
-      headline: "Doses are too close together",
-      detail: `This is a once-weekly compound, but your last two doses were ${days(previous.date, last.date)} days apart. Keep to one set day each week.`,
+      headline: "Doses closer together than the schedule",
+      detail: `This is dosed weekly, but your last two were ${days(previous.date, last.date)} days apart. Closer spacing raises exposure without added benefit.`,
       why: [...why, { label: "Previous dose", value: previous.date }],
     };
   }
@@ -181,8 +275,8 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
     return {
       ...base,
       status: "hold",
-      headline: "Not meant for back-to-back days",
-      detail: "Protocols use this occasionally, not on consecutive days. Space doses out.",
+      headline: "Not used on back-to-back days",
+      detail: "This is used occasionally. Spacing doses out keeps exposure lower.",
       why: [...why, { label: "Previous dose", value: previous.date }],
     };
   }
@@ -193,7 +287,10 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
   if (model.titration) {
     const { steps, weeksPerStep } = model.titration;
     const index = steps.reduce((found, step, i) => (current >= step * 0.98 ? i : found), -1);
-    const why2: Driver[] = [...why, { label: "At this dose", value: `${weeksAtDose} week${weeksAtDose === 1 ? "" : "s"}`, effect: `protocol holds each step ${weeksPerStep} week${weeksPerStep === 1 ? "" : "s"}` }];
+    const why2: Driver[] = [
+      ...why,
+      { label: "At this amount", value: `${weeksAtDose} week${weeksAtDose === 1 ? "" : "s"}`, effect: `schedule holds each step ${weeksPerStep} week${weeksPerStep === 1 ? "" : "s"}` },
+    ];
 
     if (moderateGi.length > 0) {
       const giDays = new Set(moderateGi.map((r) => r.date)).size;
@@ -201,50 +298,62 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
         return {
           ...base,
           status: "step-down",
-          headline: `Consider stepping back to ${fmt(steps[index - 1])} ${unit}`,
-          detail: "Side effects have lasted several days at this dose. Protocols treat dropping back one step as normal, and still effective.",
+          headline: `Consider going back to ${fmt(steps[index - 1])} ${unit}`,
+          detail: "Side effects have lasted several days at this amount. Lowering exposure is the lower-risk direction; a smaller amount is often still effective.",
           why: [...why2, { label: "Stomach side effects", value: `${giDays} days this week`, effect: "moderate or worse" }],
         };
       }
       return {
         ...base,
         status: "hold",
-        headline: "Stay at this dose for now",
-        detail: "Do not step up while side effects are active. They usually settle within a week or two at the same dose.",
+        headline: "Do not increase while side effects are active",
+        detail: "Give this amount time to settle before changing anything. Changing more than one thing at once makes the cause impossible to read.",
         why: [...why2, { label: "Side effect", value: symptomLabel(moderateGi[0].symptom), effect: "moderate" }],
       };
     }
     if (index < 0) {
-      return { ...base, status: "start", headline: `Protocols start at ${fmt(steps[0])} ${unit}`, detail: "Your logged dose is below the first step of the protocol.", why: why2 };
+      return { ...base, status: "reference", headline: `Below the reported starting amount of ${fmt(steps[0])} ${unit}`, detail: `${uncertainty[model.evidence]} Lower exposure is not a problem in itself.`, why: why2 };
     }
-    const firstOfRun = doses.find((dose) => dose.date >= start);
-    const firstIndex = firstOfRun ? steps.reduce((found, step, i) => (firstOfRun.amount >= step * 0.98 ? i : found), -1) : 0;
-    if (firstIndex > 0 && index >= firstIndex && days(start, today) < weeksPerStep * 7) {
+    const startedAbove = (() => {
+      const first = doses.find((dose) => dose.date >= start);
+      const firstIndex = first ? steps.reduce((found, step, i) => (first.amount >= step * 0.98 ? i : found), -1) : 0;
+      return firstIndex > 0 && days(start, today) < weeksPerStep * 7;
+    })();
+    if (startedAbove) {
       return {
         ...base,
         status: "hold",
-        headline: `Protocols start at ${fmt(steps[0])} ${unit}`,
-        detail: `You started this run at ${fmt(firstOfRun!.amount)} ${unit}, above the first step. Starting high is the main cause of side effects; protocols climb one step at a time.`,
-        why: [...why2, { label: "First dose this run", value: `${fmt(firstOfRun!.amount)} ${unit}`, effect: start }],
+        headline: `Schedules start at ${fmt(steps[0])} ${unit}`,
+        detail: "You began this run above the first step. Starting high is the main cause of side effects, and it removes the chance to find the lowest amount that works.",
+        why: why2,
       };
     }
     if (index >= steps.length - 1) {
-      return { ...base, status: "keep", headline: "At the protocol's top step", detail: "There is no higher step. Stay here or step down if side effects appear.", why: why2 };
+      return { ...base, status: "keep", headline: "At the top of the reported schedule", detail: `${uncertainty[model.evidence]} There is no higher step to assess.`, why: why2 };
     }
-    if (weeksAtDose >= weeksPerStep && moderateAny.length === 0) {
+    if (model.evidence === "clinical" && weeksAtDose >= weeksPerStep && moderateAny.length === 0) {
       return {
         ...base,
         status: "step-up",
-        headline: `Protocol's next step: ${fmt(steps[index + 1])} ${unit}`,
-        detail: `You have held ${fmt(current)} ${unit} for ${weeksAtDose} weeks without logged side effects. Protocols only move up if progress has stalled; staying at a dose that works is fine.`,
+        headline: `Approved schedule's next step is ${fmt(steps[index + 1])} ${unit}`,
+        detail: `You have held ${fmt(current)} ${unit} for ${weeksAtDose} weeks without logged side effects. Only move up if this amount has stopped working, and agree it with your prescriber. Staying where you are is a valid choice.`,
+        why: why2,
+      };
+    }
+    if (weeksAtDose >= weeksPerStep) {
+      return {
+        ...base,
+        status: "reference",
+        headline: "Aevum does not recommend increasing",
+        detail: `For reference, the reported schedule's next step is ${fmt(steps[index + 1])} ${unit} after ${weeksPerStep} week${weeksPerStep === 1 ? "" : "s"}. ${uncertainty[model.evidence]} Increasing raises uncertainty, so the lower-risk choice is to hold and reassess.`,
         why: why2,
       };
     }
     return {
       ...base,
       status: "keep",
-      headline: "Keep this dose",
-      detail: `Week ${Math.min(weeksAtDose + 1, weeksPerStep)} of ${weeksPerStep} at this step. The protocol holds each step before moving up.`,
+      headline: "Hold this amount",
+      detail: `Week ${Math.min(weeksAtDose + 1, weeksPerStep)} of ${weeksPerStep} at this step. ${uncertainty[model.evidence]}`,
       why: why2,
     };
   }
@@ -254,14 +363,14 @@ function guidanceFor(model: CompoundModel, doses: Dose[], reactions: (Reaction &
       ...base,
       status: "hold",
       headline: "Do not increase",
-      detail: `You logged ${symptomLabel(moderateAny[0].symptom).toLowerCase()}. Stay at or below this dose until it settles.`,
+      detail: `You logged ${symptomLabel(moderateAny[0].symptom).toLowerCase()}. Staying at or below this amount is the lower-risk direction until it settles.`,
       why: [...why, { label: "Side effect", value: symptomLabel(moderateAny[0].symptom), effect: "moderate" }],
     };
   }
   if (current < model.range[0] * 0.98) {
-    return { ...base, status: "start", headline: `Below the usual ${fmt(model.range[0])} ${unit}`, detail: "Your dose is under the protocol's typical range. That is not a reason to go higher on its own.", why };
+    return { ...base, status: "reference", headline: "Below the reported range", detail: `${uncertainty[model.evidence]} A lower amount is not a reason to increase on its own.`, why };
   }
-  return { ...base, status: "keep", headline: "Keep this dose", detail: `Within the protocol's typical range of ${fmt(model.range[0])}–${fmt(model.range[1])} ${unit}.`, why };
+  return { ...base, status: "keep", headline: "No change suggested", detail: `Within reported exposure. ${uncertainty[model.evidence]}`, why };
 }
 
 // ── Interactions ─────────────────────────────────────────────────────────
@@ -275,38 +384,37 @@ function interactions(active: CompoundModel[], lastDoses: Map<string, Dose[]>, c
 
   const glp1 = withClass("glp1");
   if (glp1.length >= 2) {
-    out.push({ level: "warning", title: "Two GLP-1 drugs at once", detail: "They work the same way, so side effects stack: nausea, dehydration, and low blood sugar. Protocols run one at a time.", compounds: names(glp1) });
+    out.push({ level: "warning", title: "Two GLP-1 compounds at once", detail: "They act on the same pathway, so side effects stack and neither can be assessed on its own. Running one at a time is the lower-risk approach.", compounds: names(glp1) });
   }
   const amylin = withClass("amylin");
   if (amylin.length && glp1.length === 1 && glp1[0].slug === "semaglutide") {
-    out.push({ level: "info", title: "Common pairing", detail: "Cagrilintide and semaglutide are often run together. Titrate each on its own schedule, same day, different sites.", compounds: names([...amylin, ...glp1]) });
+    out.push({ level: "info", title: "Studied pairing", detail: "This pairing has been studied together. Change one at a time, same day, different sites.", compounds: names([...amylin, ...glp1]) });
   } else if (amylin.length && glp1.length) {
-    out.push({ level: "caution", title: "Amylin plus GLP-1", detail: "Both reduce appetite and slow the stomach. Expect stronger nausea; titrate one at a time.", compounds: names([...amylin, ...glp1]) });
+    out.push({ level: "caution", title: "Amylin plus GLP-1", detail: "Both cut appetite and slow the stomach. Human data for this particular combination is limited.", compounds: names([...amylin, ...glp1]) });
   }
 
   const melano = withClass("melanocortin");
   if (melano.length >= 2) {
-    out.push({ level: "warning", title: "Melanocortin compounds together", detail: "Melanotan-1, Melanotan-2, and PT-141 act on the same receptors. Combining them is redundant and adds nausea and blood-pressure effects.", compounds: names(melano) });
+    out.push({ level: "warning", title: "Melanocortin compounds together", detail: "Melanotan-1, Melanotan-2, and PT-141 act on the same receptors. Combining them adds exposure without adding a distinct effect.", compounds: names(melano) });
   }
 
   const ghrh = withClass("ghrh");
   if (ghrh.length >= 2) {
-    out.push({ level: "warning", title: "Two GHRH analogues", detail: "Tesamorelin, sermorelin, and CJC-1295 do the same job. Protocols pick one, often paired with a single GHRP like ipamorelin.", compounds: names(ghrh) });
+    out.push({ level: "warning", title: "Two GHRH compounds", detail: "Tesamorelin, sermorelin, and CJC-1295 do the same job. One is the lower-risk choice.", compounds: names(ghrh) });
   }
   const ghrp = withClass("ghrp");
   if (ghrp.length >= 2) {
-    out.push({ level: "caution", title: "More than one GHRP", detail: "Ipamorelin, GHRP-2, and GHRP-6 overlap. Check whether a blend already includes one you take separately.", compounds: names(ghrp) });
+    out.push({ level: "caution", title: "More than one GHRP", detail: "Ipamorelin, GHRP-2, and GHRP-6 overlap. Check whether a blend already contains one you also take separately.", compounds: names(ghrp) });
   }
 
   const igf = withClass("igf");
   if (igf.length >= 2) {
-    out.push({ level: "warning", title: "Two IGF-1 variants", detail: "Both lower blood sugar and act on the same receptor. Run one at a time.", compounds: names(igf) });
+    out.push({ level: "warning", title: "Two IGF-1 variants", detail: "Both lower blood sugar and hit the same receptor. Running one at a time is the lower-risk approach.", compounds: names(igf) });
   }
   if (igf.length && (glp1.length || context.conditions.includes("diabetes") || GLUCOSE_MEDS.test(context.medications))) {
-    out.push({ level: "warning", title: "Low blood sugar risk", detail: "IGF-1 lowers blood sugar, and so do GLP-1 drugs and diabetes medication. Eat after every IGF dose and know the signs of a low.", compounds: names([...igf, ...glp1]) });
+    out.push({ level: "warning", title: "Low blood sugar risk", detail: "IGF-1 lowers blood sugar, and so do GLP-1 compounds and diabetes medication. This combination needs clinician or pharmacist review.", compounds: names([...igf, ...glp1]) });
   }
 
-  // Blends that overlap with something taken separately or in another blend.
   const exposure = new Map<string, string[]>();
   for (const compound of active) {
     const parts = compound.components ? Object.keys(compound.components) : [compound.slug];
@@ -327,27 +435,176 @@ function interactions(active: CompoundModel[], lastDoses: Map<string, Dose[]>, c
     out.push({
       level: over ? "warning" : "caution",
       title: `${model.name} from more than one source`,
-      detail: `${sources.join(" and ")} both contain ${model.name}: about ${fmt(total)} ${model.unit} combined per dose${over ? `, above the protocol maximum of ${fmt(model.max)} ${model.unit}` : ""}. Count the blend toward your total.`,
+      detail: `${sources.join(" and ")} both contain ${model.name}: about ${fmt(total)} ${model.unit} combined${over ? `, above the highest reported exposure of ${fmt(model.max)} ${model.unit}` : ""}. Duplicate exposure is rarely intended.`,
       compounds: sources,
     });
   }
 
   if (withClass("copper").length && active.length > 1) {
-    out.push({ level: "info", title: "GHK-Cu in the syringe", detail: "Copper can react with other peptides. Do not mix GHK-Cu in the same syringe as anything except BPC-157.", compounds: names(withClass("copper")) });
+    out.push({ level: "info", title: "GHK-Cu in the syringe", detail: "Copper can react with other peptides. Do not mix GHK-Cu in one syringe with anything except BPC-157.", compounds: names(withClass("copper")) });
   }
 
-  // The user's own health history.
   const growth = withClass("growth-signal");
   if (context.conditions.includes("cancer") && growth.length) {
-    out.push({ level: "warning", title: "Cancer history", detail: "These compounds promote growth signalling. Do not use them without your oncologist's approval.", compounds: names(growth) });
+    out.push({ level: "warning", title: "Cancer history", detail: "These compounds promote growth signalling. This needs your oncologist's review before it continues.", compounds: names(growth) });
   }
   if (context.conditions.includes("cardio") && (glp1.length || melano.length)) {
-    out.push({ level: "warning", title: "Heart or blood-pressure condition", detail: "GLP-1 drugs raise heart rate and melanocortins can raise blood pressure. Check with your doctor first.", compounds: names([...glp1, ...melano]) });
+    out.push({ level: "warning", title: "Heart or blood-pressure condition", detail: "GLP-1 compounds raise heart rate and melanocortins can raise blood pressure. Get medical review.", compounds: names([...glp1, ...melano]) });
   }
-  if (context.conditions.includes("pregnant")) {
+  if (context.conditions.includes("pregnant") && active.length) {
     out.push({ level: "warning", title: "Pregnancy or nursing", detail: "None of these compounds has safety data for pregnancy or nursing. Stop and speak to your clinician.", compounds: names(active) });
   }
+  if (context.medications.trim() && active.length) {
+    out.push({
+      level: "caution",
+      title: "Prescription medication in the mix",
+      detail: `You listed ${context.medications.trim()}. Interaction data between prescription drugs and research compounds is thin; a pharmacist or clinician review is worth more than anything Aevum can calculate.`,
+      compounds: names(active),
+    });
+  }
   return out;
+}
+
+// ── Mechanism overlap, complexity, escalation ────────────────────────────
+
+const SHARED_CLASSES = ["glp1", "ghrh", "ghrp", "igf", "melanocortin", "healing", "growth-signal", "mitochondrial", "nootropic", "metabolic"] as const;
+
+function overlapPairs(active: CompoundModel[]): { a: CompoundModel; b: CompoundModel; shared: string[] }[] {
+  const pairs: { a: CompoundModel; b: CompoundModel; shared: string[] }[] = [];
+  for (let i = 0; i < active.length; i += 1) {
+    for (let j = i + 1; j < active.length; j += 1) {
+      const shared = SHARED_CLASSES.filter((cls) => active[i].classes.includes(cls) && active[j].classes.includes(cls));
+      if (shared.length) pairs.push({ a: active[i], b: active[j], shared: [...shared] });
+    }
+  }
+  return pairs;
+}
+
+function regimenReview(
+  active: CompoundModel[],
+  all: Map<string, Dose[]>,
+  days_: DayState[],
+  today: string,
+): RegimenReview | null {
+  if (active.length === 0) return null;
+
+  const pairs = overlapPairs(active);
+  const overlap = pairs.length >= 3 ? "High" : pairs.length >= 1 ? "Moderate" : "Low";
+  const community = active.filter((model) => model.evidence === "community").length;
+  const comboKnown = active.filter((model) => model.combinationEvidence === "some").length;
+  const combinationEvidence = active.length < 2 ? "Some" : comboKnown > 0 && pairs.length === 0 ? "Some" : pairs.length ? "Limited" : "None identified";
+
+  const runs = active.map((model) => days(runStart(all.get(model.slug)!), today) + 1);
+  const longestRun = Math.max(...runs);
+
+  const escalations: string[] = [];
+  for (const model of active) {
+    const ups = increases(all.get(model.slug)!, today, 42);
+    if (ups.length >= 2) {
+      escalations.push(`${model.name} increased ${ups.length} times in the last six weeks (now ${fmt(ups.at(-1)!.to)} ${model.unit}).`);
+    } else if (ups.length === 1 && days(ups[0].date, today) <= 14) {
+      escalations.push(`${model.name} increased to ${fmt(ups[0].to)} ${model.unit} on ${ups[0].date}.`);
+    }
+  }
+
+  const started = active.filter((model) => days(runStart(all.get(model.slug)!), today) <= 14).length;
+  const recentChanges = escalations.length + started;
+
+  let score = active.length >= 5 ? 3 : active.length >= 3 ? 2 : active.length >= 2 ? 1 : 0;
+  if (overlap === "High") score += 2;
+  else if (overlap === "Moderate") score += 1;
+  if (community >= 3) score += 1;
+  if (escalations.length) score += 1;
+  if (longestRun > 90) score += 1;
+  const complexity = score >= 5 ? "Higher" : score >= 3 ? "Moderate" : "Lower";
+
+  const why: string[] = [`${active.length} compound${active.length === 1 ? "" : "s"} active in the last week.`];
+  if (pairs.length) why.push(`${pairs.length} pair${pairs.length === 1 ? "" : "s"} share a mechanism.`);
+  if (community) why.push(`${community} with no established human dosing.`);
+  if (escalations.length) why.push(...escalations);
+  if (started) why.push(`${started} started within the last two weeks.`);
+  if (longestRun > 90) why.push(`Longest continuous run is ${longestRun} days; long-term data past that is limited.`);
+
+  let recommendation: string;
+  if (complexity === "Higher") {
+    recommendation =
+      "Aevum would not add anything here. The lower-risk direction is to hold exposure where it is, work out which compounds are actually doing something, and get professional review of the combination before any further change.";
+  } else if (escalations.length) {
+    recommendation =
+      "Your reported exposure has gone up recently. Avoid further increases until you have watched your response and side effects at this level for a few weeks.";
+  } else if (recentChanges > 1) {
+    recommendation =
+      "More than one thing changed recently, which makes it hard to tell what caused any effect. Change one thing at a time and give it time before the next change.";
+  } else if (complexity === "Moderate") {
+    recommendation =
+      "Hold the regimen where it is rather than adding to it, and check whether each compound still has a clear purpose.";
+  } else {
+    recommendation =
+      "Nothing here suggests a change is needed. Adding another compound is rarely the lower-risk option when the current one has not been assessed yet.";
+  }
+
+  return { active: active.length, complexity, overlap, combinationEvidence, longestRun, recentChanges, escalations, recommendation, why };
+}
+
+function simplifications(active: CompoundModel[], all: Map<string, Dose[]>, today: string, context: UserContext): Simplification[] {
+  const out: Simplification[] = [];
+  for (const pair of overlapPairs(active)) {
+    out.push({
+      title: `${pair.a.name} and ${pair.b.name} overlap`,
+      detail: `Both act on ${pair.shared.join(" and ").replace("glp1", "GLP-1").replace("ghrh", "GH-releasing").replace("ghrp", "GH-releasing").replace("igf", "IGF")} pathways. Human evidence that running both adds benefit over one is limited.`,
+      recommendation: "Consider whether both are necessary rather than keeping both by default. Dropping one also makes the other readable.",
+      compounds: [pair.a.name, pair.b.name],
+    });
+  }
+  for (const model of active) {
+    const run = days(runStart(all.get(model.slug)!), today) + 1;
+    if (model.cycleDays && run > model.cycleDays) {
+      out.push({
+        title: `${model.name} has run ${run} days`,
+        detail: `Research runs are about ${model.cycleDays} days. Continuous use past that has limited safety data behind it.`,
+        recommendation: "A break is the lower-risk option, and it shows you what changes without it.",
+        compounds: [model.name],
+      });
+    }
+  }
+  const goalless = active.filter((model) => model.classes.includes("nootropic") || model.classes.includes("mitochondrial"));
+  if (active.length >= 4 && goalless.length && context.goals.length) {
+    out.push({
+      title: "Not every compound maps to your goals",
+      detail: `Your goals are ${context.goals.join(", ")}. With ${active.length} compounds running, some may be there from an earlier plan.`,
+      recommendation: "Work out what each one is for. Anything without a clear answer is exposure without a purpose.",
+      compounds: goalless.map((model) => model.name),
+    });
+  }
+  return out;
+}
+
+/** What adding one more compound would mean for this regimen. */
+export function evaluateAddition(slug: string, active: CompoundModel[], context: UserContext): AdditionReview | null {
+  const candidate = getCompound(slug);
+  if (!candidate) return null;
+
+  const shared = active.filter((model) => model.classes.some((cls) => candidate.classes.includes(cls) && SHARED_CLASSES.includes(cls as never)));
+  const overlap = shared.length >= 2 ? "High" : shared.length === 1 ? "Moderate" : "Low";
+  const combinationEvidence = candidate.combinationEvidence === "some" && shared.length ? "Some" : shared.length ? "Limited" : "None identified";
+  const total = active.length + 1;
+  const addedComplexity = total >= 5 || overlap === "High" ? "High" : total >= 3 || overlap === "Moderate" ? "Moderate" : "Low";
+
+  const reasons: string[] = [];
+  if (shared.length) reasons.push(`Overlaps with ${shared.map((m) => m.name).join(" and ")} on the same pathway.`);
+  if (candidate.evidence === "community") reasons.push("No established human dosing for this compound.");
+  if (candidate.evidence === "trial") reasons.push("Human data comes from trials, not approved use.");
+  if (active.length >= 3) reasons.push(`Your regimen would go to ${total} compounds, which makes cause and effect harder to read.`);
+  if (context.medications.trim()) reasons.push(`You take ${context.medications.trim()}; interaction data with research compounds is thin.`);
+  if (context.conditions.includes("cancer") && candidate.classes.includes("growth-signal")) reasons.push("Growth-signalling compound with a cancer history.");
+  if (context.conditions.includes("cardio") && candidate.classes.some((c) => c === "glp1" || c === "melanocortin")) reasons.push("Can raise heart rate or blood pressure, and you logged a heart condition.");
+
+  const against = shared.length > 0 || addedComplexity === "High" || active.length >= 3 || reasons.length >= 2;
+  const recommendation = against
+    ? `Aevum would not add ${candidate.name} now. ${shared.length ? "It covers ground your regimen already covers" : "It adds exposure"} while the evidence for the combination is ${combinationEvidence.toLowerCase()}. More compounds do not reliably produce better outcomes, and each one makes the others harder to assess.`
+    : `If you do add ${candidate.name}, add it on its own, change nothing else, and give it enough time to judge before any further change. ${uncertainty[candidate.evidence]}`;
+
+  return { slug: candidate.slug, name: candidate.name, overlap, combinationEvidence, addedComplexity, recommendation, reasons };
 }
 
 // ── Sites ────────────────────────────────────────────────────────────────
@@ -375,7 +632,20 @@ function siteSummary(days_: DayState[], today: string): SiteSummary {
 
 export function peptideReport(context: UserContext, history_: DayState[], today: string): PeptideReport | null {
   const all = history(history_);
-  if (all.size === 0) return null;
+  const sites_ = siteSummary(history_, today);
+
+  const urgentDay = [...history_]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .filter((day) => days(day.date, today) <= 3 && days(day.date, today) >= 0)
+    .findLast((day) => (day.urgent ?? []).length > 0);
+  const urgent = urgentDay
+    ? {
+        date: urgentDay.date,
+        labels: (urgentDay.urgent ?? []).map((id) => urgentSymptoms.find((s) => s.id === id)?.label ?? id),
+      }
+    : null;
+
+  if (all.size === 0) return urgent ? { urgent, review: null, guidance: [], interactions: [], simplifications: [], sites: sites_ } : null;
 
   const active = compounds.filter((model) => {
     const last = all.get(model.slug)?.at(-1);
@@ -386,13 +656,17 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
   const reactions = recentReactions(history_, today, 7);
   const withheld =
     context.age < 21
-      ? "Dose guidance is not shown under 21."
+      ? "Regimen guidance is not shown under 21."
       : context.conditions.includes("pregnant")
-        ? "Dose guidance is not shown during pregnancy or nursing. Speak to your clinician."
+        ? "Regimen guidance is not shown during pregnancy or nursing. Speak to your clinician."
         : undefined;
 
+  // A red flag stops all regimen guidance.
+  if (urgent) {
+    return { urgent, review: null, guidance: [], interactions: [], simplifications: [], sites: sites_, withheld };
+  }
+
   const found = interactions(active, all, context);
-  // Never suggest a step up on a compound caught in an active warning.
   const flagged = new Set(found.filter((item) => item.level === "warning").flatMap((item) => item.compounds));
   const guidance = withheld
     ? []
@@ -403,10 +677,34 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
           ...item,
           status: "hold" as const,
           headline: "Sort out the warning above first",
-          detail: "This peptide is part of a combination warning. Resolve that before changing its dose.",
+          detail: "This compound is part of a combination warning. Resolve that before any change to its amount.",
           why: [...item.why, { label: "Blocked by", value: "Combination warning" }],
         };
       });
 
-  return { guidance, interactions: found, sites: siteSummary(history_, today), withheld };
+  return {
+    urgent: null,
+    review: withheld ? null : regimenReview(active, all, history_, today),
+    guidance,
+    interactions: found,
+    simplifications: withheld ? [] : simplifications(active, all, today, context),
+    sites: sites_,
+    withheld,
+  };
+}
+
+/** Compounds someone might consider adding, for the "considering adding" picker. */
+export function addableCompounds(active: CompoundModel[]): CompoundModel[] {
+  const running = new Set(active.map((model) => model.slug));
+  return compounds.filter((model) => !running.has(model.slug));
+}
+
+export function activeCompounds(history_: DayState[], today: string): CompoundModel[] {
+  const all = history(history_);
+  return compounds.filter((model) => {
+    const last = all.get(model.slug)?.at(-1);
+    if (!last) return false;
+    const window = model.frequency === "weekly" ? 10 : 7;
+    return days(last.date, today) < window;
+  });
 }

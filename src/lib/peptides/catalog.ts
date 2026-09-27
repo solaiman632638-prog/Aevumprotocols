@@ -39,6 +39,15 @@ export type CompoundModel = {
   /** Protocol run length before a break, in days. */
   cycleDays?: number;
   classes: DoseClass[];
+  /**
+   * How well the dosing is established.
+   * clinical: an approved label or regulator-reviewed schedule.
+   * trial: published human trials, no approval for this use.
+   * community: research chemical; no established human dosing.
+   */
+  evidence: "clinical" | "trial" | "community";
+  /** Whether human data exists for combining it with other compounds. */
+  combinationEvidence?: "some" | "limited" | "none";
   /** Blends: fraction of each dose that is each component. */
   components?: Record<string, number>;
   route: "subcutaneous" | "subcutaneous-or-im";
@@ -48,59 +57,59 @@ const m = (model: CompoundModel) => model;
 
 export const compounds: CompoundModel[] = [
   // GLP-1 and metabolic
-  m({ slug: "retatrutide", name: "Retatrutide", unit: "mg", frequency: "weekly", range: [2, 12], max: 12, titration: { steps: [2, 4, 6, 9, 12], weeksPerStep: 4 }, classes: ["glp1", "glucagon"], route: "subcutaneous" }),
-  m({ slug: "tirzepatide", name: "Tirzepatide", unit: "mg", frequency: "weekly", range: [2.5, 15], max: 15, titration: { steps: [2.5, 5, 7.5, 10, 12.5, 15], weeksPerStep: 4 }, classes: ["glp1"], route: "subcutaneous" }),
-  m({ slug: "semaglutide", name: "Semaglutide", unit: "mg", frequency: "weekly", range: [0.25, 2.4], max: 2.4, titration: { steps: [0.25, 0.5, 1, 1.7, 2.4], weeksPerStep: 4 }, classes: ["glp1"], route: "subcutaneous" }),
-  m({ slug: "mazdutide", name: "Mazdutide", unit: "mg", frequency: "weekly", range: [1.5, 6], max: 6, titration: { steps: [1.5, 3, 4.5, 6], weeksPerStep: 4 }, classes: ["glp1", "glucagon"], route: "subcutaneous" }),
-  m({ slug: "survodutide", name: "Survodutide", unit: "mg", frequency: "weekly", range: [0.3, 4.8], max: 4.8, titration: { steps: [0.3, 0.6, 1.2, 1.8, 2.4, 3.6, 4.8], weeksPerStep: 4 }, classes: ["glp1", "glucagon"], route: "subcutaneous" }),
-  m({ slug: "cagrilintide", name: "Cagrilintide", unit: "mg", frequency: "weekly", range: [0.25, 2.4], max: 2.4, titration: { steps: [0.25, 0.5, 1, 1.7, 2.4], weeksPerStep: 4 }, classes: ["amylin"], route: "subcutaneous" }),
-  m({ slug: "aod-9604", name: "AOD-9604", unit: "mcg", frequency: "daily", range: [300, 300], max: 300, classes: ["metabolic"], route: "subcutaneous" }),
-  m({ slug: "5-amino-1mq", name: "5-Amino-1MQ", unit: "mg", frequency: "daily", range: [2.5, 5], max: 5, cycleDays: 56, titration: { steps: [2.5, 5], weeksPerStep: 1 }, classes: ["metabolic"], route: "subcutaneous" }),
-  m({ slug: "slu-pp-332", name: "SLU-PP-332", unit: "mg", frequency: "daily", range: [0.5, 1], max: 1, cycleDays: 56, classes: ["metabolic"], route: "subcutaneous" }),
-  m({ slug: "l-carnitine", name: "L-Carnitine", unit: "mg", frequency: "daily", range: [200, 600], max: 600, classes: ["metabolic"], route: "subcutaneous-or-im" }),
+  m({ slug: "retatrutide", name: "Retatrutide", unit: "mg", frequency: "weekly", range: [2, 12], max: 12, titration: { steps: [2, 4, 6, 9, 12], weeksPerStep: 4 }, evidence: "trial", classes: ["glp1", "glucagon"], route: "subcutaneous" }),
+  m({ slug: "tirzepatide", name: "Tirzepatide", unit: "mg", frequency: "weekly", range: [2.5, 15], max: 15, titration: { steps: [2.5, 5, 7.5, 10, 12.5, 15], weeksPerStep: 4 }, evidence: "clinical", classes: ["glp1"], route: "subcutaneous" }),
+  m({ slug: "semaglutide", name: "Semaglutide", unit: "mg", frequency: "weekly", range: [0.25, 2.4], max: 2.4, titration: { steps: [0.25, 0.5, 1, 1.7, 2.4], weeksPerStep: 4 }, evidence: "clinical", combinationEvidence: "some", classes: ["glp1"], route: "subcutaneous" }),
+  m({ slug: "mazdutide", name: "Mazdutide", unit: "mg", frequency: "weekly", range: [1.5, 6], max: 6, titration: { steps: [1.5, 3, 4.5, 6], weeksPerStep: 4 }, evidence: "clinical", classes: ["glp1", "glucagon"], route: "subcutaneous" }),
+  m({ slug: "survodutide", name: "Survodutide", unit: "mg", frequency: "weekly", range: [0.3, 4.8], max: 4.8, titration: { steps: [0.3, 0.6, 1.2, 1.8, 2.4, 3.6, 4.8], weeksPerStep: 4 }, evidence: "trial", classes: ["glp1", "glucagon"], route: "subcutaneous" }),
+  m({ slug: "cagrilintide", name: "Cagrilintide", unit: "mg", frequency: "weekly", range: [0.25, 2.4], max: 2.4, titration: { steps: [0.25, 0.5, 1, 1.7, 2.4], weeksPerStep: 4 }, evidence: "trial", combinationEvidence: "some", classes: ["amylin"], route: "subcutaneous" }),
+  m({ slug: "aod-9604", name: "AOD-9604", unit: "mcg", frequency: "daily", range: [300, 300], max: 300, evidence: "community", classes: ["metabolic"], route: "subcutaneous" }),
+  m({ slug: "5-amino-1mq", name: "5-Amino-1MQ", unit: "mg", frequency: "daily", range: [2.5, 5], max: 5, cycleDays: 56, titration: { steps: [2.5, 5], weeksPerStep: 1 }, evidence: "community", classes: ["metabolic"], route: "subcutaneous" }),
+  m({ slug: "slu-pp-332", name: "SLU-PP-332", unit: "mg", frequency: "daily", range: [0.5, 1], max: 1, cycleDays: 56, evidence: "community", classes: ["metabolic"], route: "subcutaneous" }),
+  m({ slug: "l-carnitine", name: "L-Carnitine", unit: "mg", frequency: "daily", range: [200, 600], max: 600, evidence: "community", classes: ["metabolic"], route: "subcutaneous-or-im" }),
 
   // Healing and recovery
-  m({ slug: "bpc-157", name: "BPC-157", unit: "mcg", frequency: "daily", range: [250, 500], max: 500, cycleDays: 56, titration: { steps: [250, 500], weeksPerStep: 2 }, classes: ["healing", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "tb-500", name: "TB-500", unit: "mg", frequency: "several-weekly", range: [2, 2.5], max: 2.5, cycleDays: 84, classes: ["healing", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "wolverine-stack", name: "BPC-157 + TB-500 blend", unit: "mg", frequency: "daily", range: [0.5, 2], max: 2, cycleDays: 84, classes: ["healing", "growth-signal"], components: { "bpc-157": 0.5, "tb-500": 0.5 }, route: "subcutaneous" }),
-  m({ slug: "kpv", name: "KPV", unit: "mcg", frequency: "daily", range: [200, 500], max: 500, cycleDays: 28, classes: ["healing"], route: "subcutaneous" }),
-  m({ slug: "thymosin-alpha-1", name: "Thymosin Alpha-1", unit: "mg", frequency: "several-weekly", range: [1.5, 1.6], max: 1.6, classes: ["immune"], route: "subcutaneous" }),
-  m({ slug: "ll-37", name: "LL-37", unit: "mcg", frequency: "several-weekly", range: [100, 500], max: 500, cycleDays: 14, classes: ["immune"], route: "subcutaneous" }),
+  m({ slug: "bpc-157", name: "BPC-157", unit: "mcg", frequency: "daily", range: [250, 500], max: 500, cycleDays: 56, titration: { steps: [250, 500], weeksPerStep: 2 }, evidence: "community", classes: ["healing", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "tb-500", name: "TB-500", unit: "mg", frequency: "several-weekly", range: [2, 2.5], max: 2.5, cycleDays: 84, evidence: "community", classes: ["healing", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "wolverine-stack", name: "BPC-157 + TB-500 blend", unit: "mg", frequency: "daily", range: [0.5, 2], max: 2, cycleDays: 84, evidence: "community", combinationEvidence: "limited", classes: ["healing", "growth-signal"], components: { "bpc-157": 0.5, "tb-500": 0.5 }, route: "subcutaneous" }),
+  m({ slug: "kpv", name: "KPV", unit: "mcg", frequency: "daily", range: [200, 500], max: 500, cycleDays: 28, evidence: "community", classes: ["healing"], route: "subcutaneous" }),
+  m({ slug: "thymosin-alpha-1", name: "Thymosin Alpha-1", unit: "mg", frequency: "several-weekly", range: [1.5, 1.6], max: 1.6, evidence: "trial", classes: ["immune"], route: "subcutaneous" }),
+  m({ slug: "ll-37", name: "LL-37", unit: "mcg", frequency: "several-weekly", range: [100, 500], max: 500, cycleDays: 14, evidence: "community", classes: ["immune"], route: "subcutaneous" }),
 
   // Growth hormone axis
-  m({ slug: "tesamorelin", name: "Tesamorelin", unit: "mg", frequency: "daily", range: [1, 2], max: 2, classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "sermorelin", name: "Sermorelin", unit: "mcg", frequency: "daily", range: [200, 300], max: 300, cycleDays: 84, classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "ipamorelin", name: "Ipamorelin", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, titration: { steps: [100, 200, 300], weeksPerStep: 1 }, classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "cjc-1295-no-dac", name: "CJC-1295 (No DAC)", unit: "mcg", frequency: "daily", range: [100, 200], max: 200, cycleDays: 84, classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "cjc-1295", name: "CJC-1295 / Ipamorelin blend", unit: "mcg", frequency: "daily", range: [200, 600], max: 600, cycleDays: 84, titration: { steps: [200, 400, 600], weeksPerStep: 2 }, classes: ["ghrh", "ghrp", "growth-signal"], components: { "cjc-1295-no-dac": 0.5, ipamorelin: 0.5 }, route: "subcutaneous" }),
-  m({ slug: "cjc-1295-dac", name: "CJC-1295 (With DAC)", unit: "mg", frequency: "weekly", range: [1, 2], max: 2, cycleDays: 84, classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "ghrp-2", name: "GHRP-2", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "ghrp-6", name: "GHRP-6", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
-  m({ slug: "kisspeptin-10", name: "Kisspeptin-10", unit: "mcg", frequency: "daily", range: [100, 200], max: 200, cycleDays: 28, classes: ["growth-signal"], route: "subcutaneous" }),
-  m({ slug: "igf-1-des", name: "IGF-1 DES", unit: "mcg", frequency: "daily", range: [50, 150], max: 150, cycleDays: 28, classes: ["igf", "growth-signal"], route: "subcutaneous-or-im" }),
-  m({ slug: "igf-1-lr3", name: "IGF-1 LR3", unit: "mcg", frequency: "daily", range: [20, 40], max: 50, cycleDays: 42, titration: { steps: [20, 40], weeksPerStep: 2 }, classes: ["igf", "growth-signal"], route: "subcutaneous-or-im" }),
+  m({ slug: "tesamorelin", name: "Tesamorelin", unit: "mg", frequency: "daily", range: [1, 2], max: 2, evidence: "clinical", classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "sermorelin", name: "Sermorelin", unit: "mcg", frequency: "daily", range: [200, 300], max: 300, cycleDays: 84, evidence: "clinical", classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "ipamorelin", name: "Ipamorelin", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, titration: { steps: [100, 200, 300], weeksPerStep: 1 }, evidence: "community", classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "cjc-1295-no-dac", name: "CJC-1295 (No DAC)", unit: "mcg", frequency: "daily", range: [100, 200], max: 200, cycleDays: 84, evidence: "community", classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "cjc-1295", name: "CJC-1295 / Ipamorelin blend", unit: "mcg", frequency: "daily", range: [200, 600], max: 600, cycleDays: 84, titration: { steps: [200, 400, 600], weeksPerStep: 2 }, evidence: "community", combinationEvidence: "limited", classes: ["ghrh", "ghrp", "growth-signal"], components: { "cjc-1295-no-dac": 0.5, ipamorelin: 0.5 }, route: "subcutaneous" }),
+  m({ slug: "cjc-1295-dac", name: "CJC-1295 (With DAC)", unit: "mg", frequency: "weekly", range: [1, 2], max: 2, cycleDays: 84, evidence: "community", classes: ["ghrh", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "ghrp-2", name: "GHRP-2", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, evidence: "community", classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "ghrp-6", name: "GHRP-6", unit: "mcg", frequency: "daily", range: [100, 300], max: 300, cycleDays: 84, evidence: "community", classes: ["ghrp", "growth-signal"], route: "subcutaneous" }),
+  m({ slug: "kisspeptin-10", name: "Kisspeptin-10", unit: "mcg", frequency: "daily", range: [100, 200], max: 200, cycleDays: 28, evidence: "community", classes: ["growth-signal"], route: "subcutaneous" }),
+  m({ slug: "igf-1-des", name: "IGF-1 DES", unit: "mcg", frequency: "daily", range: [50, 150], max: 150, cycleDays: 28, evidence: "community", classes: ["igf", "growth-signal"], route: "subcutaneous-or-im" }),
+  m({ slug: "igf-1-lr3", name: "IGF-1 LR3", unit: "mcg", frequency: "daily", range: [20, 40], max: 50, cycleDays: 42, titration: { steps: [20, 40], weeksPerStep: 2 }, evidence: "community", classes: ["igf", "growth-signal"], route: "subcutaneous-or-im" }),
 
   // Skin, tanning, and sexual health
-  m({ slug: "ghk-cu", name: "GHK-Cu", unit: "mg", frequency: "daily", range: [1, 2], max: 2, cycleDays: 30, classes: ["copper"], route: "subcutaneous" }),
-  m({ slug: "glow", name: "GLOW blend", unit: "mg", frequency: "daily", range: [1.4, 3.5], max: 3.5, cycleDays: 84, classes: ["copper", "healing", "growth-signal"], components: { "ghk-cu": 5 / 7, "bpc-157": 1 / 7, "tb-500": 1 / 7 }, route: "subcutaneous" }),
-  m({ slug: "klow", name: "KLOW blend", unit: "mg", frequency: "daily", range: [1.6, 4], max: 4, cycleDays: 84, classes: ["copper", "healing", "growth-signal"], components: { "ghk-cu": 5 / 8, "bpc-157": 1 / 8, "tb-500": 1 / 8, kpv: 1 / 8 }, route: "subcutaneous" }),
-  m({ slug: "melanotan-2", name: "Melanotan-2", unit: "mg", frequency: "several-weekly", range: [0.25, 1], max: 1, classes: ["melanocortin"], route: "subcutaneous" }),
-  m({ slug: "melanotan-1", name: "Melanotan-1", unit: "mg", frequency: "several-weekly", range: [0.25, 0.25], max: 0.25, classes: ["melanocortin"], route: "subcutaneous" }),
-  m({ slug: "pt-141", name: "PT-141", unit: "mg", frequency: "as-needed", range: [1, 2], max: 2, classes: ["melanocortin"], route: "subcutaneous" }),
+  m({ slug: "ghk-cu", name: "GHK-Cu", unit: "mg", frequency: "daily", range: [1, 2], max: 2, cycleDays: 30, evidence: "community", classes: ["copper"], route: "subcutaneous" }),
+  m({ slug: "glow", name: "GLOW blend", unit: "mg", frequency: "daily", range: [1.4, 3.5], max: 3.5, cycleDays: 84, evidence: "community", combinationEvidence: "limited", classes: ["copper", "healing", "growth-signal"], components: { "ghk-cu": 5 / 7, "bpc-157": 1 / 7, "tb-500": 1 / 7 }, route: "subcutaneous" }),
+  m({ slug: "klow", name: "KLOW blend", unit: "mg", frequency: "daily", range: [1.6, 4], max: 4, cycleDays: 84, evidence: "community", combinationEvidence: "limited", classes: ["copper", "healing", "growth-signal"], components: { "ghk-cu": 5 / 8, "bpc-157": 1 / 8, "tb-500": 1 / 8, kpv: 1 / 8 }, route: "subcutaneous" }),
+  m({ slug: "melanotan-2", name: "Melanotan-2", unit: "mg", frequency: "several-weekly", range: [0.25, 1], max: 1, evidence: "community", classes: ["melanocortin"], route: "subcutaneous" }),
+  m({ slug: "melanotan-1", name: "Melanotan-1", unit: "mg", frequency: "several-weekly", range: [0.25, 0.25], max: 0.25, evidence: "trial", classes: ["melanocortin"], route: "subcutaneous" }),
+  m({ slug: "pt-141", name: "PT-141", unit: "mg", frequency: "as-needed", range: [1, 2], max: 2, evidence: "clinical", classes: ["melanocortin"], route: "subcutaneous" }),
 
   // Longevity and cellular
-  m({ slug: "mots-c", name: "MOTS-c", unit: "mg", frequency: "several-weekly", range: [1, 5], max: 5, cycleDays: 56, classes: ["mitochondrial"], route: "subcutaneous" }),
-  m({ slug: "ss-31", name: "SS-31", unit: "mg", frequency: "several-weekly", range: [5, 10], max: 10, cycleDays: 42, classes: ["mitochondrial"], route: "subcutaneous" }),
-  m({ slug: "epitalon", name: "Epitalon", unit: "mg", frequency: "daily", range: [5, 10], max: 10, cycleDays: 20, classes: ["mitochondrial"], route: "subcutaneous" }),
-  m({ slug: "nad-plus", name: "NAD+", unit: "mg", frequency: "several-weekly", range: [20, 100], max: 100, titration: { steps: [20, 50, 100], weeksPerStep: 1 }, cycleDays: 42, classes: ["mitochondrial"], route: "subcutaneous" }),
-  m({ slug: "glutathione", name: "Glutathione", unit: "mg", frequency: "several-weekly", range: [200, 600], max: 600, classes: ["antioxidant"], route: "subcutaneous-or-im" }),
+  m({ slug: "mots-c", name: "MOTS-c", unit: "mg", frequency: "several-weekly", range: [1, 5], max: 5, cycleDays: 56, evidence: "community", classes: ["mitochondrial"], route: "subcutaneous" }),
+  m({ slug: "ss-31", name: "SS-31", unit: "mg", frequency: "several-weekly", range: [5, 10], max: 10, cycleDays: 42, evidence: "trial", classes: ["mitochondrial"], route: "subcutaneous" }),
+  m({ slug: "epitalon", name: "Epitalon", unit: "mg", frequency: "daily", range: [5, 10], max: 10, cycleDays: 20, evidence: "community", classes: ["mitochondrial"], route: "subcutaneous" }),
+  m({ slug: "nad-plus", name: "NAD+", unit: "mg", frequency: "several-weekly", range: [20, 100], max: 100, titration: { steps: [20, 50, 100], weeksPerStep: 1 }, cycleDays: 42, evidence: "community", classes: ["mitochondrial"], route: "subcutaneous" }),
+  m({ slug: "glutathione", name: "Glutathione", unit: "mg", frequency: "several-weekly", range: [200, 600], max: 600, evidence: "trial", classes: ["antioxidant"], route: "subcutaneous-or-im" }),
 
   // Brain and sleep
-  m({ slug: "semax", name: "Semax", unit: "mcg", frequency: "daily", range: [300, 600], max: 600, cycleDays: 10, classes: ["nootropic"], route: "subcutaneous" }),
-  m({ slug: "selank", name: "Selank", unit: "mcg", frequency: "daily", range: [200, 400], max: 400, cycleDays: 14, classes: ["nootropic"], route: "subcutaneous" }),
-  m({ slug: "semax-selank-blend", name: "Semax + Selank blend", unit: "mcg", frequency: "daily", range: [400, 1000], max: 1000, cycleDays: 10, classes: ["nootropic"], components: { semax: 0.5, selank: 0.5 }, route: "subcutaneous" }),
-  m({ slug: "pinealon", name: "Pinealon", unit: "mg", frequency: "daily", range: [1, 1.5], max: 1.5, cycleDays: 20, classes: ["nootropic"], route: "subcutaneous" }),
-  m({ slug: "dsip", name: "DSIP", unit: "mcg", frequency: "as-needed", range: [100, 200], max: 200, cycleDays: 14, classes: ["sleep"], route: "subcutaneous" }),
+  m({ slug: "semax", name: "Semax", unit: "mcg", frequency: "daily", range: [300, 600], max: 600, cycleDays: 10, evidence: "trial", classes: ["nootropic"], route: "subcutaneous" }),
+  m({ slug: "selank", name: "Selank", unit: "mcg", frequency: "daily", range: [200, 400], max: 400, cycleDays: 14, evidence: "trial", classes: ["nootropic"], route: "subcutaneous" }),
+  m({ slug: "semax-selank-blend", name: "Semax + Selank blend", unit: "mcg", frequency: "daily", range: [400, 1000], max: 1000, cycleDays: 10, evidence: "community", combinationEvidence: "limited", classes: ["nootropic"], components: { semax: 0.5, selank: 0.5 }, route: "subcutaneous" }),
+  m({ slug: "pinealon", name: "Pinealon", unit: "mg", frequency: "daily", range: [1, 1.5], max: 1.5, cycleDays: 20, evidence: "community", classes: ["nootropic"], route: "subcutaneous" }),
+  m({ slug: "dsip", name: "DSIP", unit: "mcg", frequency: "as-needed", range: [100, 200], max: 200, cycleDays: 14, evidence: "community", classes: ["sleep"], route: "subcutaneous" }),
 ];
 
 const bySlug = new Map(compounds.map((compound) => [compound.slug, compound]));
@@ -156,6 +165,19 @@ export function siteLabel(id: SiteId): string {
 }
 
 // ── Side effects ─────────────────────────────────────────────────────────
+
+/** Red flags: these stop regimen guidance and send the user to medical care. */
+export const urgentSymptoms = [
+  { id: "chest-pain", label: "Chest pain or pressure" },
+  { id: "breathing", label: "Severe shortness of breath" },
+  { id: "fainting", label: "Fainting or near-fainting" },
+  { id: "allergy", label: "Swelling of face or throat, or a spreading rash" },
+  { id: "neuro", label: "Weakness, slurred speech, or confusion" },
+  { id: "abdominal", label: "Severe or persistent abdominal pain" },
+  { id: "vision", label: "Sudden vision change" },
+] as const;
+
+export type UrgentSymptomId = (typeof urgentSymptoms)[number]["id"];
 
 export const symptoms = [
   { id: "nausea", label: "Nausea or vomiting", gi: true },
