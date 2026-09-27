@@ -55,7 +55,13 @@ const extraGuides = guides.filter((guide) => {
   return claimed?.slug !== guide.slug;
 });
 
-export const compoundRows: CompoundRow[] = [
+/**
+ * The register carries only compounds Aevum can actually say something about:
+ * one with a dosing protocol, or one NovaEvum stocks. Monographs with neither
+ * were research summaries with no guidance attached, so they are left out and
+ * their URLs 404 rather than redirecting somewhere unrelated.
+ */
+const allRows: CompoundRow[] = [
   ...library.map((entry) => {
     const guide = primaryGuide(entry.slug);
     return {
@@ -90,10 +96,21 @@ export const compoundRows: CompoundRow[] = [
   }),
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+export const compoundRows: CompoundRow[] = allRows.filter((row) => row.hasProtocol || row.stocked);
+
+const kept = new Set(compoundRows.map((row) => row.slug));
+
 /** Every URL the section answers on, including protocol-slug aliases. */
-export const compoundSlugs: string[] = [...new Set([...library.map((entry) => entry.slug), ...guides.map((guide) => guide.slug)])];
+export const compoundSlugs: string[] = [
+  ...new Set([...compoundRows.map((row) => row.slug), ...guides.map((guide) => guide.slug)]),
+];
 
 export function compoundPage(slug: string): CompoundPage | null {
+  const page = resolvePage(slug);
+  return page && (kept.has(page.canonical) || kept.has(slug)) ? page : null;
+}
+
+function resolvePage(slug: string): CompoundPage | null {
   const entry = getEntry(slug);
   if (entry) {
     return { canonical: entry.slug, entry, guide: primaryGuide(entry.slug), worksheet: worksheetFor(entry.slug) };
