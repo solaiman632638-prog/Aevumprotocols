@@ -1,20 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree, IBM_Plex_Mono } from "next/font/google";
+import { Doto, Space_Grotesk, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SyncBridge } from "@/components/sync/SyncBridge";
 import "./globals.css";
 
-const sans = Figtree({
+const sans = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-figtree",
+  variable: "--font-grotesk",
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const mono = IBM_Plex_Mono({
+const readout = Doto({
   subsets: ["latin"],
-  variable: "--font-plex-mono",
-  weight: ["400", "500"],
+  variable: "--font-doto",
+  weight: ["400", "600", "700"],
+});
+
+const mono = Space_Mono({
+  subsets: ["latin"],
+  variable: "--font-space-mono",
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -39,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${mono.variable} h-full antialiased`}
+      className={`${sans.variable} ${mono.variable} ${readout.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <SiteShell>{children}</SiteShell>

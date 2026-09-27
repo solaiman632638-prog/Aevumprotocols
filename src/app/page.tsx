@@ -139,7 +139,12 @@ export default function Home() {
           ].map((stat) => (
             <div key={stat.label} className="py-10 pr-4">
               <dt className="eyebrow">{stat.label}</dt>
-              <dd className={`mt-2 ${display} text-6xl sm:text-7xl`}>{stat.value}</dd>
+              <dd
+                className="mt-2 text-6xl font-light tracking-[-0.02em] sm:text-7xl"
+                style={{ fontFamily: "var(--font-readout)" }}
+              >
+                {stat.value}
+              </dd>
             </div>
           ))}
         </dl>

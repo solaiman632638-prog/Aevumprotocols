@@ -44,7 +44,7 @@ const strengthTone = {
 } as const;
 
 const tierTone: Record<RiskTier, string> = {
-  "Best evidenced": "border-recovery/60 text-brass",
+  "Best evidenced": "border-recovery/60 text-[color:var(--color-recovery)]",
   "Reasonable evidence": "border-rule text-mute",
   "Limited evidence": "border-[color:var(--color-strain)]/60 text-[color:var(--color-strain)]",
   "Most uncertain": "border-warn/60 text-warn",

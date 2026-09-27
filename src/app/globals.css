@@ -1,36 +1,40 @@
 @import "tailwindcss";
 
 /**
- * Aevum Protocols — performance tokens.
+ * Aevum Protocols — clinical instrument tokens.
  *
- * Black stage, graphite panels, one electric-blue accent, a signal green
- * for labels. Big light headlines, uppercase buttons, generous radii.
- * Token names predate the dark theme: "pine" is the accent fill,
- * "pine-deep" the accent as text, "brass" the signal green.
+ * Near-black stage, layered graphite panels, cool off-white type, and no
+ * decorative accent: the chrome is monochrome and only data carries colour.
+ * Token names predate the palette: "pine" is the primary fill (now light on
+ * dark), "pine-deep" the same as text, "brass" a signal colour kept for
+ * meaning — evidence tiers, legends — not for decoration.
  */
 @theme {
-  --color-paper: #000000;
-  --color-sheet: #161616;
-  --color-ink: #ffffff;
-  --color-mute: #a1a1a1;
-  --color-pine: #4a53ff;
-  --color-pine-deep: #9ba1ff;
-  --color-brass: #00f19f;
-  --color-rule: #2c2c2c;
+  --color-paper: #040404;
+  --color-sheet: #0a0a0a;
+  --color-ink: #e8edf2;
+  --color-mute: #8a8f96;
+  --color-dim: #5a5e63;
+  --color-pine: #e8edf2;
+  --color-pine-deep: #e8edf2;
+  --color-brass: #8a8f96;
+  --color-rule: #1c1e20;
   --color-warn: #ff6b6b;
   --color-warn-tint: #2a1414;
-  --color-on-accent: #ffffff;
+  --color-on-accent: #050505;
 
   /* Metric identity on #1e1e1e panels. Validated dark-mode categorical set;
      always paired with a text label, never color alone. */
   --color-recovery: #0ea27a;
   --color-sleep: #6f78ff;
   --color-strain: #c67a20;
-  --color-panel: #1e1e1e;
+  --color-panel: #111111;
 
-  --font-display: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-figtree), "Figtree", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-grotesk), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-grotesk), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), "Space Mono", ui-monospace, SFMono-Regular, monospace;
+  /* Dot-matrix numerals, for figures that should read as an instrument. */
+  --font-readout: var(--font-doto), "Doto", var(--font-space-mono), monospace;
 
   --default-transition-duration: 160ms;
 }
@@ -51,7 +55,7 @@
   text-transform: uppercase;
   text-decoration: none;
   &:hover {
-    background-color: #353de6;
+    background-color: #ffffff;
   }
 }
 
@@ -77,11 +81,12 @@
 
 /* Small uppercase label above headings and in table groups. */
 @utility eyebrow {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-brass);
+  color: var(--color-mute);
 }
 
 @layer base {
@@ -101,7 +106,8 @@
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--color-pine) 55%, var(--color-paper));
+    background: var(--color-ink);
+    color: var(--color-paper);
   }
 
   h1,

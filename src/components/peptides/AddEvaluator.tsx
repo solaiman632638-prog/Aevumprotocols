@@ -10,7 +10,7 @@ import type { UserContext } from "@/lib/today/types";
 const field = "w-full rounded-xl border border-rule bg-paper px-3 py-2.5 text-sm outline-none focus:border-pine";
 
 const tierTone: Record<RiskTier, string> = {
-  "Best evidenced": "text-brass",
+  "Best evidenced": "text-[color:var(--color-recovery)]",
   "Reasonable evidence": "text-mute",
   "Limited evidence": "text-[color:var(--color-strain)]",
   "Most uncertain": "text-warn",
