@@ -35,7 +35,28 @@ export function useSession(): SessionState {
         recovering: event === "PASSWORD_RECOVERY" ? true : event === "SIGNED_OUT" ? false : current.recovering,
       }));
     });
-    return () => data.subscription.unsubscribe();
+
+    // Confirmation links open in a second tab, which is where the session is
+    // established. Re-check when this tab is looked at again so the person
+    // who is still staring at "check your email" sees it resolve.
+    const recheck = () => {
+      if (document.visibilityState !== "visible") return;
+      void supabase.auth.getSession().then(({ data: current }) => {
+        setState((previous) =>
+          previous.email === (current.session?.user.email ?? null)
+            ? previous
+            : { ...previous, ready: true, email: current.session?.user.email ?? null },
+        );
+      });
+    };
+
+    document.addEventListener("visibilitychange", recheck);
+    window.addEventListener("focus", recheck);
+    return () => {
+      data.subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", recheck);
+      window.removeEventListener("focus", recheck);
+    };
   }, []);
 
   return state;

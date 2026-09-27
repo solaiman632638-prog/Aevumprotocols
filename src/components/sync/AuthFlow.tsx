@@ -156,6 +156,7 @@ export function AuthFlow({
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [code, setCode] = useState("");
+  const [showCode, setShowCode] = useState(false);
   const [cardHeight, setCardHeight] = useState(0);
   const [verifyHeight, setVerifyHeight] = useState(0);
   const [pendingEmail, setPendingEmail] = useState("");
@@ -188,6 +189,7 @@ export function AuthFlow({
   function reset() {
     setVerifying(false);
     setCode("");
+    setShowCode(false);
     setPassword("");
     setShowPassword(false);
     setFieldError(null);
@@ -253,7 +255,10 @@ export function AuthFlow({
     const { error } = await supabase.auth.verifyOtp({ email: pendingEmail, token: code, type: "signup" });
     setLoading(false);
     if (error) {
-      onStatus({ tone: "error", text: friendly(error.message) });
+      onStatus({
+        tone: "error",
+        text: `${friendly(error.message)} If the email only had a link, open that instead.`,
+      });
       setCode("");
     }
     // On success the session listener swaps this whole panel for the signed-in view.
@@ -262,7 +267,11 @@ export function AuthFlow({
   async function handleResend() {
     const supabase = syncClient();
     if (!supabase) return;
-    const { error } = await supabase.auth.resend({ type: "signup", email: pendingEmail });
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: pendingEmail,
+      options: { emailRedirectTo: `${window.location.origin}/account` },
+    });
     onStatus(
       error
         ? { tone: "error", text: friendly(error.message) }
@@ -370,20 +379,30 @@ export function AuthFlow({
               animate="verifying"
               exit="default"
             >
-              <h2 className="auth__card-title font-display">Confirm your email</h2>
+              <h2 className="auth__card-title font-display">Check your email</h2>
               <p className="auth__card-description">
-                We sent a message to {pendingEmail}. Enter the six-digit code, or just open the
-                link in the email.
+                We sent a confirmation link to {pendingEmail}. Open it on this device and
+                you are in — this page signs you in by itself.
               </p>
-              <form onSubmit={handleVerify} noValidate>
-                <div className="auth__field" style={{ width: "min-content", marginInline: "auto" }}>
-                  <OTPInput length={6} value={code} onChange={setCode} />
-                </div>
-                <ResendButton onResend={handleResend} />
-                <button className="auth__btn auth__btn--primary" type="submit" disabled={loading}>
-                  {loading ? <Spinner size={12} /> : <span>Verify</span>}
+
+              <p className="auth__waiting">Waiting for you to confirm…</p>
+              <ResendButton onResend={handleResend} />
+
+              {showCode ? (
+                <form onSubmit={handleVerify} noValidate>
+                  <div className="auth__field" style={{ width: "min-content", marginInline: "auto" }}>
+                    <OTPInput length={6} value={code} onChange={setCode} />
+                  </div>
+                  <button className="auth__btn auth__btn--primary" type="submit" disabled={loading}>
+                    {loading ? <Spinner size={12} /> : <span>Verify</span>}
+                  </button>
+                </form>
+              ) : (
+                <button type="button" className="resend" onClick={() => setShowCode(true)} style={{ marginTop: "0.75rem" }}>
+                  My email had a six-digit code instead
                 </button>
-              </form>
+              )}
+
               <button className="auth__btn" onClick={reset} type="button" style={{ marginTop: "0.5rem" }}>
                 Start over
               </button>
@@ -531,6 +550,27 @@ export function AuthFlow({
         }
         .otp__slot:first-child { border-start-start-radius: 0.75rem; border-end-start-radius: 0.75rem; margin-inline-start: 0; }
         .otp__slot:last-child { border-start-end-radius: 0.75rem; border-end-end-radius: 0.75rem; }
+
+        .auth__waiting {
+          margin-top: 1.5rem;
+          text-align: center;
+          font-size: 0.8125rem;
+          color: var(--color-mute);
+        }
+        .auth__waiting::after {
+          content: "";
+          display: inline-block;
+          width: 0.4rem;
+          height: 0.4rem;
+          margin-left: 0.5rem;
+          border-radius: 9999px;
+          background: currentColor;
+          animation: auth-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes auth-pulse {
+          0%, 100% { opacity: 0.25; }
+          50% { opacity: 1; }
+        }
 
         .resend {
           display: block;
