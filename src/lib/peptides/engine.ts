@@ -646,7 +646,7 @@ function siteSummary(days_: DayState[], today: string): SiteSummary {
       usage[dose.site] = { lastDate: day.date, count: (previous?.count ?? 0) + 1 };
     }
   }
-  const subcutaneous = sites.filter((site) => !site.im || site.id.startsWith("thigh"));
+  const subcutaneous = sites.filter((site) => site.subq);
   const suggestion = [...subcutaneous].sort((a, b) => (usage[a.id]?.lastDate ?? "").localeCompare(usage[b.id]?.lastDate ?? ""))[0].id;
   return { usage, suggestion, repeats };
 }

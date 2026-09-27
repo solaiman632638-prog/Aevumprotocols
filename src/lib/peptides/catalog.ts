@@ -135,30 +135,73 @@ export type SiteId =
   | "flank-right"
   | "thigh-left"
   | "thigh-right"
+  | "thigh-front-left"
+  | "thigh-front-right"
   | "deltoid-left"
   | "deltoid-right"
+  | "arm-outer-left"
+  | "arm-outer-right"
   | "triceps-left"
   | "triceps-right"
   | "glute-left"
-  | "glute-right";
+  | "glute-right"
+  | "hip-left"
+  | "hip-right"
+  | "lowback-left"
+  | "lowback-right";
 
-/** Sites on the body map. x/y are in the 200 × 440 outline's coordinates. */
-export const sites: { id: SiteId; label: string; view: "front" | "back"; x: number; y: number; im: boolean }[] = [
-  { id: "deltoid-right", label: "Right shoulder", view: "front", x: 58, y: 106, im: true },
-  { id: "deltoid-left", label: "Left shoulder", view: "front", x: 142, y: 106, im: true },
-  { id: "abdomen-upper-right", label: "Belly, upper right", view: "front", x: 84, y: 176, im: false },
-  { id: "abdomen-upper-left", label: "Belly, upper left", view: "front", x: 116, y: 176, im: false },
-  { id: "abdomen-lower-right", label: "Belly, lower right", view: "front", x: 84, y: 208, im: false },
-  { id: "abdomen-lower-left", label: "Belly, lower left", view: "front", x: 116, y: 208, im: false },
-  { id: "flank-right", label: "Right love handle", view: "front", x: 66, y: 196, im: false },
-  { id: "flank-left", label: "Left love handle", view: "front", x: 134, y: 196, im: false },
-  { id: "thigh-right", label: "Right thigh", view: "front", x: 80, y: 290, im: true },
-  { id: "thigh-left", label: "Left thigh", view: "front", x: 120, y: 290, im: true },
-  { id: "triceps-left", label: "Back of left arm", view: "back", x: 52, y: 140, im: false },
-  { id: "triceps-right", label: "Back of right arm", view: "back", x: 148, y: 140, im: false },
-  { id: "glute-left", label: "Left glute", view: "back", x: 82, y: 236, im: true },
-  { id: "glute-right", label: "Right glute", view: "back", x: 118, y: 236, im: true },
+/**
+ * Injection sites, positioned in the 240 × 520 body outline.
+ *
+ * Only sites that are actually used for subcutaneous or intramuscular
+ * injection are here. Muscles people sometimes inject for size — biceps,
+ * pecs, calves, traps — are drawn on the diagram but are not offered:
+ * they sit over nerves and vessels, and nothing in this register calls for
+ * them. `subq` marks the sites rotation is suggested from.
+ */
+export const sites: {
+  id: SiteId;
+  label: string;
+  /** The muscle or landmark, for people who want the anatomical name. */
+  detail: string;
+  view: "front" | "back";
+  x: number;
+  y: number;
+  /** Half-width and half-height of the usable area, not just a point. */
+  rx: number;
+  ry: number;
+  im: boolean;
+  subq: boolean;
+}[] = [
+  // Front
+  { id: "deltoid-right", label: "Right shoulder", detail: "Deltoid", view: "front", x: 82, y: 110, rx: 12, ry: 14, im: true, subq: false },
+  { id: "deltoid-left", label: "Left shoulder", detail: "Deltoid", view: "front", x: 158, y: 110, rx: 12, ry: 14, im: true, subq: false },
+  { id: "arm-outer-right", label: "Right upper arm", detail: "Fat over the outer arm", view: "front", x: 68, y: 162, rx: 9, ry: 17, im: false, subq: true },
+  { id: "arm-outer-left", label: "Left upper arm", detail: "Fat over the outer arm", view: "front", x: 172, y: 162, rx: 9, ry: 17, im: false, subq: true },
+  { id: "abdomen-upper-right", label: "Belly, upper right", detail: "Two finger-widths clear of the navel", view: "front", x: 106, y: 178, rx: 12, ry: 13, im: false, subq: true },
+  { id: "abdomen-upper-left", label: "Belly, upper left", detail: "Two finger-widths clear of the navel", view: "front", x: 134, y: 178, rx: 12, ry: 13, im: false, subq: true },
+  { id: "abdomen-lower-right", label: "Belly, lower right", detail: "Two finger-widths clear of the navel", view: "front", x: 106, y: 212, rx: 12, ry: 13, im: false, subq: true },
+  { id: "abdomen-lower-left", label: "Belly, lower left", detail: "Two finger-widths clear of the navel", view: "front", x: 134, y: 212, rx: 12, ry: 13, im: false, subq: true },
+  { id: "flank-right", label: "Right love handle", detail: "Fat over the oblique", view: "front", x: 88, y: 198, rx: 8, ry: 16, im: false, subq: true },
+  { id: "flank-left", label: "Left love handle", detail: "Fat over the oblique", view: "front", x: 152, y: 198, rx: 8, ry: 16, im: false, subq: true },
+  { id: "thigh-right", label: "Right outer thigh", detail: "Vastus lateralis", view: "front", x: 94, y: 322, rx: 8, ry: 28, im: true, subq: true },
+  { id: "thigh-left", label: "Left outer thigh", detail: "Vastus lateralis", view: "front", x: 146, y: 322, rx: 8, ry: 28, im: true, subq: true },
+  { id: "thigh-front-right", label: "Right front thigh", detail: "Rectus femoris", view: "front", x: 110, y: 316, rx: 8, ry: 26, im: true, subq: true },
+  { id: "thigh-front-left", label: "Left front thigh", detail: "Rectus femoris", view: "front", x: 130, y: 316, rx: 8, ry: 26, im: true, subq: true },
+  // Back
+  { id: "triceps-left", label: "Back of left arm", detail: "Fat over the triceps", view: "back", x: 68, y: 165, rx: 9, ry: 18, im: false, subq: true },
+  { id: "triceps-right", label: "Back of right arm", detail: "Fat over the triceps", view: "back", x: 172, y: 165, rx: 9, ry: 18, im: false, subq: true },
+  { id: "lowback-left", label: "Left lower back", detail: "Fat above the hip bone", view: "back", x: 104, y: 228, rx: 11, ry: 13, im: false, subq: true },
+  { id: "lowback-right", label: "Right lower back", detail: "Fat above the hip bone", view: "back", x: 136, y: 228, rx: 11, ry: 13, im: false, subq: true },
+  { id: "hip-left", label: "Left hip", detail: "Ventrogluteal", view: "back", x: 80, y: 264, rx: 10, ry: 13, im: true, subq: false },
+  { id: "hip-right", label: "Right hip", detail: "Ventrogluteal", view: "back", x: 160, y: 264, rx: 10, ry: 13, im: true, subq: false },
+  { id: "glute-left", label: "Left glute", detail: "Upper outer quarter only", view: "back", x: 106, y: 286, rx: 14, ry: 15, im: true, subq: true },
+  { id: "glute-right", label: "Right glute", detail: "Upper outer quarter only", view: "back", x: 134, y: 286, rx: 14, ry: 15, im: true, subq: true },
 ];
+
+export function siteDetail(id: SiteId): string {
+  return sites.find((site) => site.id === id)?.detail ?? "";
+}
 
 export function siteLabel(id: SiteId): string {
   return sites.find((site) => site.id === id)?.label ?? id;
