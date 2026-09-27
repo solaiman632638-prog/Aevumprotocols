@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AuthFlow } from "@/components/sync/AuthFlow";
 import { syncClient } from "@/lib/sync/client";
+import { friendly, MIN_PASSWORD } from "@/lib/sync/errors";
 import { deleteAccount, syncNow } from "@/lib/sync/sync";
 import { useSession } from "@/lib/sync/useSession";
 import { clearLocalData, loadCheckinMap, loadProfile } from "@/lib/today/storage";
@@ -10,7 +12,6 @@ import { clearLocalData, loadCheckinMap, loadProfile } from "@/lib/today/storage
 type Status = { tone: "ok" | "error"; text: string } | null;
 type Mode = "signup" | "login" | "link" | "reset";
 
-const MIN_PASSWORD = 8;
 const field = "w-full rounded-xl border border-rule bg-paper px-3 py-2.5 text-sm outline-none focus:border-pine";
 const card = "rounded-3xl border border-rule bg-sheet p-6 sm:p-8";
 const textLink = "text-pine-deep underline decoration-rule underline-offset-2";
@@ -25,20 +26,10 @@ function downloadExport() {
   URL.revokeObjectURL(link.href);
 }
 
-/** Supabase's error text, reworded where it would confuse people. */
-function friendly(message: string): string {
-  if (/invalid login credentials/i.test(message)) return "That email and password don't match. Try again or reset your password.";
-  if (/email not confirmed/i.test(message)) return "Confirm your email first: open the link we sent you.";
-  if (/already registered|already been registered/i.test(message)) return "There is already an account with that email. Log in instead.";
-  if (/rate limit/i.test(message)) return "Too many emails in a short time. Wait a few minutes and try again.";
-  return message;
-}
-
 export function AccountPanel() {
   const session = useSession();
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
@@ -52,26 +43,11 @@ export function AccountPanel() {
     if (!supabase) return;
     const address = email.trim();
     if (!/^\S+@\S+\.\S+$/.test(address)) return setStatus({ tone: "error", text: "Enter a valid email address." });
-    if ((mode === "signup" || mode === "login") && password.length < MIN_PASSWORD) {
-      return setStatus({ tone: "error", text: `Passwords are at least ${MIN_PASSWORD} characters.` });
-    }
 
     setBusy(true);
     setStatus(null);
     try {
-      if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({ email: address, password, options: { emailRedirectTo: redirectTo() } });
-        if (error) throw error;
-        // With email confirmation on, Supabase returns no session until the link is opened.
-        setStatus(
-          data.session
-            ? { tone: "ok", text: "Account created. Your data now syncs." }
-            : { tone: "ok", text: `Almost done: we sent a confirmation link to ${address}. Open it to finish creating your account.` },
-        );
-      } else if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email: address, password });
-        if (error) throw error;
-      } else if (mode === "link") {
+      if (mode === "link") {
         const { error } = await supabase.auth.signInWithOtp({ email: address, options: { emailRedirectTo: redirectTo() } });
         if (error) throw error;
         setStatus({ tone: "ok", text: `Check ${address} for a sign-in link. Open it on this device.` });
@@ -121,11 +97,6 @@ export function AccountPanel() {
 
   if (!session.ready) return <p className="text-mute">Loading…</p>;
 
-  const tabs: { id: Mode; label: string }[] = [
-    { id: "signup", label: "Create account" },
-    { id: "login", label: "Log in" },
-  ];
-
   return (
     <div className="space-y-6">
       {!session.configured ? (
@@ -164,40 +135,32 @@ export function AccountPanel() {
             <button type="button" onClick={signOut} className="btn-secondary">Sign out</button>
           </div>
         </section>
+      ) : mode === "signup" || mode === "login" ? (
+        <AuthFlow
+          mode={mode}
+          onModeChange={(next) => {
+            setMode(next);
+            setStatus(null);
+          }}
+          onRecover={() => {
+            setMode("reset");
+            setStatus(null);
+          }}
+          onMagicLink={() => {
+            setMode("link");
+            setStatus(null);
+          }}
+          onStatus={setStatus}
+        />
       ) : (
         <section className={card}>
-          <div className="flex gap-2" role="tablist" aria-label="Create account or log in">
-            {tabs.map((tab) => {
-              const active = mode === tab.id || (tab.id === "login" && (mode === "link" || mode === "reset"));
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => {
-                    setMode(tab.id);
-                    setStatus(null);
-                  }}
-                  className={`min-h-11 rounded-full border px-4 text-sm ${active ? "border-pine bg-pine text-on-accent" : "border-rule text-mute hover:border-ink hover:text-ink"}`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <h2 className="mt-6 font-display text-3xl font-light tracking-[-0.03em]">
-            {mode === "signup" ? "Create your free account" : mode === "reset" ? "Reset your password" : "Welcome back"}
+          <h2 className="font-display text-3xl font-light tracking-[-0.03em]">
+            {mode === "reset" ? "Reset your password" : "Email me a sign-in link"}
           </h2>
           <p className="mt-2 max-w-prose text-mute">
-            {mode === "signup"
-              ? "Save your goals and every check-in, see your history on any device, and never lose your progress."
-              : mode === "reset"
-                ? "Enter your email and we'll send you a link to choose a new password."
-                : mode === "link"
-                  ? "No password needed: we'll email you a link that signs you in."
-                  : "Log in to sync your check-ins across your devices."}
+            {mode === "reset"
+              ? "Enter your email and we'll send you a link to choose a new password."
+              : "No password needed: we'll email you a link that signs you in."}
           </p>
 
           <form onSubmit={submit} className="mt-6 max-w-md space-y-4" noValidate>
@@ -205,50 +168,13 @@ export function AccountPanel() {
               <label htmlFor="account-email" className="mb-1.5 block text-sm">Email</label>
               <input id="account-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
             </div>
-            {mode === "signup" || mode === "login" ? (
-              <div>
-                <label htmlFor="account-password" className="mb-1.5 block text-sm">Password</label>
-                <input
-                  id="account-password"
-                  type="password"
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  aria-describedby={mode === "signup" ? "password-hint" : undefined}
-                  className={field}
-                />
-                {mode === "signup" ? (
-                  <p id="password-hint" className="mt-1.5 text-xs text-mute">At least {MIN_PASSWORD} characters.</p>
-                ) : null}
-              </div>
-            ) : null}
             <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-50 sm:w-auto">
-              {busy
-                ? "Working…"
-                : mode === "signup"
-                  ? "Create account"
-                  : mode === "login"
-                    ? "Log in"
-                    : mode === "link"
-                      ? "Email me a link"
-                      : "Send reset link"}
+              {busy ? "Working…" : mode === "link" ? "Email me a link" : "Send reset link"}
             </button>
           </form>
 
-          <p className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-mute">
-            {mode === "login" ? (
-              <>
-                <button type="button" className={textLink} onClick={() => setMode("reset")}>Forgot password?</button>
-                <button type="button" className={textLink} onClick={() => setMode("link")}>Email me a sign-in link instead</button>
-              </>
-            ) : mode === "link" || mode === "reset" ? (
-              <button type="button" className={textLink} onClick={() => setMode("login")}>Back to log in</button>
-            ) : (
-              <span>
-                By creating an account you agree to the <Link href="/terms" className={textLink}>terms</Link> and{" "}
-                <Link href="/privacy" className={textLink}>privacy policy</Link>.
-              </span>
-            )}
+          <p className="mt-5 text-sm text-mute">
+            <button type="button" className={textLink} onClick={() => setMode("login")}>Back to log in</button>
           </p>
         </section>
       )}
