@@ -31,6 +31,18 @@ const interactionTone = {
   info: "border-rule text-mute",
 };
 
+const strengthLabel = {
+  trial: "Randomised human trials",
+  "human-acute": "Human data, short-term marker only",
+  none: "No human data for the pair",
+} as const;
+
+const strengthTone = {
+  trial: "border-recovery/60 text-brass",
+  "human-acute": "border-rule text-mute",
+  none: "border-warn/60 text-warn",
+} as const;
+
 const tierTone: Record<RiskTier, string> = {
   "Best evidenced": "border-recovery/60 text-brass",
   "Reasonable evidence": "border-rule text-mute",
@@ -90,11 +102,6 @@ export function PeptidePanel({
         <h2 id="peptides-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
           Aevum risk review
         </h2>
-        <p className="mt-3 max-w-2xl text-mute">
-          Aevum aims to reduce unnecessary exposure, not to add compounds. For
-          research compounds no amount can be called safe, so schedules are shown
-          as reported exposure, never as a recommended dose.
-        </p>
       </div>
 
       {report.interactions.length > 0 ? (
@@ -188,6 +195,56 @@ export function PeptidePanel({
       ) : report.withheld ? null : (
         <p className="rounded-3xl border border-rule bg-sheet px-5 py-4 text-mute">No peptides logged in the last week.</p>
       )}
+
+      {report.pairings.length > 0 ? (
+        <section aria-labelledby="pairings-heading" className="rounded-3xl border border-rule bg-sheet p-5 sm:p-7">
+          <h3 id="pairings-heading" className="font-display text-2xl font-light tracking-[-0.02em]">
+            Combinations touching your regimen
+          </h3>
+          <p className="mt-2 max-w-prose text-sm text-mute">
+            What is actually known about running these together — including
+            where the answer is nothing.
+          </p>
+          <ul className="mt-5 divide-y divide-rule">
+            {report.pairings.map((item) => (
+              <li key={item.title} className="py-5 first:pt-0 last:pb-0">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <p className="font-medium">{item.title}</p>
+                  <span className={`rounded-full border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] ${strengthTone[item.strength]}`}>
+                    {strengthLabel[item.strength]}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-mute">{item.mechanism}</p>
+                <dl className="mt-3 grid gap-px overflow-hidden rounded-2xl bg-rule sm:grid-cols-2">
+                  <Stat label="What the data shows" value={item.shows} small />
+                  <Stat label="What it does not show" value={item.limits} small />
+                </dl>
+                <p className="mt-3 text-xs text-mute">{item.source}</p>
+                <p className="mt-3 text-sm">
+                  {item.partnerRunning ? (
+                    <>You already run both: {item.running} with {item.partnerRunning}.</>
+                  ) : item.options.length > 0 ? (
+                    <>
+                      You run {item.running}. The other half is{" "}
+                      {item.options.map((option, index) => (
+                        <span key={option.slug}>
+                          {index > 0 ? ", " : ""}
+                          <Link href={`/peptides/${option.slug}`} className="text-pine-deep underline decoration-rule underline-offset-2">
+                            {option.name}
+                          </Link>
+                        </span>
+                      ))}
+                      . Aevum is not telling you to add one — read the two rows above and decide with a clinician.
+                    </>
+                  ) : (
+                    <>You run {item.running}.</>
+                  )}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {report.simplifications.length > 0 ? (
         <section aria-labelledby="simplify-heading" className="rounded-3xl border border-rule bg-sheet p-5 sm:p-7">

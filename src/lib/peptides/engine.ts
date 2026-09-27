@@ -3,6 +3,8 @@ import {
   cycleLabel,
   doseGapDays,
   getCompound,
+  pairingsFor,
+  rankedCompounds,
   scheduleLabel,
   sites,
   symptoms,
@@ -10,7 +12,9 @@ import {
   toUnit,
   urgentSymptoms,
   type CompoundModel,
+  type PairingStrength,
   type RiskProfile,
+  type RiskTier,
   type SiteId,
 } from "./catalog";
 import type { DayState, Driver, Reaction, UserContext } from "../today/types";
@@ -96,10 +100,27 @@ export type SiteSummary = {
   repeats: { site: SiteId; compound: string; lastDate: string }[];
 };
 
+/** A combination the user's regimen touches, with what the evidence covers. */
+export type PairingNote = {
+  title: string;
+  strength: PairingStrength;
+  mechanism: string;
+  shows: string;
+  limits: string;
+  source: string;
+  /** The compound of theirs the pairing applies to. */
+  running: string;
+  /** What already covers the other half, if anything. */
+  partnerRunning: string | null;
+  /** The other half's options, best evidenced first. */
+  options: { slug: string; name: string; tier: RiskTier }[];
+};
+
 export type PeptideReport = {
   urgent: { labels: string[]; date: string } | null;
   review: RegimenReview | null;
   guidance: Guidance[];
+  pairings: PairingNote[];
   interactions: Interaction[];
   simplifications: Simplification[];
   sites: SiteSummary;
@@ -668,7 +689,7 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
       }
     : null;
 
-  if (all.size === 0) return urgent ? { urgent, review: null, guidance: [], interactions: [], simplifications: [], sites: sites_ } : null;
+  if (all.size === 0) return urgent ? { urgent, review: null, guidance: [], pairings: [], interactions: [], simplifications: [], sites: sites_ } : null;
 
   const active = compounds.filter((model) => {
     const last = all.get(model.slug)?.at(-1);
@@ -686,7 +707,7 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
 
   // A red flag stops all regimen guidance.
   if (urgent) {
-    return { urgent, review: null, guidance: [], interactions: [], simplifications: [], sites: sites_, withheld };
+    return { urgent, review: null, guidance: [], pairings: [], interactions: [], simplifications: [], sites: sites_, withheld };
   }
 
   const found = interactions(active, all, context);
@@ -713,6 +734,7 @@ export function peptideReport(context: UserContext, history_: DayState[], today:
       const urgentRank = (status: GuidanceStatus) => (status === "stop" ? 0 : status === "above-researched" ? 1 : 2);
       return urgentRank(a.status) - urgentRank(b.status) || a.risk.score - b.risk.score;
     }),
+    pairings: withheld ? [] : pairingNotes(active),
     interactions: found,
     simplifications: withheld ? [] : simplifications(active, all, today, context),
     sites: sites_,
@@ -786,4 +808,50 @@ export function dueDoses(history_: DayState[], today: string): DueDose[] {
   }
 
   return due.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Combinations the regimen touches. This reports what is known about a pair,
+ * including when the answer is "nothing in humans" — it is not a prompt to add
+ * the other half.
+ */
+function pairingNotes(active: CompoundModel[]): PairingNote[] {
+  const notes: PairingNote[] = [];
+  const seen = new Set<string>();
+
+  for (const model of active) {
+    for (const { pairing, partners } of pairingsFor(model)) {
+      if (seen.has(pairing.title)) continue;
+      seen.add(pairing.title);
+
+      // A blend already covers both halves, so it has no partner to name.
+      const covered = partners.length === 0;
+      const partner = covered
+        ? model
+        : active.find((other) =>
+            [other.slug, ...Object.keys(other.components ?? {})].some((slug) => partners.includes(slug)),
+          );
+      const options = partner
+        ? []
+        : rankedCompounds(partners)
+            .slice(0, 3)
+            .map((option) => ({ slug: option.slug, name: option.name, tier: riskProfile(option).tier }));
+
+      notes.push({
+        title: pairing.title,
+        strength: pairing.strength,
+        mechanism: pairing.mechanism,
+        shows: pairing.shows,
+        limits: pairing.limits,
+        source: pairing.source,
+        running: model.name,
+        partnerRunning: partner?.name ?? null,
+        options,
+      });
+    }
+  }
+
+  // Strongest evidence first.
+  const rank = (strength: PairingStrength) => (strength === "trial" ? 0 : strength === "human-acute" ? 1 : 2);
+  return notes.sort((a, b) => rank(a.strength) - rank(b.strength));
 }

@@ -302,6 +302,97 @@ export function riskProfile(model: CompoundModel): RiskProfile {
   return { score, tier, reasons };
 }
 
+// ── Pairings ─────────────────────────────────────────────────────────────
+
+/**
+ * Combinations people actually run, with what the human evidence covers and,
+ * just as importantly, what it does not. `strength` describes the evidence for
+ * the *pair*, never whether either compound is safe:
+ *   trial       — randomised human trials compared the pair against each alone
+ *   human-acute — human data, but only on a short-term marker
+ *   none        — commonly stacked, no human data for the combination
+ */
+export type PairingStrength = "trial" | "human-acute" | "none";
+
+export type Pairing = {
+  title: string;
+  /** Slugs on each side of the pair. */
+  a: string[];
+  b: string[];
+  strength: PairingStrength;
+  /** Why they are combined at all. */
+  mechanism: string;
+  /** What human data exists, stated precisely. */
+  shows: string;
+  /** What that data does not establish. */
+  limits: string;
+  source: string;
+};
+
+export const pairings: Pairing[] = [
+  {
+    title: "GLP-1 with an amylin analogue",
+    a: ["semaglutide", "tirzepatide", "mazdutide", "survodutide", "retatrutide"],
+    b: ["cagrilintide"],
+    strength: "trial",
+    mechanism:
+      "Two separate appetite pathways: a GLP-1 receptor agonist and an amylin analogue, given on the same weekly schedule.",
+    shows:
+      "Over 68 weeks the pair lost 20.4% of body weight, against 14.9% for semaglutide alone and 11.5% for cagrilintide alone, in 3,417 adults.",
+    limits:
+      "Each-drug-alone comparison was secondary, not the powered endpoint, and the result reads as additive rather than synergistic. No cardiovascular outcome data for the pair, and 79.6% had gastrointestinal side effects.",
+    source: "Garvey et al., New England Journal of Medicine 2025;393:635–47 (REDEFINE 1).",
+  },
+  {
+    title: "A GHRH analogue with a GHRP",
+    a: ["tesamorelin", "sermorelin", "cjc-1295-no-dac", "cjc-1295-dac"],
+    b: ["ipamorelin", "ghrp-2", "ghrp-6"],
+    strength: "human-acute",
+    mechanism:
+      "They work on different receptors — the GHRH analogue at the pituitary, the GHRP largely at the hypothalamus — so together they release more growth hormone than either does on its own.",
+    shows:
+      "Given as single IV doses to healthy adults, the pair released more growth hormone than both doses added together. The combination is a guideline-validated test of growth hormone reserve.",
+    limits:
+      "That is a two-hour diagnostic result at IV doses. No controlled trial has tested injecting them together over time for fat loss, muscle or strength. The only longer-run human data is an uncontrolled review of 14 men already on testosterone, which measured IGF-1 and nothing else.",
+    source:
+      "Popovic et al., Journal of Clinical Endocrinology & Metabolism 1995;80:942–7. GH Research Society consensus, European Journal of Endocrinology 2007;157:695–700.",
+  },
+  {
+    title: "BPC-157 with TB-500",
+    a: ["bpc-157"],
+    b: ["tb-500"],
+    strength: "none",
+    mechanism: "The most common healing stack, run on the theory that the two repair pathways complement each other.",
+    shows:
+      "Nothing in humans. One retrospective series of knee injections included patients on the pair but reported no comparison against either alone.",
+    limits:
+      "There is no randomised or controlled human trial of the combination, or of either compound, for tendon, ligament, muscle or cartilage healing. Efficacy evidence is animal-only. BPC-157 sits in FDA Category 2 and is banned by WADA.",
+    source: "Mayfield et al., American Journal of Sports Medicine 2026;54:223–9 (review).",
+  },
+];
+
+/** Pairings that touch a compound, with the slugs making up the other half. */
+export function pairingsFor(model: CompoundModel): { pairing: Pairing; partners: string[] }[] {
+  const mine = [model.slug, ...Object.keys(model.components ?? {})];
+  const found: { pairing: Pairing; partners: string[] }[] = [];
+  for (const pairing of pairings) {
+    const onA = mine.some((slug) => pairing.a.includes(slug));
+    const onB = mine.some((slug) => pairing.b.includes(slug));
+    if (onA && onB) found.push({ pairing, partners: [] }); // a blend covers both halves
+    else if (onA) found.push({ pairing, partners: pairing.b });
+    else if (onB) found.push({ pairing, partners: pairing.a });
+  }
+  return found;
+}
+
+/** Named compounds, best evidenced and least hazardous first. */
+export function rankedCompounds(slugs: string[]): CompoundModel[] {
+  return slugs
+    .map((slug) => getCompound(slug))
+    .filter((model): model is CompoundModel => Boolean(model))
+    .sort((a, b) => riskProfile(a).score - riskProfile(b).score);
+}
+
 const FREQUENCY_LABEL: Record<Frequency, string> = {
   daily: "Every day",
   "several-weekly": "Several days a week",
