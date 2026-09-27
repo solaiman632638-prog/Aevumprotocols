@@ -1,6 +1,9 @@
 import {
   compounds,
+  cycleLabel,
+  doseGapDays,
   getCompound,
+  scheduleLabel,
   sites,
   symptoms,
   riskProfile,
@@ -731,4 +734,56 @@ export function activeCompounds(history_: DayState[], today: string): CompoundMo
     const window = model.frequency === "weekly" ? 10 : 7;
     return days(last.date, today) < window;
   });
+}
+
+// ── What is due today ────────────────────────────────────────────────────
+
+export type DueDose = {
+  slug: string;
+  name: string;
+  /** The amount they last took, in the compound's own unit. */
+  amount: number;
+  unit: "mg" | "mcg";
+  schedule: string;
+  cycle: string;
+  lastDate: string;
+};
+
+/**
+ * Compounds already in the regimen whose next dose falls today, carried
+ * forward at the amount the user themselves last logged.
+ *
+ * This is bookkeeping, not advice: nothing new is ever suggested, no amount
+ * is changed, "as needed" compounds are never assumed, and a run already past
+ * its cycle length is left out because a break is due instead.
+ */
+export function dueDoses(history_: DayState[], today: string): DueDose[] {
+  const all = history(history_);
+  const due: DueDose[] = [];
+
+  for (const model of compounds) {
+    const list = all.get(model.slug);
+    const last = list?.at(-1);
+    if (!list || !last || last.date === today) continue;
+
+    const gap = doseGapDays(model);
+    if (gap == null) continue;
+
+    const since = days(last.date, today);
+    // Not due yet, or long enough ago that they have stopped.
+    if (since < gap || since > 21) continue;
+    if (model.cycleDays && days(runStart(list), today) + 1 > model.cycleDays) continue;
+
+    due.push({
+      slug: model.slug,
+      name: model.name,
+      amount: last.amount,
+      unit: model.unit,
+      schedule: scheduleLabel(model),
+      cycle: cycleLabel(model),
+      lastDate: last.date,
+    });
+  }
+
+  return due.sort((a, b) => a.name.localeCompare(b.name));
 }

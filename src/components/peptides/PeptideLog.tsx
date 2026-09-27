@@ -1,17 +1,27 @@
 "use client";
 
 import { BodyMap } from "@/components/peptides/BodyMap";
-import { getCompound, symptoms, urgentSymptoms, type SiteId, type SymptomId, type UrgentSymptomId } from "@/lib/peptides/catalog";
+import {
+  compounds,
+  cycleLabel,
+  getCompound,
+  scheduleLabel,
+  symptoms,
+  urgentSymptoms,
+  type SiteId,
+  type SymptomId,
+  type UrgentSymptomId,
+} from "@/lib/peptides/catalog";
 import type { DoseEntry, Reaction } from "@/lib/today/types";
 
-const groups: { label: string; slugs: string[] }[] = [
-  { label: "Weight and metabolic", slugs: ["retatrutide", "tirzepatide", "semaglutide", "mazdutide", "survodutide", "cagrilintide", "aod-9604", "5-amino-1mq", "slu-pp-332", "l-carnitine"] },
-  { label: "Healing and recovery", slugs: ["bpc-157", "tb-500", "wolverine-stack", "kpv", "thymosin-alpha-1", "ll-37"] },
-  { label: "Growth hormone", slugs: ["tesamorelin", "sermorelin", "ipamorelin", "cjc-1295-no-dac", "cjc-1295", "cjc-1295-dac", "ghrp-2", "ghrp-6", "kisspeptin-10", "igf-1-des", "igf-1-lr3"] },
-  { label: "Skin, tanning, sexual health", slugs: ["ghk-cu", "glow", "klow", "melanotan-2", "melanotan-1", "pt-141"] },
-  { label: "Longevity", slugs: ["mots-c", "ss-31", "epitalon", "nad-plus", "glutathione"] },
-  { label: "Brain and sleep", slugs: ["semax", "selank", "semax-selank-blend", "pinealon", "dsip"] },
-];
+/** Matches what someone types against the register, ignoring case and spacing. */
+function matchCompound(text: string) {
+  const needle = text.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!needle) return undefined;
+  return compounds.find(
+    (model) => model.name.toLowerCase() === needle || model.slug === needle.replace(/\s+/g, "-"),
+  );
+}
 
 const field = "w-full rounded-xl border border-rule bg-paper px-3 py-2.5 text-sm outline-none focus:border-pine";
 const severityLabel = ["", "Mild", "Moderate", "Severe"] as const;
@@ -21,6 +31,7 @@ function newDose(): DoseEntry {
 }
 
 export function PeptideLog({
+  carried = 0,
   doses,
   reactions,
   urgent,
@@ -29,6 +40,8 @@ export function PeptideLog({
   onUrgent,
   suggestion,
 }: {
+  /** How many rows were carried over from the last check-in. */
+  carried?: number;
   doses: DoseEntry[];
   reactions: Reaction[];
   urgent: UrgentSymptomId[];
@@ -50,7 +63,15 @@ export function PeptideLog({
     <fieldset className="space-y-6">
       <legend className="eyebrow mb-3">Peptides today</legend>
 
-      {doses.length === 0 ? <p className="text-sm text-mute">Nothing logged. Add each peptide you took today.</p> : null}
+      {doses.length === 0 ? (
+        <p className="text-sm text-mute">Nothing logged. Add each peptide you took today.</p>
+      ) : carried > 0 ? (
+        <p className="rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
+          {carried === 1 ? "One peptide is" : `${carried} peptides are`} filled in from your last
+          check-in, on the schedule each one runs on. Check it, change it, or remove anything you
+          did not take — nothing is saved until you do.
+        </p>
+      ) : null}
 
       <ul className="space-y-4">
         {doses.map((dose, index) => {
@@ -67,24 +88,21 @@ export function PeptideLog({
                 <div className="space-y-4">
                   <div>
                     <label htmlFor={`dose-compound-${dose.id}`} className="mb-1.5 block text-sm">Peptide</label>
-                    <select
+                    <input
                       id={`dose-compound-${dose.id}`}
-                      value={dose.compound}
+                      list="peptide-names"
+                      autoComplete="off"
+                      placeholder="Type a name, e.g. BPC-157"
+                      value={model?.name ?? dose.label ?? ""}
                       onChange={(event) => {
-                        const picked = getCompound(event.target.value);
-                        update(dose.id, { compound: event.target.value, unit: picked?.unit ?? dose.unit });
+                        const text = event.target.value;
+                        const picked = matchCompound(text);
+                        update(dose.id, picked
+                          ? { compound: picked.slug, label: undefined, unit: picked.unit }
+                          : { compound: "", label: text });
                       }}
                       className={field}
-                    >
-                      <option value="">Choose…</option>
-                      {groups.map((group) => (
-                        <optgroup key={group.label} label={group.label}>
-                          {group.slugs.map((slug) => (
-                            <option key={slug} value={slug}>{getCompound(slug)?.name ?? slug}</option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div className="flex gap-2">
                     <div className="flex-1">
@@ -107,9 +125,21 @@ export function PeptideLog({
                     </div>
                   </div>
                   {model ? (
+                    <div className="rounded-xl border border-rule px-3 py-2.5 text-xs text-mute">
+                      <p>
+                        <span className="text-ink">{scheduleLabel(model)}</span> · {cycleLabel(model)}
+                      </p>
+                      <p className="mt-1">
+                        {model.evidence === "clinical" ? "Approved dosing" : "Reported research exposure"}{" "}
+                        {model.range[0]}–{model.range[1]} {model.unit}
+                        {model.components ? " (whole blend)" : ""}.
+                        {model.evidence === "clinical" ? "" : " No amount here is established as safe."}
+                      </p>
+                    </div>
+                  ) : dose.label ? (
                     <p className="text-xs text-mute">
-                      Protocol range {model.range[0]}–{model.range[1]} {model.unit}
-                      {model.components ? " (whole blend)" : ""}.
+                      Not in Aevum&apos;s register, so it is saved with your check-in but gets no
+                      schedule or guidance.
                     </p>
                   ) : null}
                 </div>
@@ -119,6 +149,12 @@ export function PeptideLog({
           );
         })}
       </ul>
+
+      <datalist id="peptide-names">
+        {compounds.map((model) => (
+          <option key={model.slug} value={model.name} />
+        ))}
+      </datalist>
 
       <button type="button" onClick={() => onDoses([...doses, newDose()])} className="btn-secondary">
         + Add a peptide

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AddEvaluator } from "@/components/peptides/AddEvaluator";
 import { BodyMap } from "@/components/peptides/BodyMap";
 import { Why } from "@/components/today/Dashboard";
-import { siteLabel } from "@/lib/peptides/catalog";
+import { cycleLabel, getCompound, scheduleLabel, siteLabel } from "@/lib/peptides/catalog";
 import type { RiskTier } from "@/lib/peptides/catalog";
 import type { GuidanceStatus, PeptideReport } from "@/lib/peptides/engine";
 import type { UserContext } from "@/lib/today/types";
@@ -148,6 +148,7 @@ export function PeptidePanel({
         <ul className="grid gap-4 lg:grid-cols-2">
           {report.guidance.map((item) => {
             const style = statusStyle[item.status];
+            const model = getCompound(item.slug);
             return (
               <li key={item.slug} className="flex flex-col rounded-3xl border border-rule bg-sheet p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
@@ -164,6 +165,8 @@ export function PeptidePanel({
                 <dl className="mt-4 grid gap-px overflow-hidden rounded-2xl bg-rule sm:grid-cols-2">
                   <Stat label="Reference exposure" value={item.reference} small />
                   <Stat label="Evidence" value={evidenceLabel[item.evidence]} small />
+                  {model ? <Stat label="How often" value={scheduleLabel(model)} small /> : null}
+                  {model ? <Stat label="Cycle" value={cycleLabel(model)} small /> : null}
                 </dl>
                 <p className="mt-3 text-xs text-mute">
                   <span className={`mr-2 rounded-full border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] ${tierTone[item.risk.tier]}`}>

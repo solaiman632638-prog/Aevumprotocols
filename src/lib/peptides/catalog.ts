@@ -258,3 +258,33 @@ export function riskProfile(model: CompoundModel): RiskProfile {
   const tier: RiskTier = score <= 2 ? "Best evidenced" : score <= 5 ? "Reasonable evidence" : score <= 8 ? "Limited evidence" : "Most uncertain";
   return { score, tier, reasons };
 }
+
+const FREQUENCY_LABEL: Record<Frequency, string> = {
+  daily: "Every day",
+  "several-weekly": "Several days a week",
+  weekly: "Once a week",
+  "as-needed": "Only when needed",
+};
+
+/** How often the protocol has it going in, in plain words. */
+export function scheduleLabel(model: CompoundModel): string {
+  return FREQUENCY_LABEL[model.frequency];
+}
+
+/**
+ * Run length before a break. Never invented: compounds whose sources give no
+ * cycle length say so rather than having one made up for them.
+ */
+export function cycleLabel(model: CompoundModel): string {
+  if (!model.cycleDays) return "No cycle length established";
+  const weeks = Math.round(model.cycleDays / 7);
+  return `${weeks} week${weeks === 1 ? "" : "s"}, then a break`;
+}
+
+/** Gap between doses in days, used to work out what is due. */
+export function doseGapDays(model: CompoundModel): number | null {
+  if (model.frequency === "daily") return 1;
+  if (model.frequency === "several-weekly") return 2;
+  if (model.frequency === "weekly") return 7;
+  return null; // as-needed is never assumed
+}

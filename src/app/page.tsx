@@ -6,27 +6,8 @@ const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
 const display = "font-display font-light tracking-[-0.04em]";
 const sectionHeading = `${display} text-5xl leading-[0.95] sm:text-7xl lg:text-8xl`;
 
-/**
- * Illustrative morning from a check-in. Labelled "Sample"
- * wherever shown. Scores match what the Today engine returns for these inputs.
- */
-const sample = {
-  recovery: 85,
-  sleep: 95,
-  logged: [
-    { label: "Slept", value: "7.6", unit: "h" },
-    { label: "Energy", value: "4", unit: "/ 5" },
-    { label: "Soreness", value: "2", unit: "/ 5" },
-    { label: "Weight", value: "86.2", unit: "kg" },
-  ],
-  goal: { name: "Lose fat", verdict: "On track", detail: "−0.5 kg a week toward 82 kg" },
-  plan: [
-    { label: "Training", value: "Go hard if planned" },
-    { label: "Protein", value: "165 g" },
-    { label: "Hydration", value: "3.0 L" },
-    { label: "Sleep target", value: "8 h" },
-  ],
-};
+/** One illustrative recovery score, labelled "Sample" wherever it is shown. */
+const sample = { recovery: 85 };
 
 const pillars = [
   {
@@ -143,58 +124,6 @@ export default function Home() {
             <Link href="#how" className="btn-secondary">
               How it works
             </Link>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* Product preview */}
-      <section className={`${wrap} pb-24`} aria-labelledby="preview-heading">
-        <Reveal>
-          <div className="rounded-[1.875rem] bg-panel p-6 sm:p-10 lg:p-14">
-            <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <h2 id="preview-heading" className={`${display} text-3xl sm:text-4xl`}>
-                Today
-              </h2>
-              <span className="rounded-full border border-rule px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-mute">
-                Sample day
-              </span>
-            </div>
-
-            <div className="mt-10 grid grid-cols-1 items-center justify-items-center gap-10 sm:grid-cols-3">
-              <Ring label="Recovery" value={sample.recovery} max={100} display={`${sample.recovery}%`} color="var(--color-recovery)" />
-              <Ring label="Sleep" value={sample.sleep} max={100} display={`${sample.sleep}%`} color="var(--color-sleep)" />
-              <div className="w-full max-w-56 rounded-2xl border border-rule p-5 text-center sm:text-left">
-                <p className="eyebrow !text-mute">Goal</p>
-                <p className="mt-2 text-lg">{sample.goal.name}</p>
-                <p className={`mt-1 ${display} text-4xl`}>{sample.goal.verdict}</p>
-                <p className="mt-2 text-sm text-mute">{sample.goal.detail}</p>
-              </div>
-            </div>
-
-            <p className="eyebrow mt-12">Logged this morning</p>
-            <dl className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-rule lg:grid-cols-4">
-              {sample.logged.map((item) => (
-                <div key={item.label} className="bg-panel p-5">
-                  <dt className="text-sm text-mute">{item.label}</dt>
-                  <dd className={`mt-1 ${display} text-4xl`}>
-                    {item.value}
-                    <span className="ml-1 text-base text-mute">{item.unit}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="mt-10">
-              <p className="eyebrow">Recommended today</p>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {sample.plan.map((item) => (
-                  <li key={item.label} className="rounded-2xl border border-rule p-5">
-                    <p className="text-sm text-mute">{item.label}</p>
-                    <p className="mt-1 text-xl">{item.value}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </Reveal>
       </section>

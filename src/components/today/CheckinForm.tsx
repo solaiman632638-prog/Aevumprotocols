@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PeptideLog } from "@/components/peptides/PeptideLog";
 import type { SiteId, UrgentSymptomId } from "@/lib/peptides/catalog";
+import type { DueDose } from "@/lib/peptides/engine";
 import type { DayState, DoseEntry, Reaction, UserContext } from "@/lib/today/types";
 
 const LB_PER_KG = 2.20462;
@@ -29,6 +30,7 @@ export function CheckinForm({
   date,
   profile,
   previous,
+  due,
   onSave,
   onCancel,
   siteSuggestion,
@@ -36,6 +38,8 @@ export function CheckinForm({
   date: string;
   profile: UserContext;
   previous?: DayState;
+  /** Compounds already running whose next dose lands today. */
+  due?: DueDose[];
   siteSuggestion?: SiteId;
   onSave: (day: DayState) => void;
   onCancel?: () => void;
@@ -52,7 +56,18 @@ export function CheckinForm({
   const [weight, setWeight] = useState(
     sameDay && previous?.weightKg != null ? (imperial ? (previous.weightKg * LB_PER_KG).toFixed(1) : String(previous.weightKg)) : "",
   );
-  const [doses, setDoses] = useState<DoseEntry[]>(sameDay ? previous?.doses ?? [] : []);
+  // A new day starts from what is already running, at the amount they last
+  // logged themselves. Nothing new is added and no amount is changed.
+  const [doses, setDoses] = useState<DoseEntry[]>(() => {
+    if (sameDay) return previous?.doses ?? [];
+    return (due ?? []).map((item) => ({
+      id: `${item.slug}-${date}`,
+      compound: item.slug,
+      amount: item.amount,
+      unit: item.unit,
+    }));
+  });
+  const [carried] = useState(() => (sameDay ? 0 : (due ?? []).length));
   const [reactions, setReactions] = useState<Reaction[]>(sameDay ? previous?.reactions ?? [] : []);
   const [urgent, setUrgent] = useState<UrgentSymptomId[]>(sameDay ? previous?.urgent ?? [] : []);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +88,7 @@ export function CheckinForm({
     if (restingHr === null) return setError("Resting heart rate should be between 30 and 120 bpm.");
     if (variability === null) return setError("HRV should be between 5 and 250 ms.");
     if (rawWeight === null) return setError("Weight is out of range.");
-    const incomplete = doses.find((dose) => !dose.compound || !(dose.amount > 0));
+    const incomplete = doses.find((dose) => !(dose.compound || dose.label?.trim()) || !(dose.amount > 0));
     if (incomplete) return setError("Each peptide needs a name and an amount, or remove the empty row.");
     if (hours === undefined && Object.keys(values).length === 0 && doses.length === 0 && urgent.length === 0) {
       return setError("Log your sleep, one of the sliders, or a peptide.");
@@ -149,6 +164,7 @@ export function CheckinForm({
       </fieldset>
 
       <PeptideLog
+        carried={carried}
         doses={doses}
         reactions={reactions}
         urgent={urgent}

@@ -8,7 +8,7 @@ import { PeptidePanel } from "@/components/peptides/PeptidePanel";
 import { Dashboard } from "@/components/today/Dashboard";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
-import { activeCompounds, peptideReport } from "@/lib/peptides/engine";
+import { activeCompounds, dueDoses, peptideReport } from "@/lib/peptides/engine";
 import { buildReport, type CompoundSource } from "@/lib/today/engine";
 import {
   keys,
@@ -56,6 +56,8 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   );
 
   const checkedInToday = checkins.at(-1)?.date === date;
+
+  const due = useMemo(() => (date ? dueDoses(checkins, date) : []), [checkins, date]);
 
   const peptides = useMemo(
     () => (profile && date ? peptideReport(profile, checkins, date) : null),
@@ -132,6 +134,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           profile={profile}
           siteSuggestion={peptides?.sites.suggestion}
           previous={checkins.at(-1)}
+          due={due}
           onSave={(day) => {
             saveCheckin(day);
             setEditing(null);

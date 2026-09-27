@@ -80,8 +80,10 @@ export type DayState = {
 
 export type DoseEntry = {
   id: string;
-  /** Compound slug from the peptide catalog. */
+  /** Compound slug from the peptide catalog, or "" when typed freehand. */
   compound: string;
+  /** What they typed when it is not a compound Aevum models. No guidance for these. */
+  label?: string;
   amount: number;
   unit: "mg" | "mcg";
   site?: SiteId;
