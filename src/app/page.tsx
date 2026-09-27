@@ -7,7 +7,7 @@ const display = "font-display font-light tracking-[-0.04em]";
 const sectionHeading = `${display} text-5xl leading-[0.95] sm:text-7xl lg:text-8xl`;
 
 /**
- * Illustrative morning from a manual check-in, no wearable. Labelled "Sample"
+ * Illustrative morning from a check-in. Labelled "Sample"
  * wherever shown. Scores match what the Today engine returns for these inputs.
  */
 const sample = {

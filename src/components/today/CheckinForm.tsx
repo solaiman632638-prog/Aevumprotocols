@@ -81,7 +81,6 @@ export function CheckinForm({
     setError(null);
     onSave({
       date,
-      source: "manual",
       sleepHours: hours,
       ...values,
       yesterdayLoad: load,

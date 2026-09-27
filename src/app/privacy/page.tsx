@@ -49,19 +49,6 @@ export default function PrivacyPage() {
       </section>
 
       <section>
-        <h2>Connected devices</h2>
-        <p>
-          Device connections are coming soon. When available, if you choose to
-          connect a device such as WHOOP, you sign in with that
-          company and grant read access to your recovery, sleep, and training
-          data. We keep the access token in a secure, browser-only cookie and
-          fetch your data when you open Today. We do not store that data on our
-          servers. You can disconnect at any time from the Devices page, and
-          revoke access in the device maker&apos;s own settings.
-        </p>
-      </section>
-
-      <section>
         <h2>Analytics</h2>
         <p>
           We use Vercel Web Analytics to count page views. It does not use
@@ -75,7 +62,6 @@ export default function PrivacyPage() {
         <ul>
           <li>Vercel, which hosts the website.</li>
           <li>Supabase, which stores account data if you sign in.</li>
-          <li>The device maker you connect, if any, under its own privacy policy.</li>
         </ul>
         <p>These providers may store data on servers outside Canada.</p>
       </section>

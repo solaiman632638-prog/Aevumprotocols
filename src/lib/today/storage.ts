@@ -2,10 +2,7 @@ import type { DayState, UserContext } from "@/lib/today/types";
 
 const PROFILE_KEY = "aevum-today-profile";
 const CHECKINS_KEY = "aevum-checkins";
-const SOURCE_KEY = "aevum-today-source";
 const PROFILE_UPDATED_KEY = "aevum-today-profile-updated";
-
-export type DataSource = "wearable" | "manual";
 
 function read<T>(key: string): T | null {
   if (typeof window === "undefined") return null;
@@ -50,7 +47,6 @@ export function readRaw(key: string): string | null {
 export const keys = {
   profile: PROFILE_KEY,
   checkins: CHECKINS_KEY,
-  source: SOURCE_KEY,
 } as const;
 
 /** Where saves are mirrored when the user is signed in. Set by SyncBridge. */
@@ -107,9 +103,12 @@ export function saveCheckin(day: DayState) {
   remote?.pushCheckin(stamped);
 }
 
+/** Keys written by versions that had device sync; cleared but never read. */
+const RETIRED_KEYS = ["aevum-today-source", "aevum-wearable"];
+
 /** Removes everything Today keeps in this browser. */
 export function clearLocalData() {
-  for (const key of [PROFILE_KEY, PROFILE_UPDATED_KEY, CHECKINS_KEY, SOURCE_KEY]) {
+  for (const key of [PROFILE_KEY, PROFILE_UPDATED_KEY, CHECKINS_KEY, ...RETIRED_KEYS]) {
     try {
       window.localStorage.removeItem(key);
     } catch {
@@ -117,14 +116,6 @@ export function clearLocalData() {
     }
   }
   window.dispatchEvent(new Event(CHANGE_EVENT));
-}
-
-export function loadSource(): DataSource | null {
-  return read<DataSource>(SOURCE_KEY);
-}
-
-export function saveSource(source: DataSource) {
-  write(SOURCE_KEY, source);
 }
 
 export function todayIso(): string {

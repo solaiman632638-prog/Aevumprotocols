@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       // The protocol register merged into the compound library.
       { source: "/protocols", destination: "/peptides", permanent: true },
       { source: "/protocols/:slug", destination: "/peptides/:slug", permanent: true },
+      // Device sync was removed; Today is the only daily surface.
+      { source: "/monitor", destination: "/today", permanent: false },
     ];
   },
 };

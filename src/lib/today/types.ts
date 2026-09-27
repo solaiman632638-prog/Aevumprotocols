@@ -44,15 +44,14 @@ export type UserContext = {
 };
 
 /**
- * One day of state, from a wearable or a manual check-in. Every field is
+ * One day of state from a check-in. Every field is
  * optional: the engine scores what it has and says what it is missing.
  */
 export type DayState = {
   date: string;
-  source: "wearable" | "manual";
   /** ISO timestamp of the last local edit; sync keeps the newer copy. */
   updatedAt?: string;
-  /** Wearable-computed recovery, 0–100, when the device supplies one. */
+  /** Recovery score, 0–100, when a source supplies one. */
   recovery?: number;
   hrv?: number;
   rhr?: number;
@@ -143,7 +142,6 @@ export type CompoundCard = {
 
 export type DailyReport = {
   date: string;
-  source: DayState["source"];
   baselineDays: number;
   scores: Score[];
   lifestyle: Recommendation[];

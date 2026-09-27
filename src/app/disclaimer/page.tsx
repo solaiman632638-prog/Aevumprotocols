@@ -31,11 +31,6 @@ export default function DisclaimerPage() {
           the uses implied by these worksheets.
         </p>
         <p>
-          Wearable connections (Whoop, Google Fit) read recovery and heart-rate
-          data to suggest holding a pulse on a hard day. They do not diagnose,
-          and a green recovery score is not permission to raise amounts.
-        </p>
-        <p>
           You are responsible for complying with the laws that apply to you.
           If you need medical care, speak to a licensed clinician. If a
           worksheet and a certificate of analysis disagree, the certificate

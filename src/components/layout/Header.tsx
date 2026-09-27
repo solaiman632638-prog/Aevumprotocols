@@ -2,7 +2,6 @@ import Link from "next/link";
 import { AccountLink } from "@/components/layout/AccountLink";
 import { Announcement } from "@/components/layout/Announcement";
 import { counts } from "@/lib/data/compounds";
-import { site } from "@/lib/site";
 
 const links = [
   { href: "/today", label: "Today" },
@@ -10,7 +9,6 @@ const links = [
   { href: "/stacks", label: "Stacks" },
   { href: "/calculator", label: "Calculator" },
   { href: "/guides", label: "Guides" },
-  { href: "/monitor", label: "Devices" },
 ];
 
 const navLink = "text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-ink/80 no-underline hover:text-ink";
@@ -55,11 +53,6 @@ export function Header() {
           {links.map((link) => (
             <Link key={link.href} href={link.href} className={navLink}>
               {link.label}
-              {link.href === "/monitor" && !site.devicesEnabled ? (
-                <span className="ml-1.5 rounded-full border border-rule px-1.5 py-px align-middle text-[0.6rem] tracking-[0.08em] text-mute">
-                  Soon
-                </span>
-              ) : null}
             </Link>
           ))}
           <AccountLink className={navLink} />

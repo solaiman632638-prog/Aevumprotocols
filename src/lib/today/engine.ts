@@ -11,12 +11,12 @@ import type {
 } from "@/lib/today/types";
 
 /**
- * Daily analysis: wearable or manual day states + user context in, scores
- * and recommendations out. Pure — no storage, no network.
+ * Daily analysis: check-in day states + user context in, scores and
+ * recommendations out. Pure — no storage, no network.
  *
- * Rule that never bends: wearable data characterises the user's state and
- * drives lifestyle and supplement suggestions. It never selects a compound or
- * an amount. Compound cards come from the user's goals and are educational.
+ * Rule that never bends: daily metrics characterise the user's state and drive
+ * lifestyle and supplement suggestions. They never select a compound or an
+ * amount. Compound cards come from the user's goals and are educational.
  */
 
 /** Library fields the compound cards need, passed in by the server page. */
@@ -179,7 +179,7 @@ function cardioStress(today: DayState, base: Baseline): Score & { level?: Level 
     const days = base.days;
     const detail =
       today.rhr == null && today.hrv == null
-        ? "Needs resting heart rate or HRV. Connect a wearable or add them to your check-in."
+        ? "Add your resting heart rate or HRV to a check-in to unlock this."
         : `Building your baseline: ${days} of ${BASELINE_MIN_DAYS} days logged.`;
     return missing("Cardiovascular stress", detail);
   }
@@ -591,7 +591,7 @@ function card(entry: CompoundSource, goal: GoalId, context: UserContext): Compou
       { label: "Your goal", value: goalLabel(goal) },
       { label: "Risk tolerance", value: context.tolerance, effect: "sets which evidence levels appear" },
       { label: "Research score", value: `${entry.researchScore}/100` },
-      { label: "Today's wearable data", value: "Not used", effect: "compounds are never picked from daily metrics" },
+      { label: "Today's metrics", value: "Not used", effect: "compounds are never picked from daily metrics" },
     ],
   };
 }
@@ -620,7 +620,6 @@ export function buildReport(context: UserContext, history: DayState[], pool: Com
 
   return {
     date: today.date,
-    source: today.source,
     baselineDays: base.days,
     scores: [recovery, sleep, cardio, ready, goal],
     lifestyle: lifestyle(context, today, days, ready, sleep),

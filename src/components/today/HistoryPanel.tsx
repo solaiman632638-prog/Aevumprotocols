@@ -29,14 +29,12 @@ export function HistoryPanel({
   profile,
   history,
   today,
-  manual,
   onSaveDay,
   siteSuggestion,
 }: {
   profile: UserContext;
   history: DayState[];
   today: string;
-  manual: boolean;
   onSaveDay: (day: DayState) => void;
   siteSuggestion?: SiteId;
 }) {
@@ -97,11 +95,9 @@ export function HistoryPanel({
             </button>
           ))}
         </div>
-        {manual ? (
-          <button type="button" onClick={() => setBackfill(backfill ? null : isoDaysBefore(today, 1))} className="btn-secondary !min-h-0 !px-4 !py-2">
-            {backfill ? "Close" : "Log a missed day"}
-          </button>
-        ) : null}
+        <button type="button" onClick={() => setBackfill(backfill ? null : isoDaysBefore(today, 1))} className="btn-secondary !min-h-0 !px-4 !py-2">
+          {backfill ? "Close" : "Log a missed day"}
+        </button>
       </div>
 
       {backfill ? (

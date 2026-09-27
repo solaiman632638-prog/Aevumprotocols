@@ -26,9 +26,9 @@ export default function TermsPage() {
       <section>
         <h2>Scores and recommendations</h2>
         <p>
-          Daily scores and targets are estimates calculated from what you enter
-          or what a connected device reports. They can be wrong, and they are
-          not a substitute for medical testing or professional judgement.
+          Daily scores and targets are estimates calculated from what you
+          enter. They can be wrong, and they are not a substitute for medical
+          testing or professional judgement.
         </p>
       </section>
 
