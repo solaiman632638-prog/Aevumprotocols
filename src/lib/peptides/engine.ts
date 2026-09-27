@@ -103,6 +103,7 @@ export type SiteSummary = {
 /** A combination the user's regimen touches, with what the evidence covers. */
 export type PairingNote = {
   title: string;
+  verdict: string;
   strength: PairingStrength;
   mechanism: string;
   shows: string;
@@ -839,6 +840,7 @@ function pairingNotes(active: CompoundModel[]): PairingNote[] {
 
       notes.push({
         title: pairing.title,
+        verdict: pairing.verdict,
         strength: pairing.strength,
         mechanism: pairing.mechanism,
         shows: pairing.shows,

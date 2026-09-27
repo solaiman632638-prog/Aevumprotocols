@@ -199,12 +199,8 @@ export function PeptidePanel({
       {report.pairings.length > 0 ? (
         <section aria-labelledby="pairings-heading" className="rounded-3xl border border-rule bg-sheet p-5 sm:p-7">
           <h3 id="pairings-heading" className="font-display text-2xl font-light tracking-[-0.02em]">
-            Combinations touching your regimen
+            Recommended pairings
           </h3>
-          <p className="mt-2 max-w-prose text-sm text-mute">
-            What is actually known about running these together — including
-            where the answer is nothing.
-          </p>
           <ul className="mt-5 divide-y divide-rule">
             {report.pairings.map((item) => (
               <li key={item.title} className="py-5 first:pt-0 last:pb-0">
@@ -214,6 +210,7 @@ export function PeptidePanel({
                     {strengthLabel[item.strength]}
                   </span>
                 </div>
+                <p className="mt-2 text-lg">{item.verdict}</p>
                 <p className="mt-2 text-sm text-mute">{item.mechanism}</p>
                 <dl className="mt-3 grid gap-px overflow-hidden rounded-2xl bg-rule sm:grid-cols-2">
                   <Stat label="What the data shows" value={item.shows} small />
@@ -225,7 +222,7 @@ export function PeptidePanel({
                     <>You already run both: {item.running} with {item.partnerRunning}.</>
                   ) : item.options.length > 0 ? (
                     <>
-                      You run {item.running}. The other half is{" "}
+                      You run {item.running}. The other half:{" "}
                       {item.options.map((option, index) => (
                         <span key={option.slug}>
                           {index > 0 ? ", " : ""}
@@ -234,7 +231,7 @@ export function PeptidePanel({
                           </Link>
                         </span>
                       ))}
-                      . Aevum is not telling you to add one — read the two rows above and decide with a clinician.
+                      . Amounts come from your prescriber.
                     </>
                   ) : (
                     <>You run {item.running}.</>

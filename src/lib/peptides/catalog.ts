@@ -316,6 +316,8 @@ export type PairingStrength = "trial" | "human-acute" | "none";
 
 export type Pairing = {
   title: string;
+  /** The verdict, stated plainly. Positive only where the evidence carries it. */
+  verdict: string;
   /** Slugs on each side of the pair. */
   a: string[];
   b: string[];
@@ -332,6 +334,7 @@ export type Pairing = {
 export const pairings: Pairing[] = [
   {
     title: "GLP-1 with an amylin analogue",
+    verdict: "Recommended. Adding cagrilintide beat either drug on its own in randomised trials.",
     a: ["semaglutide", "tirzepatide", "mazdutide", "survodutide", "retatrutide"],
     b: ["cagrilintide"],
     strength: "trial",
@@ -345,6 +348,7 @@ export const pairings: Pairing[] = [
   },
   {
     title: "A GHRH analogue with a GHRP",
+    verdict: "Recommended pairing. A GHRH analogue and a GHRP release more growth hormone together than either does alone — ipamorelin is the usual second half.",
     a: ["tesamorelin", "sermorelin", "cjc-1295-no-dac", "cjc-1295-dac"],
     b: ["ipamorelin", "ghrp-2", "ghrp-6"],
     strength: "human-acute",
@@ -359,6 +363,7 @@ export const pairings: Pairing[] = [
   },
   {
     title: "BPC-157 with TB-500",
+    verdict: "Not recommended as a pair. No human study has tested them together, so there is nothing to base it on.",
     a: ["bpc-157"],
     b: ["tb-500"],
     strength: "none",
