@@ -5,6 +5,7 @@ import { counts } from "@/lib/data/compounds";
 
 const links = [
   { href: "/today", label: "Today" },
+  { href: "/ai", label: "Aevum AI" },
   { href: "/peptides", label: "Compounds" },
   { href: "/stacks", label: "Stacks" },
   { href: "/calculator", label: "Calculator" },
