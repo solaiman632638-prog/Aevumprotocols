@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Doto, Space_Grotesk, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { counts } from "@/lib/data/compounds";
+import { site } from "@/lib/site";
 import { SyncBridge } from "@/components/sync/SyncBridge";
 import "./globals.css";
 
@@ -24,12 +26,19 @@ const mono = Space_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(`https://www.${site.domain}`),
   title: {
-    default: "Aevum · Recovery, sleep, and goals",
+    default: "Aevum · Peptide protocols and evidence",
     template: "%s · Aevum",
   },
-  description:
-    "Set your goals, log a thirty-second morning check-in, and get daily recovery, sleep, and training guidance. Plus evidence on 173 research compounds.",
+  // Kept in step with the register so the count can never go stale.
+  description: `Log what you took, see what the human evidence actually says, and track every injection. ${counts.total} peptide compounds, each with a full protocol, interaction warnings, and vial math.`,
+  openGraph: {
+    title: "Aevum · Peptide protocols and evidence",
+    description: `${counts.total} peptide compounds, each with a full protocol, ranked by the strength of the evidence behind it.`,
+    siteName: "Aevum",
+    type: "website",
+  },
   appleWebApp: { capable: true, title: "Aevum", statusBarStyle: "black-translucent" },
   icons: {
     icon: "/favicon.svg",
