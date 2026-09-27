@@ -21,10 +21,9 @@ Next.js 16 · TypeScript · Tailwind v4. No component library.
 /account               Optional sign-in and sync; export and delete data
 /privacy, /terms       Legal pages (review with a lawyer before relying on them)
 /monitor               Devices: optional Whoop (live with keys) / Google Fit (demo)
-/peptides              Library: every Pepipedia monograph (no doses)
-/peptides/[slug]       Monograph + link to worksheet when stocked
-/protocols             Register: 20 NovaEvum worksheets + 23 protocol-only compounds
-/protocols/[slug]      Worksheet and/or full protocol + pre-filled calculator
+/peptides              Compounds: one register for research, protocols, and vials
+/peptides/[slug]       Monograph + full protocol + NovaEvum worksheet + calculator
+                       (old /protocols URLs redirect here)
 /calculator            Standalone reconstitution math
 /stacks                Combined pairings
 /guides                Method pages

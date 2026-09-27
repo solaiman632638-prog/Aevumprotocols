@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/home/Reveal";
-import { guides } from "@/lib/data/guides";
-import { library } from "@/lib/data/library";
-import { getProtocol, protocols } from "@/lib/data/protocols";
+import { counts } from "@/lib/data/compounds";
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
 const display = "font-display font-light tracking-[-0.04em]";
@@ -118,8 +116,6 @@ function Ring({
 }
 
 export default function Home() {
-  const protocolCount = protocols.length + guides.filter((guide) => !getProtocol(guide.slug)).length;
-
   return (
     <div>
       {/* Hero */}
@@ -210,7 +206,7 @@ export default function Home() {
             { value: "30s", label: "Daily check-in" },
             { value: "8", label: "Goals to choose from" },
             { value: "0", label: "Devices required" },
-            { value: String(library.length), label: "Compounds researched" },
+            { value: String(counts.total), label: "Compounds researched" },
           ].map((stat) => (
             <div key={stat.label} className="py-10 pr-4">
               <dt className="eyebrow">{stat.label}</dt>
@@ -330,39 +326,26 @@ export default function Home() {
               risks, and the questions to ask a clinician first.
             </p>
           </Reveal>
-          <div className="mt-14 grid gap-4 md:grid-cols-2">
-            {[
-              {
-                href: "/peptides",
-                value: library.length,
-                title: "Research library",
-                body: "Mechanism, evidence grade, regulatory status, and side effects for every compound.",
-              },
-              {
-                href: "/protocols",
-                value: protocolCount,
-                title: "Protocols",
-                body: "Reconstitution tables, schedules, storage, and a built-in syringe calculator.",
-              },
-            ].map((card, index) => (
-              <Reveal key={card.href} delay={index * 100}>
-                <Link
-                  href={card.href}
-                  className="group flex min-h-64 flex-col justify-between rounded-[1.875rem] bg-panel p-8 no-underline transition-colors hover:bg-[#262626]"
-                >
-                  <p className={`${display} text-7xl text-ink`}>{card.value}</p>
-                  <div>
-                    <p className="text-2xl text-ink">
-                      {card.title}
-                      <span aria-hidden className="ml-2 inline-block text-mute transition-transform group-hover:translate-x-1">
-                        →
-                      </span>
-                    </p>
-                    <p className="mt-2 max-w-md text-mute">{card.body}</p>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
+          <div className="mt-14">
+            <Reveal>
+              <Link
+                href="/peptides"
+                className="group flex min-h-64 flex-col justify-between rounded-[1.875rem] bg-panel p-8 no-underline transition-colors hover:bg-[#262626]"
+              >
+                <p className={`${display} text-7xl text-ink`}>{counts.total}</p>
+                <div>
+                  <p className="text-2xl text-ink">
+                    Compounds
+                    <span aria-hidden className="ml-2 inline-block text-mute transition-transform group-hover:translate-x-1">→</span>
+                  </p>
+                  <p className="mt-2 max-w-md text-mute">
+                    Evidence, risks, and regulatory status for every compound, with
+                    dosing protocols, reconstitution tables, and a syringe
+                    calculator on {counts.protocols} of them.
+                  </p>
+                </div>
+              </Link>
+            </Reveal>
           </div>
         </div>
       </section>

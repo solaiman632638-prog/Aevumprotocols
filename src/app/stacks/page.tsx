@@ -34,7 +34,7 @@ export default function StacksPage() {
                 return (
                   <li key={slug}>
                     <Link
-                      href={`/protocols/${slug}`}
+                      href={`/peptides/${slug}`}
                       className="border border-rule bg-paper px-2 py-1 text-sm text-pine-deep no-underline hover:border-pine rounded-full"
                     >
                       {protocol.name}

@@ -77,8 +77,8 @@ export function PeptidePanel({ report, today }: { report: PeptideReport; today: 
                 <p className="mt-4 text-lg">{item.headline}</p>
                 <p className="mt-1 text-sm text-mute">{item.detail}</p>
                 <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-4">
-                  <Link href={`/protocols/${item.slug}`} className="text-sm text-pine-deep no-underline hover:underline">
-                    Full protocol →
+                  <Link href={`/peptides/${item.slug}`} className="text-sm text-pine-deep no-underline hover:underline">
+                    Protocol →
                   </Link>
                   <Why drivers={item.why} />
                 </div>

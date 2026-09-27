@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { AccountLink } from "@/components/layout/AccountLink";
 import { Announcement } from "@/components/layout/Announcement";
-import { library } from "@/lib/data/library";
+import { counts } from "@/lib/data/compounds";
 import { site } from "@/lib/site";
 
 const links = [
   { href: "/today", label: "Today" },
-  { href: "/peptides", label: "Library" },
-  { href: "/protocols", label: "Protocols" },
+  { href: "/peptides", label: "Compounds" },
   { href: "/stacks", label: "Stacks" },
   { href: "/calculator", label: "Calculator" },
   { href: "/guides", label: "Guides" },
@@ -25,7 +24,7 @@ export function Header() {
       >
         Skip to content
       </a>
-      <Announcement count={library.length} />
+      <Announcement count={counts.total} />
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
         <Link
           href="/"

@@ -1,30 +1,28 @@
 import type { Metadata } from "next";
 import { LibraryIndex } from "@/components/library/LibraryIndex";
-import { library, toRow, worksheetFor } from "@/lib/data/library";
+import { compoundRows, counts } from "@/lib/data/compounds";
 
 export const metadata: Metadata = {
-  title: "Peptide library",
+  title: "Compounds",
   description:
-    "173 peptides: mechanism, evidence, regulatory status, and safety.",
+    "Every compound in one place: research evidence, dosing protocols, reconstitution math, and regulatory status.",
 };
 
-export default function PeptidesPage() {
-  const worksheets = library
-    .filter((entry) => worksheetFor(entry.slug))
-    .map((entry) => entry.slug);
-
+export default function CompoundsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl">
-        Peptide library
+      <p className="eyebrow">Research · Protocols · Vial math</p>
+      <h1 className="mt-3 font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl">
+        Compounds
       </h1>
-      <p className="mt-3 max-w-2xl text-mute">
-        All {library.length} peptides, from research chemicals to approved drugs. Reference only — no
-        doses. Compounds on the NovaEvum catalog are listed first and link to
-        their worksheet.
+      <p className="mt-4 max-w-2xl text-mute">
+        {counts.total} compounds, {counts.protocols} of them with a full dosing
+        protocol, and {counts.stocked} with a NovaEvum vial worksheet and
+        calculator. Each page holds the evidence, the risks, the protocol, and
+        the syringe math together.
       </p>
       <div className="mt-8">
-        <LibraryIndex entries={library.map(toRow)} worksheets={worksheets} />
+        <LibraryIndex rows={compoundRows} />
       </div>
     </div>
   );
