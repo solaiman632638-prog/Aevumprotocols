@@ -9,11 +9,15 @@
 -- password, confirmation state, timestamps. Never copy those here. Every
 -- table below hangs off auth.users(id) and is protected by row-level
 -- security, so a signed-in user can reach their own rows and nobody else's.
+--
+-- This database is shared with the NovaEvum store, which owns `profiles`
+-- and the login itself. Aevum's profile table and functions carry an
+-- `aevum_` prefix, and nothing here deletes a user from auth.users.
 -- ============================================================================
 
 -- ─── Profile ────────────────────────────────────────────────────────────────
 -- One row per user: goals, body, training week, conditions, units.
-create table if not exists public.profiles (
+create table if not exists public.aevum_profiles (
   user_id uuid primary key references auth.users (id) on delete cascade,
   data jsonb not null,
   updated_at timestamptz not null default now()
@@ -65,13 +69,13 @@ create index if not exists ai_messages_conversation_idx
 
 -- ─── Row-level security ─────────────────────────────────────────────────────
 -- Without this, any signed-in user could read every other user's health data.
-alter table public.profiles          enable row level security;
+alter table public.aevum_profiles          enable row level security;
 alter table public.checkins          enable row level security;
 alter table public.ai_conversations  enable row level security;
 alter table public.ai_messages       enable row level security;
 
-drop policy if exists "Users manage their own profile" on public.profiles;
-create policy "Users manage their own profile" on public.profiles
+drop policy if exists "Users manage their own profile" on public.aevum_profiles;
+create policy "Users manage their own profile" on public.aevum_profiles
   for all to authenticated
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
@@ -95,7 +99,7 @@ create policy "Users manage their own messages" on public.ai_messages
   with check ((select auth.uid()) = user_id);
 
 -- ─── Keep updated_at honest ─────────────────────────────────────────────────
-create or replace function public.touch_updated_at()
+create or replace function public.aevum_touch_updated_at()
 returns trigger
 language plpgsql
 as $$
@@ -105,34 +109,37 @@ begin
 end;
 $$;
 
-drop trigger if exists profiles_touch on public.profiles;
-create trigger profiles_touch before update on public.profiles
-  for each row execute function public.touch_updated_at();
+drop trigger if exists aevum_profiles_touch on public.aevum_profiles;
+create trigger aevum_profiles_touch before update on public.aevum_profiles
+  for each row execute function public.aevum_touch_updated_at();
 
 drop trigger if exists checkins_touch on public.checkins;
 create trigger checkins_touch before update on public.checkins
-  for each row execute function public.touch_updated_at();
+  for each row execute function public.aevum_touch_updated_at();
 
 drop trigger if exists ai_conversations_touch on public.ai_conversations;
 create trigger ai_conversations_touch before update on public.ai_conversations
-  for each row execute function public.touch_updated_at();
+  for each row execute function public.aevum_touch_updated_at();
 
 -- ─── Deleting your data ─────────────────────────────────────────────────────
--- Account deletion. Profile, check-ins and AI history cascade with the user.
-create or replace function public.delete_my_account()
+-- Removes everything Aevum holds for the user. The login stays, because the
+-- store shares it; deleting it would also erase their orders and coaching.
+create or replace function public.aevum_delete_my_data()
 returns void
 language sql
 security definer
 set search_path = ''
 as $$
-  delete from auth.users where id = (select auth.uid());
+  delete from public.ai_conversations where user_id = (select auth.uid());
+  delete from public.checkins where user_id = (select auth.uid());
+  delete from public.aevum_profiles where user_id = (select auth.uid());
 $$;
 
-revoke all on function public.delete_my_account() from public, anon;
-grant execute on function public.delete_my_account() to authenticated;
+revoke all on function public.aevum_delete_my_data() from public, anon;
+grant execute on function public.aevum_delete_my_data() to authenticated;
 
 -- Clearing AI history on its own, without deleting the account.
-create or replace function public.delete_my_ai_history()
+create or replace function public.aevum_delete_my_ai_history()
 returns void
 language sql
 security definer
@@ -141,11 +148,11 @@ as $$
   delete from public.ai_conversations where user_id = (select auth.uid());
 $$;
 
-revoke all on function public.delete_my_ai_history() from public, anon;
-grant execute on function public.delete_my_ai_history() to authenticated;
+revoke all on function public.aevum_delete_my_ai_history() from public, anon;
+grant execute on function public.aevum_delete_my_ai_history() to authenticated;
 
 -- Clearing logged check-ins, keeping the account and profile.
-create or replace function public.delete_my_checkins()
+create or replace function public.aevum_delete_my_checkins()
 returns void
 language sql
 security definer
@@ -154,5 +161,5 @@ as $$
   delete from public.checkins where user_id = (select auth.uid());
 $$;
 
-revoke all on function public.delete_my_checkins() from public, anon;
-grant execute on function public.delete_my_checkins() to authenticated;
+revoke all on function public.aevum_delete_my_checkins() from public, anon;
+grant execute on function public.aevum_delete_my_checkins() to authenticated;

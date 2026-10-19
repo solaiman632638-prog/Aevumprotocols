@@ -24,7 +24,7 @@ export async function pushProfile(profile: UserContext, updatedAt: string) {
   const supabase = syncClient();
   const id = await userId();
   if (!supabase || !id) return;
-  await supabase.from("profiles").upsert({ user_id: id, data: profile, updated_at: updatedAt });
+  await supabase.from("aevum_profiles").upsert({ user_id: id, data: profile, updated_at: updatedAt });
 }
 
 export async function pushCheckin(day: DayState) {
@@ -46,7 +46,7 @@ export async function syncNow(): Promise<{ ok: boolean; message?: string }> {
   if (!supabase || !id) return { ok: false, message: "Not signed in." };
 
   const [profileResult, checkinResult] = await Promise.all([
-    supabase.from("profiles").select("data, updated_at").eq("user_id", id).maybeSingle<ProfileRow>(),
+    supabase.from("aevum_profiles").select("data, updated_at").eq("user_id", id).maybeSingle<ProfileRow>(),
     supabase.from("checkins").select("day, data, updated_at").eq("user_id", id).returns<CheckinRow[]>(),
   ]);
   if (profileResult.error || checkinResult.error) {
@@ -61,7 +61,7 @@ export async function syncNow(): Promise<{ ok: boolean; message?: string }> {
     storeProfile(remoteProfile.data, remoteProfile.updated_at);
   } else if (localProfile) {
     const stamp = localUpdated ?? new Date().toISOString();
-    await supabase.from("profiles").upsert({ user_id: id, data: localProfile, updated_at: stamp });
+    await supabase.from("aevum_profiles").upsert({ user_id: id, data: localProfile, updated_at: stamp });
   }
 
   // Check-ins
@@ -89,11 +89,14 @@ export async function syncNow(): Promise<{ ok: boolean; message?: string }> {
   return { ok: true };
 }
 
-/** Deletes the account; profile and check-ins cascade in the database. */
+/**
+ * Deletes everything Aevum holds for the user. The login itself is shared with
+ * the NovaEvum store, so it stays and their store data is untouched.
+ */
 export async function deleteAccount(): Promise<{ ok: boolean; message?: string }> {
   const supabase = syncClient();
   if (!supabase) return { ok: false, message: "Accounts are not switched on." };
-  const { error } = await supabase.rpc("delete_my_account");
+  const { error } = await supabase.rpc("aevum_delete_my_data");
   if (error) return { ok: false, message: error.message };
   await supabase.auth.signOut();
   return { ok: true };
