@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { calculateRecon, formatNumber } from "@/lib/calc";
 
 type Props = {
@@ -173,6 +173,16 @@ function Stat({
   );
 }
 
+// Horizontal U-100 syringe, drawn to match the NovaEvum calculator: plunger
+// left, needle right, fill growing from the seal. A tick every 5 units and a
+// number every 10. The draw is always in real text beside it.
+const BARREL_X = 56;
+const BARREL_W = 364;
+const BARREL_Y = 22;
+const BARREL_H = 26;
+const CAPACITY = 100;
+const TICKS = Array.from({ length: CAPACITY / 5 }, (_, index) => (index + 1) * 5);
+
 function Syringe({
   fillPercent,
   over,
@@ -182,34 +192,151 @@ function Syringe({
   over: boolean;
   units: number;
 }) {
+  const clipId = `syringe-clip-${useId().replace(/:/g, "")}`;
+  const fillW = ((over ? 100 : fillPercent) / 100) * BARREL_W;
+  const drawX = BARREL_X + fillW;
+
   return (
-    <div>
-      <p className="mb-2 text-xs text-mute">U-100 syringe · 100 units = 1 mL</p>
-      <div
-        className="relative h-8 border border-ink/40 bg-paper"
+    <figure className="m-0">
+      <svg
+        viewBox="0 0 480 82"
         role="img"
         aria-label={`Draw mark at ${formatNumber(units, 1)} units on a 100-unit syringe`}
+        className="h-auto w-full overflow-visible"
       >
-        <div
-          className={`absolute inset-y-0 left-0 ${over ? "bg-warn/50" : "bg-pine/35"}`}
-          style={{ width: `${over ? 100 : fillPercent}%` }}
+        <defs>
+          <linearGradient id={`${clipId}-shine`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fff" stopOpacity="0.55" />
+            <stop offset="45%" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <clipPath id={clipId}>
+            <rect x={BARREL_X} y={BARREL_Y} width={BARREL_W} height={BARREL_H} />
+          </clipPath>
+        </defs>
+
+        {/* Plunger: thumb rest, shaft, finger flanges */}
+        <rect x="4" y="20" width="8" height="30" rx="2" fill="#8a8e93" />
+        <rect x="0" y="16" width="16" height="6" rx="1.5" fill="#5c6168" />
+        <rect x="0" y="48" width="16" height="6" rx="1.5" fill="#5c6168" />
+        <rect x="12" y="32" width="36" height="6" rx="1.5" fill="#8a8e93" />
+        <rect x="46" y="10" width="6" height="10" rx="1.5" fill="#8a8e93" />
+        <rect x="46" y="50" width="6" height="10" rx="1.5" fill="#8a8e93" />
+
+        {/* Barrel */}
+        <rect
+          x="50"
+          y={BARREL_Y}
+          width="370"
+          height={BARREL_H}
+          rx="3"
+          fill="#fcfbf8"
+          stroke="#d6d2c4"
+          strokeWidth="1"
         />
-        <div className="absolute inset-0 flex">
-          {Array.from({ length: 11 }, (_, index) => (
-            <div
-              key={index}
-              className="relative flex-1 border-r border-ink/20 last:border-r-0"
-            >
-              <span
-                className={`absolute -bottom-5 font-mono text-[0.6rem] text-mute ${index === 0 ? "left-0" : index === 10 ? "right-0" : "left-0 -translate-x-1/2"}`}
-              >
-                {index * 10}
-              </span>
-            </div>
+
+        {/* Fluid and glass highlight, clipped to the measurable barrel */}
+        <g clipPath={`url(#${clipId})`}>
+          {fillW > 0 ? (
+            <>
+              <rect
+                x={BARREL_X}
+                y={BARREL_Y}
+                width={fillW}
+                height={BARREL_H}
+                fill={over ? "#ff6b6b" : "#3f9e93"}
+                opacity="0.5"
+              />
+              <rect
+                x={drawX - 2}
+                y={BARREL_Y}
+                width="2"
+                height={BARREL_H}
+                fill={over ? "#c0392b" : "#256b62"}
+                opacity="0.85"
+              />
+            </>
+          ) : null}
+          <rect
+            x={BARREL_X}
+            y={BARREL_Y}
+            width={BARREL_W}
+            height="9"
+            fill={`url(#${clipId}-shine)`}
+          />
+        </g>
+
+        {/* Rubber seal: the leading edge you read */}
+        <rect x="50" y={BARREL_Y} width="6" height={BARREL_H} fill="#0e1621" />
+
+        {/* Scale */}
+        <g stroke="var(--color-mute)" strokeWidth="1">
+          {TICKS.map((at) => {
+            const x = BARREL_X + (at / CAPACITY) * BARREL_W;
+            return (
+              <line
+                key={at}
+                x1={x}
+                y1={BARREL_Y + BARREL_H}
+                x2={x}
+                y2={BARREL_Y + BARREL_H + (at % 10 === 0 ? 7 : 3.5)}
+              />
+            );
+          })}
+        </g>
+        <g
+          fill="var(--color-mute)"
+          fontSize="11"
+          textAnchor="middle"
+          fontFamily="var(--font-mono)"
+        >
+          {TICKS.filter((at) => at % 10 === 0).map((at) => (
+            <text key={at} x={BARREL_X + (at / CAPACITY) * BARREL_W} y="68">
+              {at}
+            </text>
           ))}
-        </div>
-      </div>
-      <div className="h-5" />
-    </div>
+        </g>
+
+        {/* Draw point */}
+        {fillW > 0 ? (
+          <g fill="var(--color-ink)">
+            <line
+              x1={drawX}
+              y1="13"
+              x2={drawX}
+              y2={BARREL_Y}
+              stroke="var(--color-ink)"
+              strokeWidth="1.5"
+            />
+            <circle cx={drawX} cy="12" r="3" />
+            <text
+              x={drawX}
+              y="8"
+              fontSize="11"
+              fontWeight="600"
+              textAnchor="middle"
+              fontFamily="var(--font-mono)"
+            >
+              {formatNumber(units, 1)}u
+            </text>
+          </g>
+        ) : null}
+
+        {/* Hub and needle */}
+        <rect x="420" y="33" width="5" height="4" rx="1" fill="#8a8e93" />
+        <rect x="425" y="34.4" width="22" height="1.8" rx="0.4" fill="#8a8e93" />
+        <polygon points="447,34.4 450,35.3 447,36.2" fill="#5c6168" />
+      </svg>
+
+      <figcaption className="mt-3 flex items-baseline justify-between gap-4 text-xs text-mute">
+        <span>
+          <strong className="font-mono font-medium text-ink">{formatNumber(units, 1)} u</strong>{" "}
+          draw point
+        </span>
+        <span className="text-right">
+          <strong className="font-mono font-medium text-ink">100-unit</strong> syringe ·{" "}
+          {formatNumber(units / 100, 3)} mL
+        </span>
+      </figcaption>
+    </figure>
   );
 }
