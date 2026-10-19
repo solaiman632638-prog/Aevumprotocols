@@ -64,11 +64,11 @@ const corrections: Record<string, Partial<LibraryEntry>> = {
   // Pepipedia files this ERR agonist under skin with a cosmetic profile.
   "slu-pp-332": {
     system: "metabolic",
-    effects: ["Fat Oxidation", "Endurance", "Mitochondrial Function", "Energy Expenditure"],
-    primaryUse: "Exercise mimetic for metabolism and endurance",
+    effects: ["Exercise Mimetic", "Endurance", "Fat Burning", "Energy Expenditure"],
+    primaryUse: "Mimics the effects of working out",
     indication: "Metabolic/Endurance",
     mechanism:
-      "Switches on estrogen-related receptors (ERR alpha, beta, and gamma), which turn up the genes for fatty-acid burning and mitochondrial energy production in muscle, much as endurance training does. In mice this raised energy expenditure and fat oxidation and lengthened running time.",
+      "Switches on estrogen-related receptors (ERR alpha, beta, and gamma), which turn up the genes for fatty-acid burning and mitochondrial energy production in muscle, the same program a workout turns on, without the workout. In mice this raised energy expenditure and fat oxidation and lengthened running time.",
     sideEffects: ["No human safety data", "Theoretical cardiac enlargement (ERR-gamma, animal data)"],
   },
 };
