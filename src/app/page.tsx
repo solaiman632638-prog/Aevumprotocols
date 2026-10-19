@@ -4,6 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { Reveal } from "@/components/home/Reveal";
 import { Tiers } from "@/components/home/Tiers";
 import { Ticker } from "@/components/home/Ticker";
+import { Wearables } from "@/components/home/Wearables";
 import { compoundRows, counts } from "@/lib/data/compounds";
 import { sites } from "@/lib/peptides/catalog";
 
@@ -151,6 +152,8 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <Wearables wrap={wrap} heading={sectionHeading} />
 
       <section className="border-t border-rule">
         <div className={`${wrap} py-28 text-center lg:py-40`}>
