@@ -1278,9 +1278,11 @@
   ],
   "important": "AOD-9604 does not reliably dissolve in bacteriostatic water alone. Add 0.6% acetic acid first, then top up with bac water. Going straight to bac water is what makes the vial turn cloudy, gel, or leave floating flakes.",
   "bacNote": "AOD-9604 is hydrophobic, so in plain bac water it clumps instead of dissolving; that is the cloudiness or gel at the bottom of the vial. Dissolve it in a small amount of 0.6% acetic acid first (about 10 to 20% of your target volume, so 0.2 to 0.4 mL for a 2 mL fill), swirl until clear, then add bac water to reach the final volume. The acetic acid counts toward that volume.",
+  "ownMixing": true,
   "recon": [
    "Add 0.6% acetic acid first, about 10 to 20% of your target volume (roughly 0.2 to 0.4 mL for a 2 mL fill), down the inside wall of the vial.",
    "Add bacteriostatic water slowly to reach your target volume (about 1.6 to 1.8 mL for a 2 mL fill), swirling as you go.",
+   "Swirl gently until the solution is clear. Do not shake.",
    "If a vial has already gone cloudy in plain bac water, adding 0.6% acetic acid will usually clear it. If it stays cloudy after the acid, the peptide has aggregated and the vial should be discarded."
   ],
   "sections": [
@@ -1437,6 +1439,7 @@
   ],
   "important": "SLU-PP-332 does not dissolve in bacteriostatic water alone. Dissolve it in DMSO first (about 10% of your final volume), then add bac water. For a 2 mL final fill: 0.2 mL DMSO first, then 1.8 mL bac water. Skipping the DMSO leaves it cloudy and undissolved.",
   "bacNote": "Not a normal peptide. Add DMSO first at about 10% of the target volume (0.2 mL for a 2 mL fill), swirl until the powder fully dissolves, then top up with 1.8 mL bac water to reach 2 mL total. Concentration is based on the 2 mL final volume.",
+  "ownMixing": true,
   "recon": [
    "Add about 0.2 mL of DMSO (roughly 10% of a 2 mL final volume) to the vial first. Swirl gently until the powder is fully dissolved.",
    "Then add bacteriostatic water slowly down the wall (about 1.8 mL) to bring the total to 2 mL, swirling as you go.",
@@ -1449,21 +1452,22 @@
     "items": [
      "0.5 mg to 1 mg per day, once daily",
      "Most start at 0.5 mg",
-     "Mind the reconstitution warning above: it needs a co-solvent to dissolve before it can be dosed at all"
+     "From a 5 mg vial filled to 2 mL total (2.5 mg/mL): 0.5 mg is 20 units, 1 mg is 40 units on a U-100 syringe",
+     "Mind the reconstitution warning above: it needs DMSO to dissolve before it can be dosed at all"
     ]
    }
   ],
   "dosing": [
    "Common dose is 0.5 mg to 1 mg per day, once daily.",
-   "An ERR agonist that mimics some effects of exercise on metabolism.",
-   "The dissolving step (co-solvent first, then bac water) is the part people get wrong, so get that right before worrying about dose.",
-   "Human data is very limited, so conservative dosing and short blocks make sense."
+   "On a 5 mg vial filled to 2 mL total, that is 20 to 40 units.",
+   "The dissolving step (DMSO first, then bac water) is the part people get wrong, so get that right before worrying about dose.",
+   "There are no human trials, so conservative dosing and short blocks make sense."
   ],
   "duration": [
    "Run in 4 to 8 week blocks alongside training."
   ],
   "notes": [
-   "An ERR agonist studied as an exercise mimetic for metabolism and endurance.",
+   "An ERR agonist studied in animals as an exercise mimetic for metabolism and endurance.",
    "The solubility quirk is the main thing to get right.",
    "Inject subcutaneously and rotate sites."
   ],

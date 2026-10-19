@@ -37,7 +37,7 @@ export function GuideBody({ guide }: { guide: Guide }) {
                     <th scope="col" className="px-4 py-2.5 font-medium">Vial</th>
                     {guide.bac.map((ml) => (
                       <th key={ml} scope="col" className="px-4 py-2.5 font-medium">
-                        {ml} mL water
+                        {ml} mL {guide.ownMixing ? "total" : "water"}
                       </th>
                     ))}
                   </tr>
@@ -58,7 +58,7 @@ export function GuideBody({ guide }: { guide: Guide }) {
             </div>
             {guide.bacNote ? <p className="mt-4 max-w-prose text-sm text-mute">{guide.bacNote}</p> : null}
             <ol className="mt-4 max-w-prose list-decimal space-y-1.5 pl-5 text-sm">
-              {[...standardMixing, ...guide.recon].map((step) => (
+              {(guide.ownMixing ? guide.recon : [...standardMixing, ...guide.recon]).map((step) => (
                 <li key={step}>{step}</li>
               ))}
             </ol>

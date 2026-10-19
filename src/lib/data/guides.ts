@@ -29,6 +29,11 @@ export type Guide = {
   readyMl?: number;
   important?: string;
   bacNote?: string;
+  /**
+   * Needs a co-solvent before bac water, so `recon` replaces the standard
+   * steps (which say plain bac water) and the fill is a total volume.
+   */
+  ownMixing?: boolean;
   /** Extra mixing steps beyond the standard four. */
   recon: string[];
   sections: GuideSection[];

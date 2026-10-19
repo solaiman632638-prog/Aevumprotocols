@@ -56,9 +56,26 @@ export const statuses = [
 
 export type StatusSlug = (typeof statuses)[number]["slug"];
 
-export const library = (entries as LibraryEntry[]).toSorted((a, b) =>
-  a.name.localeCompare(b.name),
-);
+/**
+ * Fixes for monographs Pepipedia has wrong. Applied on load so a
+ * /refresh-library run doesn't put the mistake back.
+ */
+const corrections: Record<string, Partial<LibraryEntry>> = {
+  // Pepipedia files this ERR agonist under skin with a cosmetic profile.
+  "slu-pp-332": {
+    system: "metabolic",
+    effects: ["Fat Oxidation", "Endurance", "Mitochondrial Function", "Energy Expenditure"],
+    primaryUse: "Exercise mimetic for metabolism and endurance",
+    indication: "Metabolic/Endurance",
+    mechanism:
+      "Switches on estrogen-related receptors (ERR alpha, beta, and gamma), which turn up the genes for fatty-acid burning and mitochondrial energy production in muscle, much as endurance training does. In mice this raised energy expenditure and fat oxidation and lengthened running time.",
+    sideEffects: ["No human safety data", "Theoretical cardiac enlargement (ERR-gamma, animal data)"],
+  },
+};
+
+export const library = (entries as LibraryEntry[])
+  .map((entry) => ({ ...entry, ...corrections[entry.slug] }))
+  .toSorted((a, b) => a.name.localeCompare(b.name));
 
 /** The slice of an entry the client-side index needs to filter and sort. */
 export type LibraryRow = Pick<
