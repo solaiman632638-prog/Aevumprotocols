@@ -18,7 +18,7 @@ const brands = [
 export function Wearables({ wrap, heading }: { wrap: string; heading: string }) {
   return (
     <section className="border-t border-rule" aria-labelledby="wearables-heading">
-      <div className={`${wrap} pt-24 lg:pt-32`}>
+      <div className={`${wrap} pt-16 sm:pt-24 lg:pt-32`}>
         <Reveal>
           <p className="eyebrow">Coming soon</p>
           <h2 id="wearables-heading" className={`mt-6 ${heading}`}>
@@ -34,7 +34,7 @@ export function Wearables({ wrap, heading }: { wrap: string; heading: string }) 
         </Reveal>
       </div>
 
-      <div className="marquee relative mt-16 overflow-hidden border-y border-rule py-10 lg:mb-32 mb-24">
+      <div className="marquee relative mb-16 mt-10 overflow-hidden border-y border-rule py-8 sm:mb-24 sm:mt-16 sm:py-10 lg:mb-32">
         <ul className="marquee-track flex w-max items-center text-mute">
           {[...brands, ...brands].map((brand, index) => (
             <li

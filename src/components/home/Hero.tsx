@@ -25,7 +25,7 @@ export function Hero({ compounds }: { compounds: number }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <section ref={ref} className="relative isolate min-h-[92vh] overflow-hidden">
+      <section ref={ref} className="relative isolate overflow-hidden md:min-h-[92vh]">
         <motion.div
           aria-hidden
           style={{ y: gridY, opacity: gridOpacity }}
@@ -38,23 +38,24 @@ export function Hero({ compounds }: { compounds: number }) {
           />
         </motion.div>
 
-        <motion.div
-          style={{ y: headlineY, opacity: headlineOpacity }}
-          className="mx-auto grid min-h-[92vh] max-w-7xl items-center gap-14 px-4 py-28 sm:px-6 lg:grid-cols-12 lg:gap-10"
+        <div
+          className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 md:min-h-[92vh] md:gap-14 md:py-28 lg:grid-cols-12 lg:gap-10"
         >
-          <div className="lg:col-span-7">
+          {/* Only the headline drifts: on phones the panel sits below it and must stay readable. */}
+          <motion.div style={{ y: headlineY, opacity: headlineOpacity }} className="lg:col-span-7">
             <p className="eyebrow">Peptides · Evidence · Performance</p>
-            <h1 className="mt-6 font-display text-6xl font-light leading-[0.92] tracking-[-0.045em] sm:text-8xl">
+            <h1 className="mt-5 font-display text-[3.4rem] font-light leading-[0.92] tracking-[-0.045em] sm:text-8xl">
               Peptides.
               <br />
               <span className="text-mute">Built for</span> performance.
             </h1>
-            <p className="mt-8 max-w-md text-lg text-mute">
+            <p className="mt-6 max-w-md text-mute sm:mt-8 sm:text-lg">
               {compounds} peptides and related compounds, with protocols and
-              published dosing, ranked by the evidence. Log every pin beside your training and see what the
-              research actually says about recovery, strength, and endurance.
+              published dosing, ranked by the evidence. Log every pin beside your
+              training and see what the research actually says about recovery,
+              strength, and endurance.
             </p>
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-8 grid gap-3 sm:mt-10 sm:flex sm:flex-wrap">
               <Link href="/today" className="btn-primary">
                 Start tracking
               </Link>
@@ -62,16 +63,16 @@ export function Hero({ compounds }: { compounds: number }) {
                 Browse peptides
               </Link>
             </div>
-          </div>
+          </motion.div>
 
           <div className="lg:col-span-5">
             <Readiness />
           </div>
-        </motion.div>
+        </div>
 
         <motion.p
           style={{ opacity: cueOpacity }}
-          className="pointer-events-none absolute inset-x-0 bottom-8 text-center font-mono text-[0.65rem] uppercase tracking-[0.2em] text-dim"
+          className="pointer-events-none absolute inset-x-0 bottom-8 hidden text-center font-mono text-[0.65rem] md:block uppercase tracking-[0.2em] text-dim"
         >
           Scroll
         </motion.p>

@@ -30,7 +30,7 @@ export function GoalExplorer({ goals }: { goals: Goal[] }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="mt-12 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none]" role="tablist" aria-label="Training goal">
+      <div className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-12 sm:px-0" role="tablist" aria-label="Training goal">
         {goals.map((item) => {
           const selected = item.key === active;
           return (
@@ -41,7 +41,7 @@ export function GoalExplorer({ goals }: { goals: Goal[] }) {
               aria-selected={selected}
               aria-controls="goal-panel"
               onClick={() => setActive(item.key)}
-              className={`relative shrink-0 rounded-2xl border px-5 py-3 text-sm transition-colors ${
+              className={`relative min-h-11 shrink-0 rounded-2xl border px-4 text-sm transition-colors sm:px-5 ${
                 selected ? "border-ink text-on-accent" : "border-rule text-mute hover:border-mute hover:text-ink"
               }`}
             >
@@ -58,7 +58,7 @@ export function GoalExplorer({ goals }: { goals: Goal[] }) {
         })}
       </div>
 
-      <div id="goal-panel" role="tabpanel" className="mt-10">
+      <div id="goal-panel" role="tabpanel" className="mt-6 sm:mt-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={goal.key}
@@ -67,19 +67,20 @@ export function GoalExplorer({ goals }: { goals: Goal[] }) {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="max-w-xl text-lg text-mute">{goal.blurb}</p>
-            <ul className="mt-8 grid gap-px overflow-hidden rounded-3xl bg-rule sm:grid-cols-2 lg:grid-cols-4">
+            <p className="max-w-xl text-mute sm:text-lg">{goal.blurb}</p>
+            {/* Phones swipe through the cards; wider screens lay them out as a grid. */}
+            <ul className="-mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:mt-8 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-px sm:overflow-hidden sm:rounded-3xl sm:bg-rule sm:px-0 sm:pb-0 lg:grid-cols-4">
               {goal.compounds.map((compound, index) => (
                 <motion.li
                   key={compound.slug}
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.06 * index, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="bg-paper"
+                  className="w-[78%] shrink-0 snap-start overflow-hidden rounded-3xl border border-rule bg-paper sm:w-auto sm:rounded-none sm:border-0"
                 >
                   <Link
                     href={`/peptides/${compound.slug}`}
-                    className="group flex h-full min-h-60 flex-col justify-between bg-sheet p-6 transition-colors hover:bg-panel lg:p-7"
+                    className="group flex h-full min-h-52 flex-col justify-between bg-sheet p-6 transition-colors hover:bg-panel active:bg-panel sm:min-h-60 lg:p-7"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-dim">

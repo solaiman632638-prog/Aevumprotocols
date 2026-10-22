@@ -24,7 +24,7 @@ export function Header() {
         Skip to content
       </a>
       <Announcement count={counts.total} />
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 md:py-4">
         <Link
           href="/"
           className="flex items-baseline text-xl font-light uppercase tracking-[0.28em] text-ink no-underline"
@@ -49,7 +49,7 @@ export function Header() {
         </Link>
         <nav
           aria-label="Primary"
-          className="flex w-full flex-wrap items-center gap-x-5 gap-y-1 lg:w-auto lg:gap-x-8"
+          className="hidden w-full flex-wrap items-center gap-x-5 gap-y-1 md:flex lg:w-auto lg:gap-x-8"
         >
           {links.map((link) => (
             <Link key={link.href} href={link.href} className={navLink}>

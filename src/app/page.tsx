@@ -11,7 +11,9 @@ import { sites } from "@/lib/peptides/catalog";
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
 const display = "font-display font-light tracking-[-0.04em]";
-const sectionHeading = `${display} text-5xl leading-[0.95] sm:text-7xl`;
+const sectionHeading = `${display} text-[2.75rem] leading-[0.95] sm:text-7xl`;
+/** Section rhythm: tighter on phones, where every screen of scroll counts. */
+const band = "py-16 sm:py-24 lg:py-32";
 
 const capabilities = [
   {
@@ -117,7 +119,7 @@ export default function HomePage() {
         </dl>
       </section>
 
-      <section id="goals" className={`${wrap} scroll-mt-28 py-24 lg:py-32`} aria-labelledby="goals-heading">
+      <section id="goals" className={`${wrap} scroll-mt-28 ${band}`} aria-labelledby="goals-heading">
         <Reveal>
           <p className="eyebrow">Peptides by goal</p>
           <h2 id="goals-heading" className={`mt-6 ${sectionHeading}`}>
@@ -136,7 +138,7 @@ export default function HomePage() {
 
       <Tiers />
 
-      <section className={`${wrap} py-24 lg:py-32`} aria-labelledby="capabilities-heading">
+      <section className={`${wrap} ${band}`} aria-labelledby="capabilities-heading">
         <Reveal>
           <h2 id="capabilities-heading" className={sectionHeading}>
             Every peptide.
@@ -144,16 +146,16 @@ export default function HomePage() {
             Every protocol.
           </h2>
         </Reveal>
-        <ul className="mt-16 grid gap-px overflow-hidden rounded-3xl bg-rule lg:grid-cols-2">
+        <ul className="mt-10 grid gap-px overflow-hidden rounded-3xl bg-rule sm:mt-16 lg:grid-cols-2">
           {capabilities.map((item, index) => (
             <li key={item.title} className="bg-paper">
               <Reveal delay={index * 90} className="h-full">
-                <div className="flex h-full min-h-56 flex-col justify-between bg-sheet p-8 lg:p-10">
+                <div className="flex h-full flex-col justify-between bg-sheet p-6 sm:min-h-56 sm:p-8 lg:p-10">
                   <p className="font-mono text-xs uppercase tracking-[0.18em] text-dim">
                     {String(index + 1).padStart(2, "0")}
                   </p>
-                  <div className="mt-10">
-                    <h3 className={`${display} text-3xl sm:text-4xl`}>{item.title}</h3>
+                  <div className="mt-6 sm:mt-10">
+                    <h3 className={`${display} text-2xl sm:text-4xl`}>{item.title}</h3>
                     <p className="mt-4 max-w-md text-mute">{item.body}</p>
                   </div>
                 </div>
@@ -164,11 +166,11 @@ export default function HomePage() {
       </section>
 
       <section id="how" className="scroll-mt-28 border-t border-rule">
-        <div className={`${wrap} py-24 lg:py-32`}>
+        <div className={`${wrap} ${band}`}>
           <Reveal>
             <h2 className={sectionHeading}>Thirty seconds after training.</h2>
           </Reveal>
-          <ol className="mt-16 grid gap-12 lg:grid-cols-3">
+          <ol className="mt-10 grid gap-8 sm:mt-16 sm:gap-12 lg:grid-cols-3">
             {steps.map((step, index) => (
               <li key={step.title}>
                 <Reveal delay={index * 100}>
@@ -185,7 +187,7 @@ export default function HomePage() {
       </section>
 
       <section className="border-t border-rule">
-        <div className={`${wrap} grid gap-12 py-24 lg:grid-cols-2 lg:items-center lg:py-32`}>
+        <div className={`${wrap} grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-center ${band}`}>
           <Reveal>
             <h2 className={sectionHeading}>
               Every claim,
@@ -226,9 +228,9 @@ export default function HomePage() {
       <Wearables wrap={wrap} heading={sectionHeading} />
 
       <section className="border-t border-rule">
-        <div className={`${wrap} py-28 text-center lg:py-40`}>
+        <div className={`${wrap} py-20 text-center sm:py-28 lg:py-40`}>
           <Reveal>
-            <h2 className={`${display} text-6xl leading-[0.95] sm:text-8xl`}>
+            <h2 className={`${display} text-5xl leading-[0.95] sm:text-8xl`}>
               Peptides.
               <br />
               Built for performance.

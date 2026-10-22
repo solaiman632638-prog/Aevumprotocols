@@ -30,8 +30,8 @@ export function Tiers() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <section ref={ref} className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:py-32">
-        <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">
+      <section ref={ref} className="mx-auto max-w-7xl overflow-x-clip px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
+        <div className="grid gap-10 sm:gap-16 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-32">
               <p className="eyebrow">Evidence ranking</p>
@@ -69,7 +69,7 @@ function TierRow({ index, name, body }: { index: number; name: string; body: str
   const x = useTransform(scrollYProgress, [0, 1], [28, 0]);
 
   return (
-    <motion.li ref={ref} style={{ opacity, x }} className="border-t border-rule py-10 last:border-b">
+    <motion.li ref={ref} style={{ opacity, x }} className="border-t border-rule py-7 last:border-b sm:py-10">
       <div className="flex items-baseline gap-5">
         <span className="font-mono text-xs text-dim">{String(index + 1).padStart(2, "0")}</span>
         <div>

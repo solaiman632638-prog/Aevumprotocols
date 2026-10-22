@@ -78,7 +78,7 @@ export function Readiness() {
   const profile = profiles[index];
 
   return (
-    <div className="rounded-3xl border border-rule bg-sheet/80 p-6 backdrop-blur-sm sm:p-8">
+    <div className="rounded-3xl border border-rule bg-sheet/80 p-5 backdrop-blur-sm sm:p-8">
       <div className="flex items-center justify-between gap-4">
         <p className="eyebrow">Today · sample athlete</p>
         <span className="flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.16em] text-dim">
@@ -87,14 +87,14 @@ export function Readiness() {
         </span>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Sport">
+      <div className="mt-5 grid grid-cols-4 gap-1.5 sm:flex sm:flex-wrap sm:gap-2" role="group" aria-label="Sport">
         {profiles.map((item, i) => (
           <button
             key={item.sport}
             type="button"
             aria-pressed={i === index}
             onClick={() => setIndex(i)}
-            className={`rounded-full border px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors ${
+            className={`min-h-10 rounded-full border font-mono text-[0.62rem] uppercase tracking-[0.06em] transition-colors sm:min-h-0 sm:px-3.5 sm:py-1.5 sm:text-[0.7rem] sm:tracking-[0.12em] ${
               i === index ? "border-ink bg-ink text-on-accent" : "border-rule text-mute hover:border-mute hover:text-ink"
             }`}
           >
