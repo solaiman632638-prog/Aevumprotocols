@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { siteDetail, siteLabel, sites, type SiteId } from "@/lib/peptides/catalog";
+import { siteCaution, siteDetail, siteLabel, sites, type SiteId } from "@/lib/peptides/catalog";
 
 type Usage = Partial<Record<SiteId, { lastDate: string; count: number }>>;
 type View = "front" | "back";
@@ -31,7 +31,7 @@ function limbs(view: View, m: number): Part[] {
     {
       key: `deltoid-${m}`,
       d: `M${t(49)} 118 Q${t(79)} 118 ${t(94)} 146 L${t(106)} 181 Q${t(93)} 196 ${t(78)} 198 L${t(64)} 163Z`,
-      site: front ? (`deltoid-${side}` as SiteId) : undefined,
+      site: (front ? `deltoid-${side}` : `deltoid-rear-${side}`) as SiteId,
       mark: at(80, 160),
     },
     {
@@ -40,22 +40,44 @@ function limbs(view: View, m: number): Part[] {
       site: (front ? `arm-outer-${side}` : `triceps-${side}`) as SiteId,
       mark: at(106, 236),
     },
-    { key: `forearm-${m}`, d: `M${t(117)} 281 Q${t(134)} 268 ${t(140)} 291 L${t(166)} 376 Q${t(162)} 395 ${t(147)} 395 L${t(116)} 325Z` },
+    {
+      key: `forearm-${m}`,
+      d: `M${t(117)} 281 Q${t(134)} 268 ${t(140)} 291 L${t(166)} 376 Q${t(162)} 395 ${t(147)} 395 L${t(116)} 325Z`,
+      site: (front ? `forearm-${side}` : `forearm-back-${side}`) as SiteId,
+      mark: at(140, 335),
+    },
     {
       key: `outer-thigh-${m}`,
       d: `M${t(29)} 364 L${t(81)} 353 Q${t(87)} 398 ${t(87)} 439 L${t(75)} 508 ${t(54)} 513 ${t(50)} 450Z`,
-      site: front ? (`thigh-${side}` as SiteId) : undefined,
-      mark: at(66, 432),
+      // From behind, both thigh sections are the hamstring.
+      site: (front ? `thigh-${side}` : `hamstring-${side}`) as SiteId,
+      mark: at(front ? 66 : 50, 432),
     },
     {
       key: `inner-thigh-${m}`,
       d: `M${t(6)} 369 L${t(29)} 364 ${t(50)} 450 ${t(54)} 513 ${t(28)} 502 ${t(10)} 421Z`,
-      site: front ? (`thigh-front-${side}` as SiteId) : undefined,
-      mark: at(30, 436),
+      site: (front ? `thigh-front-${side}` : `hamstring-${side}`) as SiteId,
+      mark: front ? at(30, 436) : undefined,
     },
-    { key: `knee-${m}`, d: `M${t(28)} 506 L${t(73)} 511 ${t(72)} 551 ${t(48)} 566 ${t(27)} 541Z` },
-    { key: `shin-${m}`, d: `M${t(27)} 553 L${t(45)} 570 ${t(51)} 637 ${t(44)} 670 ${t(23)} 667 ${t(18)} 609Z` },
-    { key: `calf-${m}`, d: `M${t(49)} 566 L${t(75)} 547 Q${t(87)} 583 ${t(71)} 620 L${t(53)} 655 ${t(51)} 637Z` },
+    {
+      key: `knee-${m}`,
+      d: `M${t(28)} 506 L${t(73)} 511 ${t(72)} 551 ${t(48)} 566 ${t(27)} 541Z`,
+      site: (front ? `knee-${side}` : `knee-back-${side}`) as SiteId,
+      mark: at(50, 534),
+    },
+    // The lower leg is the shin from the front and the calf from behind.
+    {
+      key: `shin-${m}`,
+      d: `M${t(27)} 553 L${t(45)} 570 ${t(51)} 637 ${t(44)} 670 ${t(23)} 667 ${t(18)} 609Z`,
+      site: (front ? `shin-${side}` : `calf-${side}`) as SiteId,
+      mark: front ? at(35, 612) : undefined,
+    },
+    {
+      key: `calf-${m}`,
+      d: `M${t(49)} 566 L${t(75)} 547 Q${t(87)} 583 ${t(71)} 620 L${t(53)} 655 ${t(51)} 637Z`,
+      site: (front ? `shin-${side}` : `calf-${side}`) as SiteId,
+      mark: front ? undefined : at(66, 598),
+    },
   ];
 }
 
@@ -66,7 +88,12 @@ function torso(view: View, m: number): Part[] {
   if (view === "front") {
     const ab = (y1: number, y2: number) => `M${t(37)} ${y1} Q${t(20)} ${y1 - 3} ${t(5)} ${y1} L${t(5)} ${y2} ${t(36)} ${y2 + 1}Z`;
     return [
-      { key: `pec-${m}`, d: `M${t(36)} 120 Q${t(67)} 116 ${t(91)} 144 L${t(73)} 189 ${t(8)} 191 ${t(5)} 157Z` },
+      {
+        key: `pec-${m}`,
+        d: `M${t(36)} 120 Q${t(67)} 116 ${t(91)} 144 L${t(73)} 189 ${t(8)} 191 ${t(5)} 157Z`,
+        site: `chest-${side}` as SiteId,
+        mark: at(46, 160),
+      },
       // Upper and middle rows sit above the navel line; the lower row below it.
       { key: `ab-upper-${m}`, d: ab(200, 235), site: `abdomen-upper-${side}` as SiteId, mark: at(21, 236) },
       { key: `ab-middle-${m}`, d: ab(238, 273), site: `abdomen-upper-${side}` as SiteId },
@@ -80,9 +107,24 @@ function torso(view: View, m: number): Part[] {
     ];
   }
   return [
-    { key: `trap-${m}`, d: `M${t(26)} 103 L${t(6)} 136 ${t(7)} 193 ${t(43)} 165 ${t(82)} 149Z` },
-    { key: `upper-back-${m}`, d: `M${t(85)} 158 L${t(9)} 198 ${t(7)} 252 ${t(60)} 231 ${t(81)} 193Z` },
-    { key: `lat-${m}`, d: `M${t(64)} 237 L${t(7)} 260 ${t(5)} 335 ${t(36)} 343 ${t(72)} 302Z` },
+    {
+      key: `trap-${m}`,
+      d: `M${t(26)} 103 L${t(6)} 136 ${t(7)} 193 ${t(43)} 165 ${t(82)} 149Z`,
+      site: `trap-${side}` as SiteId,
+      mark: at(30, 148),
+    },
+    {
+      key: `upper-back-${m}`,
+      d: `M${t(85)} 158 L${t(9)} 198 ${t(7)} 252 ${t(60)} 231 ${t(81)} 193Z`,
+      site: `upperback-${side}` as SiteId,
+      mark: at(50, 208),
+    },
+    {
+      key: `lat-${m}`,
+      d: `M${t(64)} 237 L${t(7)} 260 ${t(5)} 335 ${t(36)} 343 ${t(72)} 302Z`,
+      site: `lat-${side}` as SiteId,
+      mark: at(38, 292),
+    },
     {
       key: `lower-back-${m}`,
       d: `M${t(33)} 345 L${t(0)} 345 ${t(0)} 373 ${t(48)} 373Z`,
@@ -120,8 +162,9 @@ function silhouette(): string[] {
 
 function partsFor(view: View): Part[] {
   const sides = [-1, 1].flatMap((m) => [...limbs(view, m), ...torso(view, m)]);
-  // The midline below the navel is not a site, but the front needs it drawn.
-  return view === "front" ? [...sides, { key: "lower-abdomen", d: "M188 320 L232 320 256 358 210 373 164 358Z" }] : sides;
+  return view === "front"
+    ? [...sides, { key: "lower-abdomen", d: "M188 320 L232 320 256 358 210 373 164 358Z", site: "abdomen-centre", mark: [210, 345] }]
+    : sides;
 }
 
 function daysAgo(date: string, today: string): number {
@@ -130,14 +173,18 @@ function daysAgo(date: string, today: string): number {
 
 const SKIN = "#cfd1d2";
 const SKIN_ALT = "#dcdedf";
+/** Places people inject that are not standard sites: still tappable, a shade darker. */
+const OFF = "#a3a7ab";
+const OFF_ALT = "#adb1b4";
 const INERT = "#8f9398";
 const SHADOW = "#6f7378";
 const OUTLINE = "#25272a";
 const WEEK = "color-mix(in srgb, var(--color-strain) 45%, #cfd1d2)";
 
 /**
- * Front and back of the body as muscle sections. Sections that are injection
- * sites are bright and tappable; the rest are shaded and inert. The chosen
+ * Front and back of the body as muscle sections, every one tappable. Standard
+ * sites are bright; places that are not standard sites are a shade darker and
+ * show why to think twice when picked. The chosen
  * site lights up with a marker on it, recent sites are tinted, and the
  * suggested next one pulses.
  */
@@ -172,6 +219,7 @@ export function BodyMap({
     const age = ageOf(part.site);
     if (age != null && age <= 2) return "var(--color-strain)";
     if (age != null && age <= 7) return WEEK;
+    if (siteCaution(part.site)) return index % 2 ? OFF_ALT : OFF;
     return index % 2 ? SKIN_ALT : SKIN;
   };
 
@@ -292,11 +340,18 @@ export function BodyMap({
           <>
             {siteLabel(value)}
             <span className="block text-xs text-mute">{siteDetail(value)}</span>
+            {siteCaution(value) ? (
+              <span className="mx-auto mt-2 block max-w-xs text-xs text-warn">{siteCaution(value)}</span>
+            ) : null}
           </>
         ) : picker ? (
-          <span className="text-mute">Tap a bright section where you injected</span>
+          <span className="text-mute">Tap where you injected</span>
         ) : null}
       </p>
+
+      {picker && !value ? (
+        <p className="mt-1 text-center text-xs text-dim">Brighter sections are the standard sites.</p>
+      ) : null}
 
       {picker ? null : (
         <ul className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-mute">

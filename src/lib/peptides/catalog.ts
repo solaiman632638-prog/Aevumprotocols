@@ -148,16 +148,41 @@ export type SiteId =
   | "hip-left"
   | "hip-right"
   | "lowback-left"
-  | "lowback-right";
+  | "lowback-right"
+  // Loggable, but not standard sites: never suggested, and flagged when picked.
+  | "abdomen-centre"
+  | "chest-left"
+  | "chest-right"
+  | "forearm-left"
+  | "forearm-right"
+  | "knee-left"
+  | "knee-right"
+  | "shin-left"
+  | "shin-right"
+  | "deltoid-rear-left"
+  | "deltoid-rear-right"
+  | "trap-left"
+  | "trap-right"
+  | "upperback-left"
+  | "upperback-right"
+  | "lat-left"
+  | "lat-right"
+  | "forearm-back-left"
+  | "forearm-back-right"
+  | "hamstring-left"
+  | "hamstring-right"
+  | "knee-back-left"
+  | "knee-back-right"
+  | "calf-left"
+  | "calf-right";
 
 /**
  * Injection sites. The body map draws them as muscle sections.
  *
- * Only sites that are actually used for subcutaneous or intramuscular
- * injection are here. Muscles people sometimes inject for size — biceps,
- * pecs, calves, traps — are drawn on the diagram but are not offered:
- * they sit over nerves and vessels, and nothing in this register calls for
- * them. `subq` marks the sites rotation is suggested from.
+ * The first group are standard subcutaneous or intramuscular sites. The
+ * rest cover every other section of the map, because people inject there and
+ * an honest log needs somewhere to put it; each carries a `caution` and none
+ * is ever suggested. `subq` marks the sites rotation is suggested from.
  */
 export const sites: {
   id: SiteId;
@@ -167,6 +192,8 @@ export const sites: {
   view: "front" | "back";
   im: boolean;
   subq: boolean;
+  /** Set on places people inject that are not standard sites: why to think twice. */
+  caution?: string;
 }[] = [
   // Front
   { id: "deltoid-right", label: "Right shoulder", detail: "Deltoid", view: "front", im: true, subq: false },
@@ -192,10 +219,40 @@ export const sites: {
   { id: "hip-right", label: "Right hip", detail: "Ventrogluteal", view: "back", im: true, subq: false },
   { id: "glute-left", label: "Left glute", detail: "Upper outer quarter only", view: "back", im: true, subq: true },
   { id: "glute-right", label: "Right glute", detail: "Upper outer quarter only", view: "back", im: true, subq: true },
+  // Not standard sites. Logged so the record is honest; never suggested.
+  { id: "abdomen-centre", label: "Belly, below the navel", detail: "Midline, under the skin", view: "front", im: false, subq: false, caution: "Keep two finger-widths clear of the navel." },
+  { id: "chest-right", label: "Right chest", detail: "Pectoral", view: "front", im: true, subq: false, caution: "Not a standard site. The chest wall is thin and the lungs sit close beneath it." },
+  { id: "chest-left", label: "Left chest", detail: "Pectoral", view: "front", im: true, subq: false, caution: "Not a standard site. The chest wall is thin and the lungs sit close beneath it." },
+  { id: "forearm-right", label: "Right forearm", detail: "Inner forearm", view: "front", im: false, subq: false, caution: "Not a standard site. Nerves, veins and tendons run close to the surface here." },
+  { id: "forearm-left", label: "Left forearm", detail: "Inner forearm", view: "front", im: false, subq: false, caution: "Not a standard site. Nerves, veins and tendons run close to the surface here." },
+  { id: "knee-right", label: "Right knee", detail: "Front of the knee", view: "front", im: false, subq: false, caution: "A joint, not an injection site. Injecting into a knee is a clinical procedure." },
+  { id: "knee-left", label: "Left knee", detail: "Front of the knee", view: "front", im: false, subq: false, caution: "A joint, not an injection site. Injecting into a knee is a clinical procedure." },
+  { id: "shin-right", label: "Right shin", detail: "Front of the lower leg", view: "front", im: false, subq: false, caution: "Not a standard site. The skin is thin over bone and heals slowly." },
+  { id: "shin-left", label: "Left shin", detail: "Front of the lower leg", view: "front", im: false, subq: false, caution: "Not a standard site. The skin is thin over bone and heals slowly." },
+  { id: "deltoid-rear-right", label: "Back of right shoulder", detail: "Rear deltoid", view: "back", im: true, subq: false, caution: "Less used than the side of the shoulder. The axillary nerve runs just below it." },
+  { id: "deltoid-rear-left", label: "Back of left shoulder", detail: "Rear deltoid", view: "back", im: true, subq: false, caution: "Less used than the side of the shoulder. The axillary nerve runs just below it." },
+  { id: "trap-right", label: "Right trap", detail: "Trapezius", view: "back", im: true, subq: false, caution: "Not a standard site. Nerves to the neck and shoulder run through it." },
+  { id: "trap-left", label: "Left trap", detail: "Trapezius", view: "back", im: true, subq: false, caution: "Not a standard site. Nerves to the neck and shoulder run through it." },
+  { id: "upperback-right", label: "Right upper back", detail: "Over the shoulder blade", view: "back", im: true, subq: false, caution: "Not a standard site, and hard to see or reach on yourself." },
+  { id: "upperback-left", label: "Left upper back", detail: "Over the shoulder blade", view: "back", im: true, subq: false, caution: "Not a standard site, and hard to see or reach on yourself." },
+  { id: "lat-right", label: "Right lat", detail: "Latissimus dorsi", view: "back", im: true, subq: false, caution: "Not a standard site, and hard to see or reach on yourself." },
+  { id: "lat-left", label: "Left lat", detail: "Latissimus dorsi", view: "back", im: true, subq: false, caution: "Not a standard site, and hard to see or reach on yourself." },
+  { id: "forearm-back-right", label: "Back of right forearm", detail: "Outer forearm", view: "back", im: false, subq: false, caution: "Not a standard site. Nerves and tendons run close to the surface here." },
+  { id: "forearm-back-left", label: "Back of left forearm", detail: "Outer forearm", view: "back", im: false, subq: false, caution: "Not a standard site. Nerves and tendons run close to the surface here." },
+  { id: "hamstring-right", label: "Back of right thigh", detail: "Hamstring", view: "back", im: true, subq: false, caution: "Not a standard site. The sciatic nerve runs down the back of the thigh." },
+  { id: "hamstring-left", label: "Back of left thigh", detail: "Hamstring", view: "back", im: true, subq: false, caution: "Not a standard site. The sciatic nerve runs down the back of the thigh." },
+  { id: "knee-back-right", label: "Back of right knee", detail: "Behind the knee", view: "back", im: false, subq: false, caution: "Not an injection site. A major artery and nerve run directly behind the knee." },
+  { id: "knee-back-left", label: "Back of left knee", detail: "Behind the knee", view: "back", im: false, subq: false, caution: "Not an injection site. A major artery and nerve run directly behind the knee." },
+  { id: "calf-right", label: "Right calf", detail: "Gastrocnemius", view: "back", im: true, subq: false, caution: "Not a standard site. Deep veins run through the calf, and clots there are serious." },
+  { id: "calf-left", label: "Left calf", detail: "Gastrocnemius", view: "back", im: true, subq: false, caution: "Not a standard site. Deep veins run through the calf, and clots there are serious." },
 ];
 
 export function siteDetail(id: SiteId): string {
   return sites.find((site) => site.id === id)?.detail ?? "";
+}
+
+export function siteCaution(id: SiteId): string | undefined {
+  return sites.find((site) => site.id === id)?.caution;
 }
 
 export function siteLabel(id: SiteId): string {
