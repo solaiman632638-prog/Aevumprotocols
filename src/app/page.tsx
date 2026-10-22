@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Figure } from "@/components/home/Figure";
+import { GoalExplorer, type Goal } from "@/components/home/GoalExplorer";
 import { Hero } from "@/components/home/Hero";
 import { Reveal } from "@/components/home/Reveal";
 import { Tiers } from "@/components/home/Tiers";
@@ -15,7 +16,7 @@ const sectionHeading = `${display} text-5xl leading-[0.95] sm:text-7xl`;
 const capabilities = [
   {
     title: "Protocol guidance",
-    body: "Reported exposure, how often it goes in, and how long a run lasts before a break — for every compound in the register.",
+    body: "Reported exposure, how often it goes in, and how long a run lasts before a break, so a cycle fits around your training block.",
   },
   {
     title: "Interaction warnings",
@@ -23,31 +24,83 @@ const capabilities = [
   },
   {
     title: "Injection mapping",
-    body: "Sites across the front and back of the body, with rotation tracked so the same spot is not used twice running.",
+    body: "Sites across the front and back of the body, rotated so the same spot is never hit twice running.",
   },
   {
-    title: "Recommended pairings",
-    body: "What the human evidence says about running two compounds together, including where it says nothing at all.",
+    title: "Recovery trends",
+    body: "Sleep, soreness, and side effects logged beside your sessions, so overreaching shows up as a pattern before it shows up as an injury.",
   },
 ];
 
 const steps = [
   {
-    title: "Log what you took",
-    body: "Type the peptide, the amount, and tap where you pinned it. Next time it is already filled in, on the schedule that compound runs on.",
+    title: "Log the peptide",
+    body: "What you took, where you pinned it, and how training went, in thirty seconds. Tomorrow it is already filled in.",
   },
   {
-    title: "See the review",
-    body: "Aevum ranks your regimen by evidence, warns on interactions, and says when to hold, lower, or take a break.",
+    title: "Read the evidence",
+    body: "Aevum ranks what you run by human evidence, warns on interactions, and says when to hold or take a break.",
   },
   {
-    title: "Track the pattern",
-    body: "Sites, side effects, and trends over weeks, so a problem shows up as a pattern rather than as a bad morning.",
+    title: "Watch the block",
+    body: "Sites, side effects, and recovery over weeks, so you see what a training block is doing to you, not just one morning.",
   },
 ];
 
+/** Training goals and the register entries researched for each. No amounts. */
+const goalPicks: { key: string; label: string; blurb: string; slugs: string[] }[] = [
+  {
+    key: "recovery",
+    label: "Recovery & repair",
+    blurb: "Tendons, ligaments, and soft tissue. The most asked-about corner of the register, and mostly animal data.",
+    slugs: ["bpc-157", "tb-500", "ghk-cu", "kpv"],
+  },
+  {
+    key: "strength",
+    label: "Strength & lean mass",
+    blurb: "Growth hormone secretagogues and releasing hormones. Two are approved drugs; the rest are research chemicals.",
+    slugs: ["tesamorelin", "sermorelin", "ipamorelin", "cjc-1295"],
+  },
+  {
+    key: "engine",
+    label: "Engine & endurance",
+    blurb: "Mitochondria and exercise mimetics. Striking results in mice, very little in people.",
+    slugs: ["mots-c", "slu-pp-332", "ss-31", "aicar"],
+  },
+  {
+    key: "sleep",
+    label: "Sleep & regeneration",
+    blurb: "Where recovery actually happens. Sleep and circadian peptides, with thin human evidence behind most.",
+    slugs: ["dsip", "epitalon", "pinealon", "mk-677"],
+  },
+  {
+    key: "focus",
+    label: "Focus & composure",
+    blurb: "Nootropic peptides for the mental side of competing. Studied mostly in Russia, rarely replicated elsewhere.",
+    slugs: ["semax", "selank", "n-acetyl-semax-amidate", "cerebrolysin"],
+  },
+  {
+    key: "weight",
+    label: "Making weight",
+    blurb: "Body composition for weight-class and aesthetic athletes. The best-evidenced compounds in the register.",
+    slugs: ["tirzepatide", "semaglutide", "retatrutide", "aod-9604"],
+  },
+];
+
+const rowsBySlug = new Map(compoundRows.map((row) => [row.slug, row]));
+
+const goals: Goal[] = goalPicks.map(({ slugs, ...goal }) => ({
+  ...goal,
+  compounds: slugs.flatMap((slug) => {
+    const row = rowsBySlug.get(slug);
+    return row
+      ? [{ slug: row.slug, name: row.name, status: row.status, statusLabel: row.statusLabel, score: row.score, primaryUse: row.primaryUse }]
+      : [];
+  }),
+}));
+
 export default function HomePage() {
-  const names = compoundRows.slice(0, 18).map((row) => row.name);
+  const names = goals.flatMap((goal) => goal.compounds.map((compound) => compound.name.replace(/\s*\(.*\)\s*$/, "")));
 
   return (
     <div>
@@ -57,11 +110,28 @@ export default function HomePage() {
 
       <section className={wrap} aria-label="Aevum in numbers">
         <dl className="grid grid-cols-2 lg:grid-cols-4">
-          <Figure value={String(counts.total)} label="Compounds with protocols" />
+          <Figure value={String(counts.total)} label="Compounds" />
           <Figure value={String(counts.stocked)} label="On NovaEvum" />
           <Figure value={String(sites.length)} label="Injection sites mapped" />
           <Figure value="30s" label="Daily check-in" />
         </dl>
+      </section>
+
+      <section id="goals" className={`${wrap} scroll-mt-28 py-24 lg:py-32`} aria-labelledby="goals-heading">
+        <Reveal>
+          <p className="eyebrow">Peptides by goal</p>
+          <h2 id="goals-heading" className={`mt-6 ${sectionHeading}`}>
+            Peptides for
+            <br />
+            every goal.
+          </h2>
+        </Reveal>
+        <GoalExplorer goals={goals} />
+        <p className="mt-8 max-w-2xl text-sm text-dim">
+          Evidence, not prescriptions: Aevum shows research status and what is
+          known, never an amount for your goal. Competing in tested sport? Most of
+          these are on the WADA Prohibited List.
+        </p>
       </section>
 
       <Tiers />
@@ -69,7 +139,7 @@ export default function HomePage() {
       <section className={`${wrap} py-24 lg:py-32`} aria-labelledby="capabilities-heading">
         <Reveal>
           <h2 id="capabilities-heading" className={sectionHeading}>
-            One register.
+            Every peptide.
             <br />
             Every protocol.
           </h2>
@@ -96,7 +166,7 @@ export default function HomePage() {
       <section id="how" className="scroll-mt-28 border-t border-rule">
         <div className={`${wrap} py-24 lg:py-32`}>
           <Reveal>
-            <h2 className={sectionHeading}>Thirty seconds a day.</h2>
+            <h2 className={sectionHeading}>Thirty seconds after training.</h2>
           </Reveal>
           <ol className="mt-16 grid gap-12 lg:grid-cols-3">
             {steps.map((step, index) => (
@@ -161,14 +231,14 @@ export default function HomePage() {
             <h2 className={`${display} text-6xl leading-[0.95] sm:text-8xl`}>
               Peptides.
               <br />
-              Reimagined.
+              Built for performance.
             </h2>
             <div className="mt-12 flex flex-wrap justify-center gap-3">
               <Link href="/today" className="btn-primary">
                 Start tracking
               </Link>
               <Link href="/peptides" className="btn-secondary">
-                Browse compounds
+                Browse peptides
               </Link>
             </div>
             <p className="mt-10 text-sm text-dim">
