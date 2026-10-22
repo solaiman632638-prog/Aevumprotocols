@@ -37,14 +37,14 @@
    {
     "title": "If you do not need the full dose",
     "items": [
-     "Many people get strong results and stop climbing at 6 mg or 8 mg",
+     "Many people get strong results and stop climbing at 6 mg or 9 mg",
      "There is no rule that you have to reach 12 mg",
      "Stay at the lowest dose that is still working for you"
     ]
    }
   ],
   "dosing": [
-   "Start at 2 mg. In the trials, people who jumped straight to higher doses had far more nausea (around 60%) than those who started low (around 17%), so the slow ramp is the whole point, not a formality.",
+   "Start at 2 mg. In the phase 2 trial, a 2 mg start caused fewer stomach side effects than a 4 mg start, so the slow ramp is the whole point, not a formality.",
    "The newer Phase 3 schedule (above) ramps 2, 4, 6, 9, 12 mg, each held 4 weeks, for the smoothest climb. The older Phase 2 trial jumped 2, 4, 8, 12 and skipped the 6 and 9 mg steps, which works but trades tolerability for speed.",
    "Working range is roughly 4 mg to 12 mg weekly. 12 mg was the highest dose studied and gave the most weight loss.",
    "Pick one day a week and keep it consistent, since the half-life is about 6 days."
@@ -200,20 +200,13 @@
      "Week 13 onward: 6 mg as the maintenance dose",
      "(A simpler 2 mg, then 4 mg, then 6 mg version on the same 4-week steps is also used.)"
     ]
-   },
-   {
-    "title": "Watch fasting glucose early",
-    "items": [
-     "Because of the glucagon side of this drug, a small temporary rise in fasting blood sugar in the first 1 to 2 weeks is normal and usually settles by week 3 to 4",
-     "A persistent rise means slow the titration down"
-    ]
    }
   ],
   "dosing": [
    "Start at 1.5 mg and step up every 4 weeks. Going too fast is the top reason people quit, almost always from nausea.",
    "Maintenance is commonly 6 mg weekly. China approved it at 4 mg and 6 mg in 2025 (brand name Xinermei), and a higher 9 mg dose (titrated 3, 6, 9) is under review there for severe obesity.",
    "Some step down to 4.5 mg or 3 mg once at goal to hold results with fewer side effects.",
-   "One consistent day per week. Half-life is about 6.5 days."
+   "One consistent day per week."
   ],
   "duration": [
    "Titrate over 12 to 16 weeks, then maintain. Like the other GLP-1 class drugs, stopping tends to bring weight back."
@@ -247,8 +240,8 @@
    {
     "title": "Standard titration (once weekly, subcutaneous)",
     "items": [
-     "Start at 0.3 mg once weekly and step up roughly every 2 to 4 weeks toward a working dose, climbing over 14 to 16 weeks",
-     "The Phase 2 obesity trial topped out at 4.8 mg weekly",
+     "Start at 0.3 mg once weekly and step up toward a working dose; the phase 2 trial escalated over 20 weeks",
+     "The phase 2 obesity trial topped out at 4.8 mg weekly; phase 3 (SYNCHRONIZE) goes up to 6 mg",
      "Effects become noticeably stronger from 1.8 mg upward"
     ]
    },
@@ -262,7 +255,7 @@
   ],
   "dosing": [
    "Start at 0.3 mg. This is a tolerance dose; real weight effect kicks in around 1.8 mg.",
-   "Step up gradually over 14 to 16 weeks. Steady-state at any dose takes about 5 weeks given the 7-day half-life.",
+   "Step up gradually; the phase 2 trial took 20 weeks to reach the top dose.",
    "Phase 2 went up to 4.8 mg weekly. Stay at the lowest dose that keeps you progressing.",
    "One consistent day per week."
   ],
@@ -334,7 +327,7 @@
   "typical": "1–2 mg daily",
   "librarySlug": "ghk-cu",
   "defaultVialMg": 50,
-  "defaultWaterMl": 3,
+  "defaultWaterMl": 5,
   "startDoseMcg": 1000,
   "vials": [
    50,
@@ -342,9 +335,10 @@
   ],
   "bac": [
    2,
-   3
+   3,
+   5
   ],
-  "bacNote": "GHK-Cu is naturally acidic and can sting going in. Filling to the full 3 mL dilutes it as much as the vial allows, which noticeably reduces the burn, so the larger fill is usually preferred. Some co-mix it with BPC-157 to buffer the sting further.",
+  "bacNote": "GHK-Cu is naturally acidic and can sting going in. More water dilutes it and noticeably reduces the burn; the NovaEvum worksheet uses 5 mL on the 50 mg vial (10 mg/mL). Some co-mix it with BPC-157 to buffer the sting further.",
   "recon": [
    "The finished solution will have a faint blue tint. That is the copper and is completely normal.",
    "Once fully mixed it should be clear, not cloudy."
@@ -354,8 +348,8 @@
     "title": "Standard protocol (subcutaneous)",
     "items": [
      "1 mg to 2 mg per day, once daily or split morning and evening",
-     "At a 3 mL fill on the 50 mg vial (about 16.7 mg/mL), 1 mg is a 0.06 mL draw (6 units) and 2 mg is 0.12 mL (12 units)",
-     "The 100 mg vial at 3 mL is twice as concentrated, so halve those draws",
+     "At a 5 mL fill on the 50 mg vial (10 mg/mL), 1 mg is a 0.1 mL draw (10 units) and 2 mg is 0.2 mL (20 units)",
+     "The 100 mg vial at 5 mL is twice as concentrated, so halve those draws",
      "A 5 days on, 2 off pattern is common"
     ]
    },
@@ -454,16 +448,17 @@
   "typical": "1–2.5 mg GHK-Cu daily (blend)",
   "librarySlug": null,
   "defaultVialMg": 80,
-  "defaultWaterMl": 3,
-  "startDoseMcg": 4000,
+  "defaultWaterMl": 4,
+  "startDoseMcg": 2000,
   "vials": [
    80
   ],
   "bac": [
    3,
+   4,
    5
   ],
-  "bacNote": "KLOW is a blend (GHK-Cu, BPC-157, TB-500, KPV in a 5:1:1:1 ratio), so 80 mg is the combined weight. The vial is usually 3 mL but occasionally ships as 5 mL; use the fill that matches the vial you received. Filling to the top dilutes the GHK-Cu sting as much as the vial allows. The calculator works in total blend mg: since GHK-Cu is 5 of every 8 parts, a 2.5 mg GHK-Cu dose is 4 mg of total blend.",
+  "bacNote": "KLOW is a blend (GHK-Cu, BPC-157, TB-500, KPV in a 5:1:1:1 ratio), so 80 mg is the combined weight. The NovaEvum worksheet uses 4 mL (20 mg/mL total). More water dilutes the GHK-Cu sting. The calculator works in total blend mg: since GHK-Cu is 5 of every 8 parts, 1.25 mg of GHK-Cu is 2 mg of total blend.",
   "recon": [
    "A faint blue tint from the copper is normal.",
    "The solution should otherwise be clear once mixed."
@@ -473,9 +468,9 @@
     "title": "How a blend is dosed",
     "items": [
      "Like GLOW, dose KLOW by the GHK-Cu amount; the BPC-157, TB-500 and KPV follow in the 5:1:1:1 ratio",
-     "The common range is 1 mg to 2.5 mg of GHK-Cu per day, with around 2.5 mg typical during loading",
-     "At a 3 mL fill the GHK-Cu portion comes to about 16.7 mg/mL, so 1 mg of GHK-Cu is a 0.06 mL draw (6 units) and 2.5 mg is 0.15 mL (15 units)",
-     "These figures are for the usual 3 mL fill; with a 5 mL vial, recalculate the draws"
+     "The common range is 1 mg to 2.5 mg of GHK-Cu per day. Start around 1.25 mg and move toward 2.5 mg during loading if tolerated",
+     "At a 4 mL fill the GHK-Cu portion comes to 12.5 mg/mL, so 1.25 mg of GHK-Cu (2 mg of blend) is a 0.1 mL draw (10 units) and 2.5 mg is 0.2 mL (20 units)",
+     "These figures are for a 4 mL fill; with any other fill, recalculate the draws"
     ]
    },
    {
@@ -609,7 +604,7 @@
   "librarySlug": null,
   "defaultVialMg": 10,
   "defaultWaterMl": 2,
-  "startDoseMcg": 1000,
+  "startDoseMcg": 500,
   "vials": [
    10,
    20
@@ -634,7 +629,7 @@
     "title": "Schedule and placement",
     "items": [
      "One subcutaneous injection daily, rotating sites",
-     "BPC-157 works best near the injury, while TB-500 acts systemically, so for a specific injury you can inject close to the area and still get the whole-body benefit",
+     "Some inject BPC-157 near the injury; TB-500 is thought to act systemically. Neither placement effect is proven in humans",
      "A 5 days on, 2 days off pattern is common"
     ]
    }
@@ -645,7 +640,7 @@
    "Both BPC-157 and TB-500 are on the WADA prohibited list and are banned in competitive sport."
   ],
   "duration": [
-   "Run a 6 to 12 week block, then take a break. Acute injuries often respond in 2 to 3 weeks; chronic or post-surgical cases usually take 4 to 8 weeks to show clear progress."
+   "Run a 4 to 8 week block, then take a break. Acute injuries often respond in 2 to 3 weeks; chronic or post-surgical cases usually take 4 to 8 weeks to show clear progress."
   ],
   "notes": [
    "One daily shot covers both peptides, which is simpler than running two separate vials.",
@@ -662,7 +657,7 @@
   "librarySlug": "kpv",
   "defaultVialMg": 10,
   "defaultWaterMl": 2,
-  "startDoseMcg": 500,
+  "startDoseMcg": 250,
   "vials": [
    10
   ],
@@ -675,14 +670,14 @@
    {
     "title": "Standard protocol (subcutaneous)",
     "items": [
-     "0.5 mg (500 mcg) once daily is the common working dose",
-     "Some start at 0.2 mg to gauge response",
+     "0.25 mg (250 mcg) once daily to start, up to 0.5 mg",
+     "At a 2 mL fill (5 mg/mL), 0.25 mg is 5 units and 0.5 mg is 10 units",
      "For gut-focused use it is often run daily through an active flare"
     ]
    }
   ],
   "dosing": [
-   "Common daily dose is around 0.2 mg to 0.5 mg, with 0.5 mg the typical working amount.",
+   "Common daily dose is around 0.2 mg to 0.5 mg, starting at 0.25 mg.",
    "Once daily subcutaneous is the usual approach.",
    "Often used in shorter courses during an active inflammatory or gut issue rather than continuously.",
    "Community dosing data for KPV is thinner than for BPC-157 or TB-500, so start conservative and assess."
@@ -727,7 +722,7 @@
     "items": [
      "2 mg once daily, injected at night",
      "This is the studied clinical dose for reducing visceral fat",
-     "Inject on an empty stomach to work with your overnight GH release"
+     "The label dose is 2 mg daily (1.4 mg for the Egrifta SV formulation), into the abdomen. Night-time, empty-stomach timing is common practice, not a label rule"
     ]
    }
   ],
@@ -771,7 +766,7 @@
     "title": "Standard protocol (subcutaneous)",
     "items": [
      "0.2 mg to 0.3 mg once nightly before bed, on an empty stomach, to ride the natural deep-sleep GH pulse",
-     "Daily dosing, since the half-life is very short (about 30 minutes)"
+     "Daily dosing, since the half-life is very short (about 10 minutes)"
     ]
    }
   ],
@@ -798,11 +793,12 @@
   "route": "Subcutaneous",
   "typical": "0.2–0.3 mg, 1–2× daily",
   "librarySlug": "ipamorelin",
-  "defaultVialMg": 5,
+  "defaultVialMg": 10,
   "defaultWaterMl": 2,
   "startDoseMcg": 200,
   "vials": [
-   5
+   5,
+   10
   ],
   "bac": [
    1,
@@ -816,7 +812,7 @@
     "items": [
      "0.2 mg to 0.3 mg per dose, once or twice daily, on an empty stomach",
      "The classic timing is before bed and/or fasted in the morning",
-     "Start at the lower end (0.1 mg) for the first week"
+     "At a 2 mL fill on the 10 mg vial (5 mg/mL), 0.2 mg is a 0.04 mL draw (4 units) and 0.3 mg is 6 units; on the 5 mg vial at 2 mL, double those draws"
     ]
    }
   ],
@@ -977,7 +973,7 @@
     "title": "Standard protocol (subcutaneous)",
     "items": [
      "1 mg to 2 mg once weekly (some split into two doses per week)",
-     "The DAC version is long-acting (half-life of days), so it gives a steady GH bump rather than sharp pulses and does not need daily timing"
+     "The DAC version is long-acting (half-life of days), so it raises the GH baseline between your natural pulses, which carry on, and does not need daily timing"
     ]
    },
    {
@@ -990,7 +986,7 @@
   ],
   "dosing": [
    "Common dose is 1 mg to 2 mg per week, often as one or two shots.",
-   "Long-acting, so you get a sustained GH elevation instead of pulses.",
+   "Long-acting: it lifts the GH baseline while the natural pulses carry on.",
    "Food timing matters much less here than with the short-acting No DAC version.",
    "Mild water retention or tingling can show up early and settles."
   ],
@@ -998,7 +994,7 @@
    "Run 8 to 12 weeks, then a break."
   ],
   "notes": [
-   "The DAC extends the half-life to days, giving a steady GH bump rather than sharp pulses.",
+   "The DAC extends the half-life to days, lifting the GH baseline between natural pulses.",
    "Mild water retention or tingling can show up early and settles.",
    "Inject subcutaneously and rotate sites."
   ],
@@ -1136,7 +1132,7 @@
    {
     "title": "Inject at night",
     "items": [
-     "Most people (80 to 90%) get some nausea and facial flushing, worst during loading and peaking 2 to 4 hours after a dose",
+     "Nausea and facial flushing are very common, worst during loading and peaking 2 to 4 hours after a dose",
      "Dosing in the evening means you sleep through the worst of it"
     ]
    }
@@ -1155,7 +1151,8 @@
    "Can darken moles and freckles. Keep an eye on any that change.",
    "Inject subcutaneously and rotate sites."
   ],
-  "storage": []
+  "storage": [],
+  "important": "Melanotan-2 is not approved anywhere. Regulators have warned about new or changing moles and possible melanoma, and case reports describe priapism, kidney injury and muscle breakdown. Get any changing mole checked."
  },
  {
   "slug": "melanotan-1",
@@ -1194,7 +1191,7 @@
   "dosing": [
    "Loading: 0.25 mg twice weekly for about 4 weeks. Maintenance: about once weekly after colour develops.",
    "Pair with gradual UV exposure to build the tan.",
-   "Milder side-effect profile than MT-2: less nausea, no flushing or appetite change for most.",
+   "Reported as milder than MT-2. The Scenesse label lists nausea, headache, dizziness, fatigue and new moles.",
    "Watch moles and freckles for any changes, as with any tanning peptide."
   ],
   "duration": [
@@ -1202,21 +1199,22 @@
   ],
   "notes": [
    "Also called afamelanotide. Milder on nausea and without the libido effect of MT-2.",
-   "Does not cause the same flushing or appetite changes as MT-2 for most people.",
+   "The Scenesse label advises a full-body skin check twice a year.",
    "Inject subcutaneously and rotate sites."
   ],
-  "storage": []
+  "storage": [],
+  "important": "The only approved form of afamelanotide is Scenesse, a 16 mg implant placed by a clinician every 2 months for a rare light-sensitivity disorder (EPP). Injectable Melanotan-1 is unapproved; the protocol below is community practice, not a label."
  },
  {
   "slug": "pt-141",
   "name": "PT-141",
   "category": "skin-hair-aesthetics",
   "route": "Subcutaneous, on demand",
-  "typical": "1–2 mg as needed",
+  "typical": "1.75 mg as needed (label dose)",
   "librarySlug": "pt-141",
   "defaultVialMg": 10,
   "defaultWaterMl": 2,
-  "startDoseMcg": 1000,
+  "startDoseMcg": 1750,
   "vials": [
    10
   ],
@@ -1227,11 +1225,12 @@
   "recon": [],
   "sections": [
    {
-    "title": "Standard protocol (subcutaneous, on demand)",
+    "title": "Label protocol (subcutaneous, on demand)",
     "items": [
-     "1 mg to 2 mg, taken at least 45 minutes before activity, not on a daily schedule",
-     "Start at the low end (1 mg) the first time to gauge nausea",
-     "At a 2 mL fill on a 10 mg vial (5 mg/mL), 1 mg is a 0.2 mL draw (20 units)"
+     "1.75 mg, at least 45 minutes before activity, not on a daily schedule",
+     "No more than one dose in 24 hours, and no more than 8 doses a month",
+     "Stop if there is no benefit after 8 weeks",
+     "At a 2 mL fill on a 10 mg vial (5 mg/mL), 1.75 mg is a 0.35 mL draw (35 units)"
     ]
    },
    {
@@ -1239,13 +1238,13 @@
     "items": [
      "This is an as-needed peptide, not a daily one",
      "Do not combine with Melanotan-2 or Melanotan-1; they act on the same melanocortin system",
-     "Space doses out; it is not meant for back-to-back daily use"
+     "Blood pressure rises briefly after each dose; avoid it with uncontrolled hypertension or heart disease"
     ]
    }
   ],
   "dosing": [
-   "1 mg to 2 mg, about 45 minutes before activity. Used on demand, not daily.",
-   "Start at 1 mg to assess nausea, which is the main side effect, along with facial flushing.",
+   "1.75 mg, at least 45 minutes before activity. On demand, not daily: one dose per 24 hours at most, 8 per month at most.",
+   "Nausea is the main side effect, along with facial flushing and headache.",
    "Works through the nervous system for libido rather than on blood flow like the ED drugs.",
    "Do not stack with MT-2 or MT-1 (same receptor family)."
   ],
@@ -1253,11 +1252,12 @@
    "Used occasionally, on demand, rather than in a continuous cycle."
   ],
   "notes": [
-   "Also called bremelanotide. Works on the nervous system for libido rather than on blood flow.",
-   "Nausea and facial flushing are the common effects and ease at lower doses.",
-   "Inject subcutaneously."
+   "Also called bremelanotide (Vyleesi). Approved in the US for low sexual desire in premenopausal women.",
+   "Nausea and facial flushing are the common effects.",
+   "Inject subcutaneously into the abdomen or thigh."
   ],
-  "storage": []
+  "storage": [],
+  "important": "No more than one dose in 24 hours and no more than 8 doses a month. Do not use with uncontrolled high blood pressure or known heart disease: it raises blood pressure for a few hours after each dose."
  },
  {
   "slug": "aod-9604",
@@ -1276,8 +1276,7 @@
    1,
    2
   ],
-  "important": "AOD-9604 does not reliably dissolve in bacteriostatic water alone. Add 0.6% acetic acid first, then top up with bac water. Going straight to bac water is what makes the vial turn cloudy, gel, or leave floating flakes.",
-  "bacNote": "AOD-9604 is hydrophobic, so in plain bac water it clumps instead of dissolving; that is the cloudiness or gel at the bottom of the vial. Dissolve it in a small amount of 0.6% acetic acid first (about 10 to 20% of your target volume, so 0.2 to 0.4 mL for a 2 mL fill), swirl until clear, then add bac water to reach the final volume. The acetic acid counts toward that volume.",
+  "bacNote": "Reconstitutes with bacteriostatic water. If a vial stays cloudy, some dissolve it in a small amount of 0.6% acetic acid first (about 10 to 20% of the target volume), then top up with bac water; the acid counts toward the final volume.",
   "ownMixing": true,
   "recon": [
    "Add 0.6% acetic acid first, about 10 to 20% of your target volume (roughly 0.2 to 0.4 mL for a 2 mL fill), down the inside wall of the vial.",
@@ -1298,14 +1297,14 @@
    "Standard dose is 0.3 mg (300 mcg) daily, usually fasted in the morning.",
    "A modified GH fragment that targets fat metabolism without raising IGF-1 or overall GH, so it does not cause the water retention or growth effects of HGH.",
    "Daily consistency over a cycle is the approach.",
-   "Generally well tolerated."
+   "Well tolerated in human trials, but those trials did not show meaningful weight loss."
   ],
   "duration": [
    "Run several weeks to a few months, daily. Often paired with a GH secretagogue like Ipamorelin (AOD in the morning, Ipamorelin before bed)."
   ],
   "notes": [
    "A fragment of GH studied for fat metabolism without the broader GH effects.",
-   "Generally well tolerated.",
+   "Well tolerated in human trials, but those trials did not show meaningful weight loss.",
    "Inject subcutaneously and rotate sites."
   ],
   "storage": [
@@ -1344,7 +1343,7 @@
   "dosing": [
    "Injectable dosing is commonly 2.5 mg to 5 mg per day. (Oral capsules use far higher amounts because of low oral absorption; this is the injectable.)",
    "Once daily is typical. Some split into two smaller doses.",
-   "An NNMT inhibitor that raises NAD+ and supports fat oxidation. It works best with diet, not instead of it.",
+   "An NNMT inhibitor that raised NAD+ and fat oxidation in cell and mouse studies; there are no human trials. It works best with diet, not instead of it.",
    "Mild sting on injection is common; go slow."
   ],
   "duration": [
@@ -1352,7 +1351,7 @@
   ],
   "notes": [
    "A small molecule studied for metabolism and fat cells (NNMT inhibition).",
-   "Generally well tolerated.",
+   "No human safety data.",
    "Inject subcutaneously and rotate sites."
   ],
   "storage": []
@@ -1415,8 +1414,8 @@
    "Run 4 to 8 week blocks, then a break of similar length. Effects build over the cycle rather than from any single dose."
   ],
   "notes": [
-   "Non-hormonal, so no PCT, and it does not disrupt other hormones.",
-   "Well tolerated by most; the main reports are mild fatigue or injection-site reactions at higher doses.",
+   "Human data are limited, so its effects on other hormones are not established.",
+   "The main reports are mild fatigue or injection-site reactions at higher doses. Human safety data are limited.",
    "More is not better here: the lower signalling-style doses work fine. Inject subcutaneously and rotate sites."
   ],
   "storage": []
@@ -1765,7 +1764,7 @@
   "slug": "semax",
   "name": "Semax",
   "category": "brain-cognitive",
-  "route": "Subcutaneous",
+  "route": "Intranasal",
   "typical": "0.3–0.6 mg daily, short courses",
   "librarySlug": "semax",
   "defaultVialMg": 10,
@@ -1781,7 +1780,7 @@
   "recon": [],
   "sections": [
    {
-    "title": "Standard protocol (subcutaneous)",
+    "title": "Standard protocol (intranasal)",
     "items": [
      "0.3 mg to 0.6 mg per day, once daily, typically in the morning or early afternoon to avoid overstimulation at night",
      "Some split it morning and midday"
@@ -1791,23 +1790,23 @@
     "title": "Short courses",
     "items": [
      "Semax is not meant for continuous daily use",
-     "Run it in short courses of 5 to 10 days during periods of heavy focus or stress, then break"
+     "Run it in short courses of 5 to 14 days during periods of heavy focus or stress, then break"
     ]
    }
   ],
   "dosing": [
    "Common dose is 0.3 mg to 0.6 mg per day, once daily or split morning and midday.",
    "A nootropic peptide for focus and cognition. Dose earlier in the day to avoid sleep disruption.",
-   "Used in short bursts (5 to 10 days), not as a permanent daily habit.",
+   "Used in short bursts (5 to 14 days), not as a permanent daily habit.",
    "Generally well tolerated."
   ],
   "duration": [
-   "Short courses of 5 to 10 days during demanding periods, then a break."
+   "Short courses of 5 to 14 days during demanding periods, then a break."
   ],
   "notes": [
    "A nootropic peptide studied for focus and cognition.",
    "Generally well tolerated.",
-   "Inject subcutaneously and rotate sites."
+   "Used as a nasal spray; alternate nostrils."
   ],
   "storage": []
  },
@@ -1815,7 +1814,7 @@
   "slug": "selank",
   "name": "Selank",
   "category": "brain-cognitive",
-  "route": "Subcutaneous",
+  "route": "Intranasal",
   "typical": "0.2–0.4 mg daily, short courses",
   "librarySlug": "selank",
   "defaultVialMg": 5,
@@ -1832,10 +1831,10 @@
   "recon": [],
   "sections": [
    {
-    "title": "Standard protocol (subcutaneous)",
+    "title": "Standard protocol (intranasal)",
     "items": [
      "0.3 mg per day (range 0.2 to 0.4 mg), once daily",
-     "At a 1 mL fill on a 5 mg vial (5 mg/mL), 0.3 mg is a 0.06 mL draw (6 units)"
+     "At 5 mg/mL, 0.3 mg is 0.06 mL of solution; check your sprayer's volume per spray to count sprays"
     ]
    },
    {
@@ -1858,7 +1857,7 @@
   "notes": [
    "A calming, anti-anxiety nootropic peptide.",
    "Generally well tolerated.",
-   "Inject subcutaneously and rotate sites."
+   "Used as a nasal spray; alternate nostrils."
   ],
   "storage": []
  },
@@ -2102,7 +2101,7 @@
      "Week 2: 50 mg",
      "Week 3 onward: 100 mg per dose if well tolerated",
      "Dose 3 times per week (for example Monday, Wednesday, Friday), not daily",
-     "At a 10 mL fill (50 mg/mL), 50 mg is a 1 mL draw (100 units) and 100 mg is 2 mL (200 units)"
+     "At a 10 mL fill (50 mg/mL), 50 mg is a 1 mL draw (100 units) and 100 mg is 2 mL, two full 1 mL syringes. At a 5 mL fill (100 mg/mL), 100 mg fits one syringe (100 units)"
     ]
    },
    {
@@ -2145,10 +2144,9 @@
   ],
   "bac": [
    3,
-   5,
-   10
+   5
   ],
-  "bacNote": "A large 1500 mg vial. Filling to 5 mL gives 300 mg/mL, which keeps common doses on a standard 1 mL insulin syringe: 200 mg is 67 units, 300 mg a full 100 units. A 3 mL fill (500 mg/mL) makes draws smaller still (200 mg is 40 units). For larger single doses like 600 mg, split into two insulin-syringe injections at different sites, or fill to 10 mL and use a 3 mL syringe with a higher-gauge needle, where 600 mg is a 4 mL draw.",
+  "bacNote": "A large 1500 mg vial. Filling to 5 mL gives 300 mg/mL, which keeps common doses on a standard 1 mL insulin syringe: 200 mg is 67 units, 300 mg a full 100 units. A 3 mL fill (500 mg/mL) makes draws smaller still (200 mg is 40 units). A 600 mg dose is 2 mL at the 5 mL fill, so split it into two injections at different sites.",
   "recon": [],
   "sections": [
    {
@@ -2157,7 +2155,7 @@
      "200 mg to 600 mg per injection, 2 to 3 times weekly is the common range for antioxidant and detox support",
      "Skin-brightening protocols run at the higher end",
      "At a 5 mL fill on the 1500 mg vial (300 mg/mL), 200 mg is a 0.67 mL draw (67 units) and 300 mg is a full 1 mL (100 units) on an insulin syringe",
-     "A 600 mg dose is 2 mL, more than one insulin syringe holds, so split it into two injections or use a 3 mL syringe",
+     "A 600 mg dose is 2 mL, more than one insulin syringe holds, so split it into two injections at different sites",
      "Injecting more than about 1.5 mL into a single subcutaneous site tends to leak, so splitting a large dose across two sites is good practice anyway"
     ]
    },
@@ -2172,7 +2170,7 @@
   ],
   "dosing": [
    "Common dose is 200 mg to 600 mg per injection, 2 to 3 times weekly. Higher end for skin brightening.",
-   "For 600 mg or larger, split into two insulin-syringe injections, or fill to 10 mL and use a 3 mL syringe with a higher-gauge needle.",
+   "For 600 mg or larger, split into two insulin-syringe injections at different sites.",
    "Inject subcutaneously or intramuscularly; morning on an empty stomach is common. Rotate sites.",
    "Do not combine in the same syringe as vitamin C, as they can react. Inject separately if stacking."
   ],

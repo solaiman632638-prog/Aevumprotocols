@@ -71,6 +71,19 @@ const corrections: Record<string, Partial<LibraryEntry>> = {
       "Switches on estrogen-related receptors (ERR alpha, beta, and gamma), which turn up the genes for fatty-acid burning and mitochondrial energy production in muscle, the same program a workout turns on, without the workout. In mice this raised energy expenditure and fat oxidation and lengthened running time.",
     sideEffects: ["No human safety data", "Theoretical cardiac enlargement (ERR-gamma, animal data)"],
   },
+  // FDA dropped it from 503A Category 2 on 22 Apr 2026 pending PCAC review.
+  "bpc-157": {
+    legal:
+      "Unapproved drug. FDA removed it from the 503A Category 2 list in April 2026 pending advisory-committee review; that does not make it approved or compoundable. Prohibited by WADA.",
+  },
+  // Pepipedia gives the HIV entry-inhibitor indication of a different drug.
+  tesamorelin: { indication: "Excess abdominal fat in HIV-associated lipodystrophy" },
+  // Hexarelin is the GHRP-6 analog, not the other way round.
+  "ghrp-6": { synonyms: ["His-D-Trp-Ala-Trp-D-Phe-Lys-NH2", "GH-releasing hexapeptide"] },
+  // Ac-SDKP is thymosin β4 residues 1–4; TB-500 is residues 17–23.
+  "tb-500": { synonyms: ["TB-500", "Tβ4 fragment 17–23", "Ac-LKKTETQ"] },
+  "tb-500-fragment-17-23": { synonyms: ["Thymosin beta-4 fragment 17-23", "LKKTETQ"] },
+  "ct-388": { synonyms: ["CT388", "CT 388", "Enicepatide"] },
 };
 
 export const library = (entries as LibraryEntry[])

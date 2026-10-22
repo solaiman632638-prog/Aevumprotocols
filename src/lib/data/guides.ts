@@ -66,7 +66,7 @@ export const standardMixing = [
 
 export const standardStorage = [
   "Keep the powdered (lyophilized) vial in a cool, dark place. Refrigerate it for longer-term storage before mixing.",
-  "Once reconstituted and refrigerated at 2–8 °C away from light, use the vial within 90 days.",
+  "Once reconstituted and refrigerated at 2–8 °C away from light, use the vial within 28 days.",
   "Do not freeze a reconstituted vial, and keep it away from heat and sunlight.",
   "If the solution turns cloudy, develops floating particles, or shows any other sign of degradation, stop using that vial.",
 ];

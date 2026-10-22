@@ -16,10 +16,11 @@ export default function CompoundsPage() {
         Compounds
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
-        {counts.total} compounds, every one with a full dosing protocol, and{" "}
-        {counts.stocked} with a NovaEvum vial worksheet and calculator. Each
-        page holds the evidence, the risks, the protocol, and the syringe math
-        together.
+        {counts.total} compounds, {counts.protocols} of them with a full dosing
+        protocol, and {counts.stocked} with a NovaEvum vial worksheet and
+        calculator. The rest carry the published dosing where a label, trial,
+        or study gives one. Each page holds the evidence, the risks, and the
+        dosing together.
       </p>
       <div className="mt-8">
         <LibraryIndex rows={compoundRows} />

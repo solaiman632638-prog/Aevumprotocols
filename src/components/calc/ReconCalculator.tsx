@@ -18,16 +18,16 @@ export function ReconCalculator({
 }: Props) {
   const [vialMg, setVialMg] = useState(String(defaultVialMg));
   const [waterMl, setWaterMl] = useState(String(defaultWaterMl));
-  const [doseMcg, setDoseMcg] = useState(String(defaultDoseMcg));
+  const [doseMg, setDoseMg] = useState(String(defaultDoseMcg / 1000));
 
   const result = useMemo(
     () =>
       calculateRecon({
         vialMg: Number(vialMg),
         waterMl: Number(waterMl),
-        doseMcg: Number(doseMcg),
+        doseMcg: Number(doseMg) * 1000,
       }),
-    [vialMg, waterMl, doseMcg],
+    [vialMg, waterMl, doseMg],
   );
 
   const unitPercent = result
@@ -65,11 +65,12 @@ export function ReconCalculator({
             step="0.1"
           />
           <Field
-            id="dose-mcg"
+            id="dose-mg"
             label="Intended amount"
-            unit="mcg"
-            value={doseMcg}
-            onChange={setDoseMcg}
+            unit="mg"
+            value={doseMg}
+            onChange={setDoseMg}
+            step="0.01"
             hint="1 mg = 1000 mcg"
           />
         </fieldset>

@@ -63,6 +63,7 @@ export function LibraryIndex({ rows }: { rows: CompoundRow[] }) {
             <label htmlFor="library-show" className="mb-1 block text-sm">Show</label>
             <select id="library-show" value={only} onChange={(event) => setOnly(event.target.value as typeof only)} className={control}>
               <option value="all">Everything</option>
+              <option value="protocol">With a protocol</option>
               <option value="stocked">On NovaEvum</option>
             </select>
           </div>

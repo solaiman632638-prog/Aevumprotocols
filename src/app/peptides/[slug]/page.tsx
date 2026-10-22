@@ -6,6 +6,7 @@ import { GuideBody } from "@/components/protocols/GuideBody";
 import { compoundPage, compoundSlugs } from "@/lib/data/compounds";
 import { library, statusName, systemName } from "@/lib/data/library";
 import { storeUrl } from "@/lib/data/protocols";
+import { basisName, getRegimen } from "@/lib/data/regimens";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -31,6 +32,7 @@ export default async function CompoundPage({ params }: Props) {
 
   const { entry, guide, worksheet } = page;
   const name = entry?.name ?? guide!.name;
+  const regimen = guide ? undefined : getRegimen(page.canonical);
   const related = entry
     ? library
         .filter((item) => item.system === entry.system && item.slug !== entry.slug)
@@ -130,6 +132,31 @@ export default async function CompoundPage({ params }: Props) {
           ) : null}
 
           {guide ? <GuideBody guide={guide} /> : null}
+
+          {regimen ? (
+            <section>
+              <p className="eyebrow">{basisName[regimen.basis]}</p>
+              <h2 className={`mt-2 ${heading}`}>Published dosing</h2>
+              {regimen.basis !== "none" ? <p className="mt-3 text-sm text-mute">{regimen.route}</p> : null}
+              <ul className="mt-3 max-w-prose list-disc space-y-1.5 pl-5">
+                {regimen.lines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+              {regimen.sources.length > 0 ? (
+                <p className="mt-4 text-sm text-mute">
+                  Source:{" "}
+                  {regimen.sources.map((source, index) => (
+                    <span key={source.url}>
+                      {index > 0 ? "; " : null}
+                      <a href={source.url} rel="noreferrer" target="_blank">{source.label}</a>
+                    </span>
+                  ))}
+                  . Reference only, not a prescription.
+                </p>
+              ) : null}
+            </section>
+          ) : null}
 
           {worksheet ? (
             <section aria-labelledby="worksheet">

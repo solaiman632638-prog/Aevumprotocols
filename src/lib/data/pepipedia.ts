@@ -1,15 +1,18 @@
 import type { Protocol } from "@/lib/types";
 
-/** Pepipedia reconstitution guide, paraphrased. */
+/**
+ * Pepipedia reconstitution guide, paraphrased. Mixed-vial life is capped at
+ * the 28-day multi-dose limit (USP <797>) rather than Pepipedia's 45 days.
+ */
 export const pepipediaStorage = {
   lyophilized:
     "−20 °C freezer preferred; a refrigerator is also acceptable. Do not open a cold vial — wait 15–30 minutes so it does not sweat. Avoid freeze–thaw cycling.",
   reconstituted:
-    "2–8 °C, dark, up to 45 days when mixed with bacteriostatic water. Mixed vials stay in their box. Sterile water (no preservative) is single-use.",
+    "2–8 °C, dark, up to 28 days when mixed with bacteriostatic water. Mixed vials stay in their box. Sterile water (no preservative) is single-use.",
   bacWater:
     "Bacteriostatic water: 20–25 °C. Do not refrigerate the diluent.",
   nasal:
-    "2–8 °C before and after opening. Up to 45 days after first use. Do not freeze. Return the spray to the fridge after each actuation.",
+    "2–8 °C before and after opening. Up to 28 days after first use. Do not freeze. Return the spray to the fridge after each actuation.",
 };
 
 type Overlay = Partial<
@@ -40,7 +43,7 @@ export const pepipedia: Record<string, Overlay> = {
     primaryUse: "Tissue healing and gastrointestinal repair",
     researchScore: 60,
     effects: ["Healing", "Anti-inflammatory", "Gut health", "Joint support", "Wound healing"],
-    legal: "Unapproved new drug (FDA Category 2 bulk). Prohibited by WADA.",
+    legal: "Unapproved drug. Removed from FDA 503A Category 2 in April 2026 pending advisory-committee review; not approved or compoundable. Prohibited by WADA.",
     approval: "Not FDA-approved for human or animal use.",
     evidence: "Limited human studies. Most evidence is preclinical.",
     summary:
@@ -55,7 +58,7 @@ export const pepipedia: Record<string, Overlay> = {
   },
   "tb-500": {
     pepipediaSlug: "tb-500",
-    synonyms: ["Tβ4 fragment", "T-beta-4", "Ac-SDKP"],
+    synonyms: ["Tβ4 fragment 17–23", "Ac-LKKTETQ"],
     primaryUse: "Tissue repair and cardiovascular protection",
     researchScore: 60,
     effects: ["Healing", "Angiogenesis", "Anti-inflammatory", "Wound healing"],
@@ -65,7 +68,7 @@ export const pepipedia: Record<string, Overlay> = {
     summary:
       "A synthetic fragment of thymosin beta-4 (often residues 17–23), sold separately from the full-length protein that is actually in wound-healing and cardiac trials. TB-500 is a research chemical with no formal human safety file.",
     mechanism:
-      "G-actin sequestration and cell migration, plus VEGF/bFGF. The Ac-SDKP fragment is the piece tied to TGF-β and fibrosis in cardiac models.",
+      "G-actin sequestration and cell migration, plus VEGF/bFGF. The anti-fibrotic Ac-SDKP piece of thymosin β4 is a different fragment and is not in TB-500.",
     safety:
       "Full-length Tβ4 looks safe in trials. TB-500’s human safety is unknown. Theoretical cancer risk. WADA prohibited.",
     sideEffects: ["Joint pain", "Headache", "Fatigue", "Temporary local hair growth"],

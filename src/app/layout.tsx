@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     template: "%s · Aevum",
   },
   // Kept in step with the register so the count can never go stale.
-  description: `Log what you took, see what the human evidence actually says, and track every injection. ${counts.total} peptide compounds, each with a full protocol, interaction warnings, and vial math.`,
+  description: `Log what you took, see what the human evidence actually says, and track every injection. ${counts.total} peptide compounds with protocols, published dosing, interaction warnings, and vial math.`,
   openGraph: {
     title: "Aevum · Peptide protocols and evidence",
-    description: `${counts.total} peptide compounds, each with a full protocol, ranked by the strength of the evidence behind it.`,
+    description: `${counts.total} peptide compounds with protocols and published dosing, ranked by the strength of the evidence behind it.`,
     siteName: "Aevum",
     type: "website",
   },
