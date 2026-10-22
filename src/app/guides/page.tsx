@@ -15,7 +15,7 @@ const guides = [
   {
     href: "/guides/storage",
     title: "Storage",
-    body: "Freezer-preferred powder, 45-day BAC vials, room-temp diluent, nasal fridge rules.",
+    body: "Freezer-preferred powder, 28-day BAC vials, room-temp diluent, nasal fridge rules.",
   },
   {
     href: "/calculator",
