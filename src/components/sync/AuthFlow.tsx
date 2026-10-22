@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useState } from "react";
 import { AnimatePresence, motion, MotionConfig, resize } from "motion/react";
 import { syncClient } from "@/lib/sync/client";
@@ -149,6 +150,8 @@ export function AuthFlow({
   onMagicLink: () => void;
   onStatus: (status: Status) => void;
 }) {
+  const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -220,14 +223,19 @@ export function AuthFlow({
     onStatus(null);
     try {
       if (mode === "signup") {
+        // Stored as full_name on the login itself, which the NovaEvum store shares.
+        const fullName = name.trim();
         const { data, error } = await supabase.auth.signUp({
           email: address,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/account` },
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: fullName ? { full_name: fullName } : undefined,
+          },
         });
         if (error) throw error;
         if (data.session) {
-          onStatus({ tone: "ok", text: "Account created. Your data now syncs." });
+          router.push("/dashboard");
         } else {
           // Confirmation is on: Supabase holds the session until the email is confirmed.
           setPendingEmail(address);
@@ -236,6 +244,7 @@ export function AuthFlow({
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: address, password });
         if (error) throw error;
+        router.push("/dashboard");
       }
     } catch (error) {
       onStatus({ tone: "error", text: friendly(error instanceof Error ? error.message : "Something went wrong.") });
@@ -260,8 +269,9 @@ export function AuthFlow({
         text: `${friendly(error.message)} If the email only had a link, open that instead.`,
       });
       setCode("");
+      return;
     }
-    // On success the session listener swaps this whole panel for the signed-in view.
+    router.push("/dashboard");
   }
 
   async function handleResend() {
@@ -270,7 +280,7 @@ export function AuthFlow({
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: pendingEmail,
-      options: { emailRedirectTo: `${window.location.origin}/account` },
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
     });
     onStatus(
       error
@@ -308,6 +318,21 @@ export function AuthFlow({
           </p>
 
           <form onSubmit={handleSubmit} noValidate>
+            {signup ? (
+              <div className="auth__field" style={{ marginBottom: "0.75rem" }}>
+                <label htmlFor="auth-name">First name</label>
+                <input
+                  id="auth-name"
+                  name="given-name"
+                  type="text"
+                  autoComplete="given-name"
+                  placeholder="What should we call you?"
+                  maxLength={60}
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </div>
+            ) : null}
             <div className="auth__field">
               <label htmlFor="auth-email">Email address</label>
               <input

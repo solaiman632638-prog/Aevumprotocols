@@ -58,7 +58,7 @@ export function TabBar() {
   }, [open]);
 
   const active = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-  const moreActive = !open && [...moreLinks.map((link) => link.href), "/account"].some(active);
+  const moreActive = !open && [...moreLinks.map((link) => link.href), "/account", "/dashboard"].some(active);
 
   return (
     <div className="md:hidden">

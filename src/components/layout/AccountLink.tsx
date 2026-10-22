@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useSession } from "@/lib/sync/useSession";
 
-/** Nav entry that reads "Sign in" or "My account" once accounts are switched on. */
+/** Nav entry: "Sign in" when signed out, "Dashboard" once signed in. */
 export function AccountLink({ className }: { className: string }) {
   const { configured, ready, email } = useSession();
-  const label = !configured || !ready ? "Account" : email ? "My account" : "Sign in";
+  const signedIn = configured && ready && Boolean(email);
+  const label = !configured || !ready ? "Account" : signedIn ? "Dashboard" : "Sign in";
   return (
-    <Link href="/account" className={className}>
+    <Link href={signedIn ? "/dashboard" : "/account"} className={className}>
       {label}
     </Link>
   );

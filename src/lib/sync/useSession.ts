@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { syncClient, syncConfigured } from "@/lib/sync/client";
 
 export type SessionState = {
@@ -9,15 +10,26 @@ export type SessionState = {
   /** Session lookup finished (always true when accounts are off). */
   ready: boolean;
   email: string | null;
+  /** Name on the shared login (`full_name`, set by Aevum or the NovaEvum store). */
+  name: string | null;
   /** The user arrived from a password-reset email and should set a new password. */
   recovering: boolean;
 };
+
+function who(session: Session | null): Pick<SessionState, "email" | "name"> {
+  const name = session?.user.user_metadata?.full_name;
+  return {
+    email: session?.user.email ?? null,
+    name: typeof name === "string" && name.trim() ? name.trim() : null,
+  };
+}
 
 export function useSession(): SessionState {
   const [state, setState] = useState<SessionState>({
     configured: syncConfigured,
     ready: !syncConfigured,
     email: null,
+    name: null,
     recovering: false,
   });
 
@@ -25,13 +37,13 @@ export function useSession(): SessionState {
     const supabase = syncClient();
     if (!supabase) return;
     void supabase.auth.getSession().then(({ data }) => {
-      setState((current) => ({ ...current, ready: true, email: data.session?.user.email ?? null }));
+      setState((current) => ({ ...current, ready: true, ...who(data.session) }));
     });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setState((current) => ({
         ...current,
         ready: true,
-        email: session?.user.email ?? null,
+        ...who(session),
         recovering: event === "PASSWORD_RECOVERY" ? true : event === "SIGNED_OUT" ? false : current.recovering,
       }));
     });
@@ -45,7 +57,7 @@ export function useSession(): SessionState {
         setState((previous) =>
           previous.email === (current.session?.user.email ?? null)
             ? previous
-            : { ...previous, ready: true, email: current.session?.user.email ?? null },
+            : { ...previous, ready: true, ...who(current.session) },
         );
       });
     };

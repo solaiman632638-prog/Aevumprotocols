@@ -7,7 +7,7 @@ import type { RiskTier } from "@/lib/peptides/catalog";
 import type { GuidanceStatus, PeptideReport } from "@/lib/peptides/engine";
 import type { UserContext } from "@/lib/today/types";
 
-const statusStyle: Record<GuidanceStatus, { label: string; tone: string }> = {
+export const statusStyle: Record<GuidanceStatus, { label: string; tone: string }> = {
   start: { label: "Below range", tone: "border-rule text-mute" },
   keep: { label: "No change", tone: "border-recovery/60 text-brass" },
   reference: { label: "Hold", tone: "border-rule text-mute" },

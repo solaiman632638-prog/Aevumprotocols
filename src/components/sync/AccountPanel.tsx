@@ -36,7 +36,10 @@ export function AccountPanel() {
     setStatus(null);
     try {
       if (mode === "link") {
-        const { error } = await supabase.auth.signInWithOtp({ email: address, options: { emailRedirectTo: redirectTo() } });
+        const { error } = await supabase.auth.signInWithOtp({
+          email: address,
+          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+        });
         if (error) throw error;
         setStatus({ tone: "ok", text: `Check ${address} for a sign-in link. Open it on this device.` });
       } else {
@@ -100,15 +103,17 @@ export function AccountPanel() {
         </section>
       ) : session.email ? (
         <section className={card}>
-          <p className="eyebrow">Signed in</p>
-          <h2 className="mt-2 break-all font-display text-3xl font-light tracking-[-0.03em]">{session.email}</h2>
+          <p className="eyebrow">Signed in as {session.email}</p>
+          <h2 className="mt-2 font-display text-3xl font-light tracking-[-0.03em]">
+            Welcome{session.name ? `, ${session.name}` : ""}
+          </h2>
           <p className="mt-3 max-w-prose text-mute">
             Your profile, goals, and every check-in are saved to your account and
             sync automatically. Log in with the same email on any phone or
             computer to pick up where you left off.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/today" className="btn-primary">Go to Today</Link>
+            <Link href="/dashboard" className="btn-primary">Open dashboard</Link>
             <button type="button" onClick={runSync} disabled={busy} className="btn-secondary disabled:opacity-50">
               {busy ? "Working…" : "Sync now"}
             </button>

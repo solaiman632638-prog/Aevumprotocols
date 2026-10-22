@@ -811,6 +811,55 @@ export function dueDoses(history_: DayState[], today: string): DueDose[] {
   return due.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+// ── Where each run stands ────────────────────────────────────────────────
+
+export type ProtocolRun = {
+  slug: string;
+  name: string;
+  /** What the user last logged, in the compound's own unit. */
+  amount: number;
+  unit: "mg" | "mcg";
+  schedule: string;
+  started: string;
+  /** Day of the current run, counting the start day as day 1. */
+  day: number;
+  /** Research cycle length; absent for compounds taken without a fixed cycle. */
+  cycleDays?: number;
+  daysLeft?: number;
+  ends?: string;
+};
+
+/**
+ * Progress through each active run, from the user's own log: when it
+ * started, the amount they logged last, and how long the research cycle for
+ * that compound runs. Bookkeeping only — it never suggests extending,
+ * shortening, or changing anything.
+ */
+export function protocolRuns(history_: DayState[], today: string): ProtocolRun[] {
+  const all = history(history_);
+  return activeCompounds(history_, today)
+    .map((model) => {
+      const list = all.get(model.slug)!;
+      const started = runStart(list);
+      const day = days(started, today) + 1;
+      const run: ProtocolRun = {
+        slug: model.slug,
+        name: model.name,
+        amount: list[list.length - 1].amount,
+        unit: model.unit,
+        schedule: scheduleLabel(model),
+        started,
+        day,
+      };
+      if (model.cycleDays) {
+        const end = new Date(Date.parse(started) + (model.cycleDays - 1) * DAY).toISOString().slice(0, 10);
+        Object.assign(run, { cycleDays: model.cycleDays, daysLeft: Math.max(0, model.cycleDays - day), ends: end });
+      }
+      return run;
+    })
+    .sort((a, b) => (a.daysLeft ?? Infinity) - (b.daysLeft ?? Infinity));
+}
+
 /**
  * Combinations the regimen touches. This reports what is known about a pair,
  * including when the answer is "nothing in humans" — it is not a prompt to add
