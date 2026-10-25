@@ -12,15 +12,21 @@ export type SessionState = {
   email: string | null;
   /** Name on the shared login (`full_name`, set by Aevum or the NovaEvum store). */
   name: string | null;
+  /** The account was created in the last hour: greet it as new, not "back". */
+  isNew: boolean;
   /** The user arrived from a password-reset email and should set a new password. */
   recovering: boolean;
 };
 
-function who(session: Session | null): Pick<SessionState, "email" | "name"> {
+const NEW_ACCOUNT_MS = 60 * 60 * 1000;
+
+function who(session: Session | null): Pick<SessionState, "email" | "name" | "isNew"> {
   const name = session?.user.user_metadata?.full_name;
+  const created = Date.parse(session?.user.created_at ?? "");
   return {
     email: session?.user.email ?? null,
     name: typeof name === "string" && name.trim() ? name.trim() : null,
+    isNew: Number.isFinite(created) && Date.now() - created < NEW_ACCOUNT_MS,
   };
 }
 
@@ -30,6 +36,7 @@ export function useSession(): SessionState {
     ready: !syncConfigured,
     email: null,
     name: null,
+    isNew: false,
     recovering: false,
   });
 

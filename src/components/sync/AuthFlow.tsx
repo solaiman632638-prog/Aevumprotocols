@@ -203,6 +203,10 @@ export function AuthFlow({
     const supabase = syncClient();
     if (!supabase) return;
 
+    if (mode === "signup" && !name.trim()) {
+      return onStatus({ tone: "error", text: "Enter your first name." });
+    }
+
     const address = email.trim();
     if (!/^\S+@\S+\.\S+$/.test(address)) {
       return onStatus({ tone: "error", text: "Enter a valid email address." });
@@ -230,7 +234,7 @@ export function AuthFlow({
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: fullName ? { full_name: fullName } : undefined,
+            data: { full_name: fullName },
           },
         });
         if (error) throw error;
@@ -325,6 +329,7 @@ export function AuthFlow({
                   id="auth-name"
                   name="given-name"
                   type="text"
+                  required
                   autoComplete="given-name"
                   placeholder="What should we call you?"
                   maxLength={60}

@@ -105,7 +105,8 @@ export function AccountPanel() {
         <section className={card}>
           <p className="eyebrow">Signed in as {session.email}</p>
           <h2 className="mt-2 font-display text-3xl font-light tracking-[-0.03em]">
-            Welcome{session.name ? `, ${session.name}` : ""}
+            {session.isNew ? "Welcome" : "Welcome back"}
+            {session.name ? `, ${session.name}` : ""}
           </h2>
           <p className="mt-3 max-w-prose text-mute">
             Your profile, goals, and every check-in are saved to your account and

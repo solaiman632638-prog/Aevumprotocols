@@ -153,7 +153,8 @@ export function MemberDashboard() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="mt-3 font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl"
           >
-            Welcome{session.name ? "," : ""}
+            {session.isNew ? "Welcome" : "Welcome back"}
+            {session.name ? "," : ""}
             {session.name ? (
               <>
                 <br className="sm:hidden" /> <span className="text-mute">{session.name}</span>
