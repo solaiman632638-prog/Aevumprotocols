@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ReconCalculator } from "@/components/calc/ReconCalculator";
+import { SameSyringeChecker } from "@/components/calc/SameSyringeChecker";
 
 export const metadata: Metadata = {
   title: "Reconstitution calculator",
@@ -24,6 +25,14 @@ export default function CalculatorPage() {
       <p className="mt-6 text-sm text-mute">
         Open a compound sheet if you want these fields pre-filled from the
         catalog vial size.
+      </p>
+      <div className="mt-12">
+        <SameSyringeChecker />
+      </div>
+      <p className="mt-6 text-sm text-mute">
+        Mixing peptides in one syringe has almost no published stability data.
+        Most of these entries are community practice, not testing. When in
+        doubt, use separate syringes. Educational only, not medical advice.
       </p>
     </div>
   );
