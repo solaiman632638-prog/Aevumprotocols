@@ -10,6 +10,9 @@
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\""
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@capgo/capacitor-health": "^8.11.12",
     "@supabase/supabase-js": "^2.116.0",
     "@vercel/analytics": "^2.0.1",
     "motion": "^13.4.4",
@@ -21,6 +24,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -22,6 +22,7 @@ import {
 } from "@/lib/today/storage";
 import type { DayState, UserContext } from "@/lib/today/types";
 import { latestReading, localDate, type HeartReading } from "@/lib/health/heart";
+import { isNativeApp, nativeHealthLinked, syncNativeHealth } from "@/lib/health/native";
 import { useSession } from "@/lib/sync/useSession";
 
 function useStored<T>(key: string): T | null {
@@ -53,14 +54,17 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   const [view, setView] = useState<"today" | "history">("today");
   const session = useSession();
   const [reading, setReading] = useState<HeartReading | null>(null);
+  const [refresh, setRefresh] = useState(0);
 
   // The Shortcut posts from the phone; look again whenever the page is shown.
+  // Inside the app, read Apple Health first so the newest numbers are there.
   useEffect(() => {
     if (!session.email) return;
     let cancelled = false;
     const load = () => {
       if (document.visibilityState !== "visible") return;
-      void latestReading().then((next) => {
+      const native = isNativeApp() && nativeHealthLinked() ? syncNativeHealth().catch(() => null) : Promise.resolve(null);
+      void native.then(latestReading).then((next) => {
         if (!cancelled) setReading(next);
       });
     };
@@ -70,7 +74,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
       cancelled = true;
       document.removeEventListener("visibilitychange", load);
     };
-  }, [session.email]);
+  }, [session.email, refresh]);
 
   const date = hydrated ? todayIso() : "";
 
@@ -202,7 +206,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
         </>
       ) : null}
 
-      {view === "today" && session.email ? <HeartConnect reading={reading} /> : null}
+      {view === "today" && session.email ? <HeartConnect reading={reading} onSynced={() => setRefresh((n) => n + 1)} /> : null}
     </div>
   );
 }

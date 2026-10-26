@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-const SIZES = [180, 192, 512] as const;
+const SIZES = [180, 192, 512, 1024] as const;
 
 export function generateStaticParams() {
   return SIZES.map((size) => ({ size: String(size) }));

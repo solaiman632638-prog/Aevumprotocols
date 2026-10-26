@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { linkUrl, SHORTCUT_NAME, type HeartReading } from "@/lib/health/heart";
+import { isNativeApp, syncNativeHealth } from "@/lib/health/native";
 import { site } from "@/lib/site";
 import { syncClient } from "@/lib/sync/client";
 
@@ -11,9 +12,19 @@ const timeFormat = new Intl.DateTimeFormat(undefined, { weekday: "short", hour: 
  * Apple Health link for signed-in members. The iPhone Shortcut reads resting
  * heart rate, HRV, and breathing rate each morning and posts them here.
  */
-export function HeartConnect({ reading }: { reading: HeartReading | null }) {
+export function HeartConnect({ reading, onSynced }: { reading: HeartReading | null; onSynced: () => void }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "linking" | "error">("idle");
+  const [nativeMessage, setNativeMessage] = useState<string | null>(null);
+  const native = useSyncExternalStore(() => () => undefined, isNativeApp, () => false);
+
+  async function connectNative() {
+    setStatus("linking");
+    const result = await syncNativeHealth().catch(() => ({ ok: false, message: "Could not read Apple Health." }));
+    setStatus(result.ok ? "idle" : "error");
+    setNativeMessage(result.message);
+    if (result.ok) onSynced();
+  }
 
   async function link() {
     setStatus("linking");
@@ -40,6 +51,22 @@ export function HeartConnect({ reading }: { reading: HeartReading | null }) {
           Set up again
         </button>
       </div>
+    );
+  }
+
+  if (native) {
+    return (
+      <section className="rounded-3xl border border-rule bg-sheet p-5 sm:p-8">
+        <h2 className="font-display text-2xl font-light tracking-[-0.02em]">Connect your health data</h2>
+        <p className="mt-2 max-w-prose text-sm text-mute">
+          Aevum reads your resting heart rate, HRV, and breathing rate each time you open the app, from Apple Health on
+          iPhone or Health Connect on Android. Anything your watch or ring shares there is included.
+        </p>
+        <button type="button" onClick={connectNative} disabled={status === "linking"} className="btn-primary mt-4 !min-h-0 !px-5 !py-2">
+          {status === "linking" ? "Connecting…" : "Connect"}
+        </button>
+        {nativeMessage ? <p className={`mt-3 text-sm ${status === "error" ? "text-warn" : "text-mute"}`}>{nativeMessage}</p> : null}
+      </section>
     );
   }
 
