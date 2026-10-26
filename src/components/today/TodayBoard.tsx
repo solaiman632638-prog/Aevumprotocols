@@ -7,6 +7,7 @@ import { DailyReminder } from "@/components/today/DailyReminder";
 import { PeptidePanel } from "@/components/peptides/PeptidePanel";
 import { Dashboard } from "@/components/today/Dashboard";
 import { HeartConnect } from "@/components/today/HeartConnect";
+import { InstallApp } from "@/components/layout/InstallApp";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
 import { activeCompounds, dueDoses, peptideReport } from "@/lib/peptides/engine";
@@ -128,6 +129,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
   return (
     <div className="space-y-10">
+      <InstallApp />
       <div className="flex gap-2" role="tablist" aria-label="Today or history">
         {(["today", "history"] as const).map((tab) => (
           <button

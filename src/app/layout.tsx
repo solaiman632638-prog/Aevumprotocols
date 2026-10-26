@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { counts } from "@/lib/data/compounds";
 import { site } from "@/lib/site";
 import { SyncBridge } from "@/components/sync/SyncBridge";
+import { ServiceWorker } from "@/components/layout/ServiceWorker";
 import "./globals.css";
 
 const sans = Space_Grotesk({
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col font-sans">
         <SiteShell>{children}</SiteShell>
         <SyncBridge />
+        <ServiceWorker />
         <Analytics />
       </body>
     </html>
