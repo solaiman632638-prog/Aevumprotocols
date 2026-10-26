@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { AccountLink } from "@/components/layout/AccountLink";
-import { Announcement } from "@/components/layout/Announcement";
-import { counts } from "@/lib/data/compounds";
 
 const links = [
   { href: "/today", label: "Today" },
@@ -22,7 +20,6 @@ export function Header() {
       >
         Skip to content
       </a>
-      <Announcement count={counts.total} />
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 md:py-4">
         <Link
           href="/"
