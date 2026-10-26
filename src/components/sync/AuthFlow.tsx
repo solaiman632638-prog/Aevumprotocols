@@ -234,7 +234,8 @@ export function AuthFlow({
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { full_name: fullName },
+            // signup_source lets /admin tell Aevum sign-ups from store ones.
+            data: { full_name: fullName, signup_source: "aevum" },
           },
         });
         if (error) throw error;
