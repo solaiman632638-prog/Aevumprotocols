@@ -1,4 +1,4 @@
-/** Site-wide facts used by the legal pages. */
+/** Site-wide facts. */
 export const site = {
   name: "Aevum",
   domain: "aevumperformance.ca",
@@ -6,4 +6,6 @@ export const site = {
   contactEmail: "Contact@novaevum.ca" as string | null,
   /** Date the current privacy policy and terms took effect. */
   legalEffectiveDate: "September 22, 2026",
+  /** iCloud link to the "Aevum Heart" Shortcut (docs/apple-health-shortcut.md). Null hides the add step. */
+  healthShortcutUrl: null as string | null,
 };

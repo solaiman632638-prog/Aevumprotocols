@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PeptideLog } from "@/components/peptides/PeptideLog";
 import type { SiteId, UrgentSymptomId } from "@/lib/peptides/catalog";
 import type { DueDose } from "@/lib/peptides/engine";
+import type { HeartReading } from "@/lib/health/heart";
 import type { DayState, DoseEntry, Reaction, UserContext } from "@/lib/today/types";
 
 const LB_PER_KG = 2.20462;
@@ -34,8 +35,11 @@ export function CheckinForm({
   onSave,
   onCancel,
   siteSuggestion,
+  reading,
 }: {
   date: string;
+  /** Today's Apple Health reading, used where nothing was typed. */
+  reading?: HeartReading;
   profile: UserContext;
   previous?: DayState;
   /** Compounds already running whose next dose lands today. */
@@ -51,8 +55,8 @@ export function CheckinForm({
     sameDay ? { sleepQuality: previous?.sleepQuality, energy: previous?.energy, soreness: previous?.soreness, stress: previous?.stress } : {},
   );
   const [load, setLoad] = useState<number | undefined>(sameDay ? previous?.yesterdayLoad : undefined);
-  const [rhr, setRhr] = useState(sameDay && previous?.rhr != null ? String(previous.rhr) : "");
-  const [hrv, setHrv] = useState(sameDay && previous?.hrv != null ? String(previous.hrv) : "");
+  const [rhr, setRhr] = useState(String((sameDay ? previous?.rhr : undefined) ?? reading?.rhr ?? ""));
+  const [hrv, setHrv] = useState(String((sameDay ? previous?.hrv : undefined) ?? reading?.hrv ?? ""));
   const [weight, setWeight] = useState(
     sameDay && previous?.weightKg != null ? (imperial ? (previous.weightKg * LB_PER_KG).toFixed(1) : String(previous.weightKg)) : "",
   );
@@ -101,6 +105,7 @@ export function CheckinForm({
       yesterdayLoad: load,
       rhr: restingHr,
       hrv: variability,
+      respRate: (sameDay ? previous?.respRate : undefined) ?? reading?.respRate,
       weightKg: rawWeight === undefined ? undefined : Math.round((imperial ? rawWeight / LB_PER_KG : rawWeight) * 10) / 10,
       doses: doses.length ? doses : undefined,
       reactions: reactions.length ? reactions : undefined,
@@ -174,11 +179,12 @@ export function CheckinForm({
         suggestion={siteSuggestion}
       />
 
-      <details className="rounded-2xl border border-rule px-4 py-3">
+      <details open={Boolean(reading)} className="rounded-2xl border border-rule px-4 py-3">
         <summary className="cursor-pointer text-sm">Optional: heart rate, HRV, weight</summary>
         <p className="mt-2 text-xs text-mute">
-          If you track them with a watch, ring, or phone app. These unlock the
-          cardiovascular score and the weight trend.
+          {reading
+            ? "Heart rate and HRV came from Apple Health this morning. Change them if they look wrong."
+            : "If you track them with a watch, ring, or phone app. These unlock the cardiovascular score and the weight trend."}
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>

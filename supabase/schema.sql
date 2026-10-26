@@ -67,12 +67,60 @@ create index if not exists ai_conversations_user_idx
 create index if not exists ai_messages_conversation_idx
   on public.ai_messages (conversation_id, created_at);
 
+-- ─── Workouts ───────────────────────────────────────────────────────────────
+-- One row per user per training day: the lifts logged, as weight, reps, sets.
+create table if not exists public.aevum_workouts (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  day date not null,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, day)
+);
+
+-- ─── Apple Health heart readings ────────────────────────────────────────────
+-- The "Aevum Heart" iPhone Shortcut posts resting heart rate, HRV, and
+-- respiratory rate from Apple Health. It signs in with a per-user key; only
+-- the key's SHA-256 hash is stored. Both tables are written by the server
+-- with the service key, never from the browser.
+create table if not exists public.aevum_health_keys (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  key_hash text not null unique,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.aevum_heart_readings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  measured_at timestamptz not null default now(),
+  rhr numeric,
+  hrv numeric,
+  resp_rate numeric
+);
+
+create index if not exists aevum_heart_readings_user_idx
+  on public.aevum_heart_readings (user_id, measured_at desc);
+
 -- ─── Row-level security ─────────────────────────────────────────────────────
 -- Without this, any signed-in user could read every other user's health data.
 alter table public.aevum_profiles          enable row level security;
 alter table public.checkins          enable row level security;
 alter table public.ai_conversations  enable row level security;
 alter table public.ai_messages       enable row level security;
+alter table public.aevum_workouts        enable row level security;
+alter table public.aevum_health_keys     enable row level security;
+alter table public.aevum_heart_readings  enable row level security;
+
+drop policy if exists "Users manage their own workouts" on public.aevum_workouts;
+create policy "Users manage their own workouts" on public.aevum_workouts
+  for all to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+-- Keys have no policy at all: only the server reaches them.
+drop policy if exists "Users read their own heart readings" on public.aevum_heart_readings;
+create policy "Users read their own heart readings" on public.aevum_heart_readings
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
 
 drop policy if exists "Users manage their own profile" on public.aevum_profiles;
 create policy "Users manage their own profile" on public.aevum_profiles
@@ -117,6 +165,10 @@ drop trigger if exists checkins_touch on public.checkins;
 create trigger checkins_touch before update on public.checkins
   for each row execute function public.aevum_touch_updated_at();
 
+drop trigger if exists aevum_workouts_touch on public.aevum_workouts;
+create trigger aevum_workouts_touch before update on public.aevum_workouts
+  for each row execute function public.aevum_touch_updated_at();
+
 drop trigger if exists ai_conversations_touch on public.ai_conversations;
 create trigger ai_conversations_touch before update on public.ai_conversations
   for each row execute function public.aevum_touch_updated_at();
@@ -132,6 +184,9 @@ set search_path = ''
 as $$
   delete from public.ai_conversations where user_id = (select auth.uid());
   delete from public.checkins where user_id = (select auth.uid());
+  delete from public.aevum_workouts where user_id = (select auth.uid());
+  delete from public.aevum_heart_readings where user_id = (select auth.uid());
+  delete from public.aevum_health_keys where user_id = (select auth.uid());
   delete from public.aevum_profiles where user_id = (select auth.uid());
 $$;
 

@@ -7,9 +7,12 @@ import {
   storeProfile,
 } from "@/lib/today/storage";
 import type { DayState, UserContext } from "@/lib/today/types";
+import { loadWorkoutMap, storeWorkouts } from "@/lib/train/storage";
+import type { WorkoutDay } from "@/lib/train/types";
 
 type ProfileRow = { data: UserContext; updated_at: string };
 type CheckinRow = { day: string; data: DayState; updated_at: string };
+type WorkoutRow = { day: string; data: WorkoutDay; updated_at: string };
 
 async function userId(): Promise<string | null> {
   const supabase = syncClient();
@@ -33,6 +36,39 @@ export async function pushCheckin(day: DayState) {
   if (!supabase || !id) return;
   const updatedAt = day.updatedAt ?? new Date().toISOString();
   await supabase.from("checkins").upsert({ user_id: id, day: day.date, data: day, updated_at: updatedAt });
+}
+
+export async function pushWorkout(day: WorkoutDay) {
+  const supabase = syncClient();
+  const id = await userId();
+  if (!supabase || !id) return;
+  const updatedAt = day.updatedAt ?? new Date().toISOString();
+  await supabase.from("aevum_workouts").upsert({ user_id: id, day: day.date, data: day, updated_at: updatedAt });
+}
+
+/** Same newest-wins merge as check-ins, for training days. */
+async function syncWorkouts(id: string): Promise<string | undefined> {
+  const supabase = syncClient()!;
+  const { data, error } = await supabase.from("aevum_workouts").select("day, data, updated_at").eq("user_id", id).returns<WorkoutRow[]>();
+  if (error) return error.message;
+  const local = loadWorkoutMap();
+  const remote = new Map((data ?? []).map((row) => [row.day, row]));
+  const uploads: { user_id: string; day: string; data: WorkoutDay; updated_at: string }[] = [];
+  for (const [day, row] of remote) {
+    if (!local[day] || newer(row.updated_at, local[day].updatedAt)) local[day] = { ...row.data, updatedAt: row.updated_at };
+  }
+  for (const [day, entry] of Object.entries(local)) {
+    const row = remote.get(day);
+    if (!row || newer(entry.updatedAt, row.updated_at)) {
+      const updatedAt = entry.updatedAt ?? new Date().toISOString();
+      uploads.push({ user_id: id, day, data: { ...entry, updatedAt }, updated_at: updatedAt });
+    }
+  }
+  storeWorkouts(local);
+  if (uploads.length > 0) {
+    const { error: uploadError } = await supabase.from("aevum_workouts").upsert(uploads);
+    if (uploadError) return uploadError.message;
+  }
 }
 
 /**
@@ -86,6 +122,8 @@ export async function syncNow(): Promise<{ ok: boolean; message?: string }> {
     const { error } = await supabase.from("checkins").upsert(uploads);
     if (error) return { ok: false, message: error.message };
   }
+  const workoutError = await syncWorkouts(id);
+  if (workoutError) return { ok: false, message: workoutError };
   return { ok: true };
 }
 

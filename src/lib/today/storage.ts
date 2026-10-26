@@ -108,7 +108,7 @@ const RETIRED_KEYS = ["aevum-today-source", "aevum-wearable"];
 
 /** Removes everything Today keeps in this browser. */
 export function clearLocalData() {
-  for (const key of [PROFILE_KEY, PROFILE_UPDATED_KEY, CHECKINS_KEY, ...RETIRED_KEYS]) {
+  for (const key of [PROFILE_KEY, PROFILE_UPDATED_KEY, CHECKINS_KEY, "aevum-workouts", "aevum-body-analysis", ...RETIRED_KEYS]) {
     try {
       window.localStorage.removeItem(key);
     } catch {

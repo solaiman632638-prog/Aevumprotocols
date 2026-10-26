@@ -27,8 +27,20 @@ export default function PrivacyPage() {
           goals, training habits, health conditions, medications, supplements,
           allergies, and daily check-ins such as sleep, energy, soreness,
           stress, heart rate, weight, the peptides you log with their amounts
-          and injection sites, and side effects. We treat all of it as
-          sensitive.
+          and injection sites, and side effects. The Training page stores the
+          lifts you log. We treat all of it as sensitive.
+        </p>
+        <p>
+          <strong>Apple Health.</strong> If you link the Aevum Heart Shortcut,
+          your iPhone sends your resting heart rate, heart rate variability,
+          and breathing rate to your account each time it runs. Unlink it by
+          deleting the Shortcut; deleting your data removes the readings.
+        </p>
+        <p>
+          <strong>Body analysis photos.</strong> A photo you upload for body
+          analysis is sent to OpenAI to be analysed and is not saved by Aevum.
+          OpenAI does not use it to train its models. The result is kept only
+          in your browser.
         </p>
         <p>
           <strong>If you do not sign in,</strong> this information is saved only
@@ -37,7 +49,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           <strong>If you create an account,</strong> we store your email
-          address, your profile, and your check-ins with our database provider
+          address, your profile, your check-ins, your workouts, and any heart
+          readings from Apple Health with our database provider
           so you can use them on more than one device. Access is restricted so
           that only your signed-in account can read or change your records. If
           you choose a password, it is stored only as a secure hash by our
@@ -59,6 +72,7 @@ export default function PrivacyPage() {
         <ul>
           <li>Vercel, which hosts the website.</li>
           <li>Supabase, which stores account data if you sign in.</li>
+          <li>OpenAI, which answers Aevum AI questions and analyses body photos you upload.</li>
         </ul>
         <p>These providers may store data on servers outside Canada.</p>
       </section>

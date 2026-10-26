@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { CheckinForm } from "@/components/today/CheckinForm";
 import { AccountPrompt } from "@/components/today/AccountPrompt";
 import { DailyReminder } from "@/components/today/DailyReminder";
 import { PeptidePanel } from "@/components/peptides/PeptidePanel";
 import { Dashboard } from "@/components/today/Dashboard";
+import { HeartConnect } from "@/components/today/HeartConnect";
 import { HistoryPanel } from "@/components/today/HistoryPanel";
 import { ProfileForm } from "@/components/today/ProfileForm";
 import { activeCompounds, dueDoses, peptideReport } from "@/lib/peptides/engine";
@@ -19,6 +20,8 @@ import {
   todayIso,
 } from "@/lib/today/storage";
 import type { DayState, UserContext } from "@/lib/today/types";
+import { latestReading, localDate, type HeartReading } from "@/lib/health/heart";
+import { useSession } from "@/lib/sync/useSession";
 
 function useStored<T>(key: string): T | null {
   const raw = useSyncExternalStore(subscribe, () => readRaw(key), () => null);
@@ -47,6 +50,26 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   const checkinMap = useStored<Record<string, DayState>>(keys.checkins);
   const [editing, setEditing] = useState<"profile" | "checkin" | null>(null);
   const [view, setView] = useState<"today" | "history">("today");
+  const session = useSession();
+  const [reading, setReading] = useState<HeartReading | null>(null);
+
+  // The Shortcut posts from the phone; look again whenever the page is shown.
+  useEffect(() => {
+    if (!session.email) return;
+    let cancelled = false;
+    const load = () => {
+      if (document.visibilityState !== "visible") return;
+      void latestReading().then((next) => {
+        if (!cancelled) setReading(next);
+      });
+    };
+    load();
+    document.addEventListener("visibilitychange", load);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", load);
+    };
+  }, [session.email]);
 
   const date = hydrated ? todayIso() : "";
 
@@ -56,6 +79,21 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   );
 
   const checkedInToday = checkins.at(-1)?.date === date;
+  const todaysReading = reading && date && localDate(reading.measuredAt) === date ? reading : undefined;
+
+  // A reading that lands after today's check-in fills the gaps, never what was typed.
+  useEffect(() => {
+    const today = checkins.at(-1);
+    if (!todaysReading || today?.date !== date) return;
+    const fill = {
+      rhr: today.rhr ?? todaysReading.rhr,
+      hrv: today.hrv ?? todaysReading.hrv,
+      respRate: today.respRate ?? todaysReading.respRate,
+    };
+    if (fill.rhr !== today.rhr || fill.hrv !== today.hrv || fill.respRate !== today.respRate) {
+      saveCheckin({ ...today, ...fill });
+    }
+  }, [todaysReading, checkins, date]);
 
   const due = useMemo(() => (date ? dueDoses(checkins, date) : []), [checkins, date]);
 
@@ -129,8 +167,9 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
         />
       ) : !checkedInToday || editing === "checkin" ? (
         <CheckinForm
-          key={`${date}-${editing}`}
+          key={`${date}-${editing}-${todaysReading?.measuredAt ?? ""}`}
           date={date}
+          reading={todaysReading}
           profile={profile}
           siteSuggestion={peptides?.sites.suggestion}
           previous={checkins.at(-1)}
@@ -160,6 +199,8 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
           <DailyReminder />
         </>
       ) : null}
+
+      {view === "today" && session.email ? <HeartConnect reading={reading} /> : null}
     </div>
   );
 }

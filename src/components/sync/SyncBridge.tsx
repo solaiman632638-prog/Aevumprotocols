@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import { syncClient } from "@/lib/sync/client";
-import { pushCheckin, pushProfile, syncNow } from "@/lib/sync/sync";
+import { pushCheckin, pushProfile, pushWorkout, syncNow } from "@/lib/sync/sync";
 import { registerRemote } from "@/lib/today/storage";
+import { registerWorkoutRemote } from "@/lib/train/storage";
 
 /** Mirrors local saves to the account while signed in, and merges on sign-in. */
 export function SyncBridge() {
@@ -16,6 +17,7 @@ export function SyncBridge() {
         pushProfile: (profile, updatedAt) => void pushProfile(profile, updatedAt),
         pushCheckin: (day) => void pushCheckin(day),
       });
+      registerWorkoutRemote((day) => void pushWorkout(day));
       void syncNow();
     };
 
@@ -24,7 +26,10 @@ export function SyncBridge() {
     });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) connect();
-      if (event === "SIGNED_OUT") registerRemote(null);
+      if (event === "SIGNED_OUT") {
+        registerRemote(null);
+        registerWorkoutRemote(null);
+      }
     });
     return () => data.subscription.unsubscribe();
   }, []);

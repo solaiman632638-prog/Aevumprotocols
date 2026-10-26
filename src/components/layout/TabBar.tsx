@@ -11,7 +11,7 @@ const icons = {
   today: "M4 13h4l2-5 4 10 2-5h4",
   compounds: "M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3M7.5 15h9",
   ai: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18 16l.8 2.2L21 19l-2.2.8L18 22l-.8-2.2L15 19l2.2-.8z",
-  calculator: "M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01",
+  train: "M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12",
   more: "M4 7h16M4 12h16M4 17h16",
 };
 
@@ -19,11 +19,12 @@ const tabs = [
   { href: "/today", label: "Today", icon: icons.today },
   { href: "/peptides", label: "Compounds", icon: icons.compounds },
   { href: "/ai", label: "AI", icon: icons.ai },
-  { href: "/calculator", label: "Calculator", icon: icons.calculator },
+  { href: "/train", label: "Training", icon: icons.train },
 ];
 
 const moreLinks = [
   { href: "/supplements", label: "Supplements" },
+  { href: "/calculator", label: "Calculator" },
   { href: "/stacks", label: "Stacks" },
 ];
 

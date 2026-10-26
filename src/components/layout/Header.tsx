@@ -3,6 +3,7 @@ import { AccountLink } from "@/components/layout/AccountLink";
 
 const links = [
   { href: "/today", label: "Today" },
+  { href: "/train", label: "Training" },
   { href: "/ai", label: "Aevum AI" },
   { href: "/peptides", label: "Compounds" },
   { href: "/supplements", label: "Supplements" },
