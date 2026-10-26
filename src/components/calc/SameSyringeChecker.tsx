@@ -17,6 +17,10 @@ const verdict: Record<MixStatus, string> = {
 
 export function SameSyringeChecker() {
   const [picked, setPicked] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
+  const needle = query.trim().toLowerCase();
+  // Picked peptides stay visible whatever the search says.
+  const shown = mixPeptides.filter((peptide) => !needle || picked.includes(peptide.slug) || peptide.name.toLowerCase().includes(needle));
 
   function toggle(slug: string) {
     setPicked((current) =>
@@ -58,8 +62,16 @@ export function SameSyringeChecker() {
               </button>
             ) : null}
           </div>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={`Search ${mixPeptides.length} peptides`}
+            aria-label="Search peptides"
+            className="mb-3 w-full rounded-xl border border-rule bg-paper px-3 py-2 text-sm outline-none focus:border-pine sm:w-72"
+          />
           <div className="flex flex-wrap gap-2">
-            {mixPeptides.map((peptide) => {
+            {shown.map((peptide) => {
               const on = picked.includes(peptide.slug);
               const full = !on && picked.length >= MAX;
               return (

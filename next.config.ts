@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       { source: "/protocols/:slug", destination: "/peptides/:slug", permanent: true },
       // Device sync was removed; Today is the only daily surface.
       { source: "/monitor", destination: "/today", permanent: false },
+      // Guides folded into the calculator (mixing, storage) and compound pages.
+      { source: "/guides", destination: "/calculator#mixing", permanent: true },
+      { source: "/guides/reconstitution", destination: "/calculator#mixing", permanent: true },
+      { source: "/guides/storage", destination: "/calculator#storage", permanent: true },
     ];
   },
 };

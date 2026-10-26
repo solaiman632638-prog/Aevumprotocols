@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { standardMixing, standardStorage, type Guide } from "@/lib/data/guides";
 
 const heading = "font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl";
@@ -62,6 +63,11 @@ export function GuideBody({ guide }: { guide: Guide }) {
                 <li key={step}>{step}</li>
               ))}
             </ol>
+            <p className="mt-3 text-sm">
+              <Link href="/calculator#mixing" className="text-pine-deep underline decoration-rule underline-offset-2">
+                Full mixing method
+              </Link>
+            </p>
           </>
         )}
       </section>
@@ -128,6 +134,11 @@ export function GuideBody({ guide }: { guide: Guide }) {
             <li key={line}>{line}</li>
           ))}
         </ul>
+        <p className="mt-3 text-sm">
+          <Link href="/calculator#storage" className="text-pine-deep underline decoration-rule underline-offset-2">
+            Storage rules and when to discard
+          </Link>
+        </p>
       </section>
     </div>
   );

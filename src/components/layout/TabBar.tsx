@@ -24,7 +24,6 @@ const tabs = [
 
 const moreLinks = [
   { href: "/stacks", label: "Stacks" },
-  { href: "/guides", label: "Guides" },
 ];
 
 function Icon({ d }: { d: string }) {

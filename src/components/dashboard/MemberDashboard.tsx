@@ -553,15 +553,14 @@ function Alert({ tone, title, children }: { tone: "warn" | "caution"; title: str
 const actions = [
   { href: "/today", label: "Check in", detail: "30 seconds" },
   { href: "/ai", label: "Ask Aevum AI", detail: "Evidence answers" },
-  { href: "/calculator", label: "Vial calculator", detail: "Reconstitution math" },
+  { href: "/calculator", label: "Vial calculator", detail: "Mixing, storage, math" },
   { href: "/peptides", label: "Compounds", detail: "The full register" },
   { href: "/stacks", label: "Stacks", detail: "Studied pairings" },
-  { href: "/guides", label: "Guides", detail: "Storage and mixing" },
 ];
 
 function QuickActions() {
   return (
-    <nav aria-label="Quick actions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <nav aria-label="Quick actions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {actions.map((action) => (
         <Link
           key={action.href}

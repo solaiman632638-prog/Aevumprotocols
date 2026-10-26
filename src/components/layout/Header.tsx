@@ -9,7 +9,6 @@ const links = [
   { href: "/peptides", label: "Compounds" },
   { href: "/stacks", label: "Stacks" },
   { href: "/calculator", label: "Calculator" },
-  { href: "/guides", label: "Guides" },
 ];
 
 const navLink = "text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-ink/80 no-underline hover:text-ink";
