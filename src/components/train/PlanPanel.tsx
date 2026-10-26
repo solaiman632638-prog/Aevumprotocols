@@ -8,6 +8,7 @@ import { getExercise, muscleName } from "@/lib/train/exercises";
 import { buildPlan, strengthFocus, type Focus } from "@/lib/train/plan";
 import type { SavedAnalysis } from "@/lib/train/bodyAnalysis";
 import { useWorkouts } from "@/lib/train/useWorkouts";
+import { compounds, type CompoundSource } from "@/lib/today/engine";
 import { todayIso } from "@/lib/today/storage";
 import { useProfile } from "@/lib/today/useProfile";
 
@@ -24,7 +25,7 @@ export function combinedFocus(lifts: Focus[], photo: SavedAnalysis | null): Focu
   return merged.slice(0, 3);
 }
 
-export function PlanPanel({ photo, onLog }: { photo: SavedAnalysis | null; onLog: (rows: Row[]) => void }) {
+export function PlanPanel({ photo, pool, onLog }: { photo: SavedAnalysis | null; pool: CompoundSource[]; onLog: (rows: Row[]) => void }) {
   const profile = useProfile();
   const days = useWorkouts();
   const [perWeek, setPerWeek] = useState<number | null>(null);
@@ -37,6 +38,8 @@ export function PlanPanel({ photo, onLog }: { photo: SavedAnalysis | null; onLog
 
   const goalSlugs = new Set([...(profile?.goals ?? []).flatMap((goal) => goalsFromProfile[goal] ?? []), "muscle"]);
   const picks = supplements.filter((item) => item.evidence !== "Early" && item.goals.some((goal) => goalSlugs.has(goal))).slice(0, 4);
+
+  const peptides = profile ? compounds(profile, pool) : null;
 
   const show = (kg: number) => (imperial ? Math.round(kg * LB_PER_KG) : kg);
 
@@ -128,9 +131,38 @@ export function PlanPanel({ photo, onLog }: { photo: SavedAnalysis | null; onLog
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm text-mute">
-          Peptide research matched to your goals is on your <Link href="/today" className="text-pine-deep underline decoration-rule underline-offset-2">Today page</Link>,
-          as education only: Aevum never picks a peptide or an amount for you.
+      </section>
+
+      <section className="rounded-3xl border border-rule bg-sheet p-5 sm:p-8">
+        <h2 className="font-display text-2xl font-light tracking-[-0.02em]">Peptides that fit your goals</h2>
+        {!peptides ? (
+          <p className="mt-3 text-sm text-mute">
+            <Link href="/today" className="text-pine-deep underline decoration-rule underline-offset-2">Set up your Today profile</Link> so
+            Aevum can pick peptides for your goals and screen them against your health.
+          </p>
+        ) : peptides.withheld ? (
+          <p className="mt-3 text-sm text-mute">{peptides.withheld}</p>
+        ) : peptides.cards.length === 0 ? (
+          <p className="mt-3 text-sm text-mute">Nothing fits your goals and risk tolerance. Training, food, and sleep are the whole plan.</p>
+        ) : (
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {peptides.cards.slice(0, 4).map((card) => (
+              <li key={card.slug}>
+                <Link href={`/peptides/${card.slug}`} className="block h-full rounded-2xl border border-rule bg-paper p-4 text-ink no-underline hover:border-pine">
+                  <span className="text-xs text-mute">For {card.goal.toLowerCase()}</span>
+                  <span className="mt-1 block font-medium">{card.name}</span>
+                  <span className="mt-1 block text-sm text-mute">
+                    {card.protocol ? `Start at ${card.protocol.start} · typical ${card.protocol.typical}` : "No published protocol yet"}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        {peptides?.notes.length ? <p className="mt-3 text-xs text-mute">{peptides.notes.join(" ")}</p> : null}
+        <p className="mt-3 text-xs text-mute">
+          Starting amounts are each published protocol&apos;s first step. Most of these are research compounds with limited
+          human data; stop and see a clinician if side effects appear.
         </p>
       </section>
     </div>

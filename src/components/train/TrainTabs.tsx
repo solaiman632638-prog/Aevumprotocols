@@ -5,6 +5,7 @@ import { BodyPanel } from "@/components/train/BodyPanel";
 import { PlanPanel } from "@/components/train/PlanPanel";
 import { TrainBoard, type Row } from "@/components/train/TrainBoard";
 import { BODY_KEY, type SavedAnalysis } from "@/lib/train/bodyAnalysis";
+import type { CompoundSource } from "@/lib/today/engine";
 import { readRaw, subscribe } from "@/lib/today/storage";
 
 const tabs = [
@@ -15,7 +16,7 @@ const tabs = [
 
 type Tab = (typeof tabs)[number]["id"];
 
-export function TrainTabs() {
+export function TrainTabs({ pool }: { pool: CompoundSource[] }) {
   const [tab, setTab] = useState<Tab>("log");
   const [prefill, setPrefill] = useState<{ rows: Row[]; key: number } | null>(null);
   const raw = useSyncExternalStore(subscribe, () => readRaw(BODY_KEY), () => null);
@@ -48,6 +49,7 @@ export function TrainTabs() {
       {tab === "plan" ? (
         <PlanPanel
           photo={photo}
+          pool={pool}
           onLog={(rows) => {
             setPrefill({ rows, key: Date.now() });
             setTab("log");

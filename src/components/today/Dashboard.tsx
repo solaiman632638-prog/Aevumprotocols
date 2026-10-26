@@ -71,16 +71,15 @@ export function Dashboard({ report, peptides }: { report: DailyReport; peptides?
       />
 
       <section aria-labelledby="compounds-heading">
-        <p className="eyebrow">Reference · not a suggestion</p>
+        <p className="eyebrow">Picked for your goals</p>
         <h2 id="compounds-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
-          If you are researching options
+          Peptides for you
         </h2>
         <p className="mt-3 max-w-2xl text-mute">
-          Aevum does not suggest adding any of these. They are the compounds
-          studied for your goals, listed so you can read the evidence and the
-          risks before deciding anything. Adding nothing is often the
-          lower-risk answer, and lifestyle changes come first. No amounts here:
-          whether and how much belongs with a clinician.
+          Chosen from your goals and risk tolerance, best evidence first, with
+          anything your health profile rules out left off. Each shows the
+          starting amount its published protocol uses. Start there, change one
+          thing at a time, and stop if side effects appear.
         </p>
         {report.compoundsWithheld ? (
           <p className="mt-6 rounded-3xl border border-warn/30 bg-warn-tint px-5 py-4 text-warn">
@@ -176,6 +175,18 @@ function CompoundItem({ compound }: { compound: CompoundCard }) {
         </div>
       </dl>
 
+      {compound.protocol ? (
+        <div className="mt-4 rounded-2xl border border-pine/40 px-4 py-3">
+          <p className="text-xs text-mute">Starting amount</p>
+          <p className="mt-0.5 font-display text-2xl font-light">{compound.protocol.start}</p>
+          <p className="mt-1 text-sm text-mute">{compound.protocol.route} · typical {compound.protocol.typical}</p>
+          <p className="mt-3 text-sm">{compound.protocol.how}</p>
+          {compound.protocol.duration ? <p className="mt-2 text-sm text-mute">{compound.protocol.duration}</p> : null}
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-mute">No published protocol on Aevum yet, so no starting amount.</p>
+      )}
+
       {compound.boxedWarning ? (
         <p className="mt-4 rounded-2xl border border-warn/30 bg-warn-tint px-3 py-2 text-sm text-warn">
           Boxed warning: {compound.boxedWarning}
@@ -217,7 +228,7 @@ function CompoundItem({ compound }: { compound: CompoundCard }) {
 
       <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-5">
         <Link href={`/peptides/${compound.slug}`} className="text-sm text-pine-deep no-underline hover:underline">
-          Full monograph →
+          {compound.protocol ? "Full protocol and syringe math →" : "Full monograph →"}
         </Link>
         <Why drivers={compound.why} />
       </div>

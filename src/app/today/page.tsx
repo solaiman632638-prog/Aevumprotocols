@@ -1,38 +1,12 @@
 import type { Metadata } from "next";
 import { TodayBoard } from "@/components/today/TodayBoard";
-import { getEntry, worksheetFor } from "@/lib/data/library";
-import { compoundsByGoal, type CompoundSource } from "@/lib/today/engine";
+import { compoundPool } from "@/lib/today/pool";
 
 export const metadata: Metadata = {
   title: "Today",
   description:
     "Daily recovery, sleep, and readiness from a thirty-second check-in or an optional device, with guidance for your goals.",
 };
-
-/** Only the monographs the engine can surface, trimmed to what the cards show. */
-function compoundPool(): CompoundSource[] {
-  const slugs = [...new Set(Object.values(compoundsByGoal).flat())];
-  return slugs.flatMap((slug) => {
-    const entry = getEntry(slug);
-    if (!entry) return [];
-    return [
-      {
-        slug: entry.slug,
-        name: entry.name,
-        legal: entry.legal,
-        status: entry.status,
-        approval: entry.approval,
-        evidence: entry.evidence,
-        researchScore: entry.researchScore,
-        primaryUse: entry.primaryUse,
-        effects: entry.effects,
-        sideEffects: entry.sideEffects,
-        boxedWarning: entry.boxedWarning,
-        worksheet: worksheetFor(entry.slug),
-      },
-    ];
-  });
-}
 
 export default function TodayPage() {
   return (
@@ -48,10 +22,11 @@ export default function TodayPage() {
         recommendation shows the data behind it.
       </p>
       <p className="mt-4 max-w-2xl rounded-2xl border border-rule px-4 py-3 text-sm text-mute">
-        Educational, not medical advice. Aevum works to reduce unnecessary
-        exposure: it does not tell you to add compounds, and for compounds
-        without established human dosing it cannot call any amount safe.
-        Dosing and treatment decisions belong with a clinician.
+        Not medical advice. Peptides are picked from your goals and screened
+        against your health profile, with the starting amount each published
+        protocol uses. Most are research compounds with limited human data, so
+        no amount is proven safe. Start low, and stop and see a clinician if
+        side effects appear.
       </p>
       <div className="mt-10">
         <TodayBoard pool={compoundPool()} />

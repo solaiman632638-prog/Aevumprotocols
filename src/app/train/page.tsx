@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { TrainTabs } from "@/components/train/TrainTabs";
+import { compoundPool } from "@/lib/today/pool";
 
 export const metadata: Metadata = {
   title: "Training",
@@ -15,7 +16,7 @@ export default function TrainPage() {
         around how often you train and what needs the most work.
       </p>
       <div className="mt-8">
-        <TrainTabs />
+        <TrainTabs pool={compoundPool()} />
       </div>
     </div>
   );

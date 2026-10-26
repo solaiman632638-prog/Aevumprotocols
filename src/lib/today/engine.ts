@@ -20,6 +20,15 @@ import type {
  */
 
 /** Library fields the compound cards need, passed in by the server page. */
+export type CompoundProtocol = {
+  /** Starting amount, e.g. "250 mcg (0.25 mg)". */
+  start: string;
+  typical: string;
+  route: string;
+  how: string;
+  duration: string;
+};
+
 export type CompoundSource = {
   slug: string;
   name: string;
@@ -33,6 +42,8 @@ export type CompoundSource = {
   sideEffects: string[];
   boxedWarning?: string;
   worksheet?: string;
+  /** Published protocol from the site's dosing guides, when there is one. */
+  protocol?: CompoundProtocol;
 };
 
 /** Compounds worth reading about per goal, strongest literature first. */
@@ -509,7 +520,8 @@ function supplements(context: UserContext, today: DayState, days: DayState[], sl
 const BP_MEDS = /lisinopril|losartan|amlodipine|metoprolol|valsartan|hydrochlorothiazide|blood pressure/i;
 const GLUCOSE_MEDS = /insulin|glipizide|glyburide|glimepiride|sulfonylurea|metformin/i;
 
-function compounds(context: UserContext, pool: CompoundSource[]): { cards: CompoundCard[]; withheld?: string; notes: string[] } {
+/** Peptides for the profile's goals, screened against its conditions, with starting amounts. */
+export function compounds(context: UserContext, pool: CompoundSource[]): { cards: CompoundCard[]; withheld?: string; notes: string[] } {
   if (context.age < 21) return { cards: [], withheld: "Compound research is hidden under 21.", notes: [] };
   if (context.conditions.includes("pregnant")) {
     return { cards: [], withheld: "Pregnancy, nursing, or trying to conceive: no compound on this site has safety data for that. Speak to your clinician.", notes: [] };
@@ -587,11 +599,13 @@ function card(entry: CompoundSource, goal: GoalId, context: UserContext): Compou
     cautions,
     questions,
     worksheet: entry.worksheet,
+    protocol: entry.protocol,
     why: [
       { label: "Your goal", value: goalLabel(goal) },
       { label: "Risk tolerance", value: context.tolerance, effect: "sets which evidence levels appear" },
       { label: "Research score", value: `${entry.researchScore}/100` },
-      { label: "Today's metrics", value: "Not used", effect: "compounds are never picked from daily metrics" },
+      ...(entry.protocol ? [{ label: "Starting amount", value: entry.protocol.start, effect: "the published protocol's starting dose" }] : []),
+      { label: "Today's metrics", value: "Not used", effect: "picked from your goals and health profile" },
     ],
   };
 }

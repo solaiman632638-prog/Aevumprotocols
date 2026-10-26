@@ -139,6 +139,7 @@ export type CompoundCard = {
   cautions: string[];
   questions: string[];
   worksheet?: string;
+  protocol?: { start: string; typical: string; route: string; how: string; duration: string };
   why: Driver[];
 };
 
