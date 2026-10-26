@@ -26,6 +26,7 @@ const moreLinks = [
   { href: "/supplements", label: "Supplements" },
   { href: "/calculator", label: "Calculator" },
   { href: "/stacks", label: "Stacks" },
+  { href: "/app", label: "Get the app" },
 ];
 
 function Icon({ d }: { d: string }) {

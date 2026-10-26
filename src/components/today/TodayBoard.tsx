@@ -118,14 +118,17 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
 
   if (!profile || editing === "profile") {
     return (
-      <ProfileForm
-        initial={profile}
-        onSave={(next) => {
-          saveProfile(next);
-          setEditing(null);
-        }}
-        onCancel={profile ? () => setEditing(null) : undefined}
-      />
+      <div className="space-y-10">
+        {profile ? null : <InstallApp />}
+        <ProfileForm
+          initial={profile}
+          onSave={(next) => {
+            saveProfile(next);
+            setEditing(null);
+          }}
+          onCancel={profile ? () => setEditing(null) : undefined}
+        />
+      </div>
     );
   }
 

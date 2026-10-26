@@ -9,6 +9,7 @@ const links = [
   { href: "/supplements", label: "Supplements" },
   { href: "/stacks", label: "Stacks" },
   { href: "/calculator", label: "Calculator" },
+  { href: "/app", label: "Get the app" },
 ];
 
 const navLink = "text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-ink/80 no-underline hover:text-ink";

@@ -4,28 +4,45 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 
 type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
-const DISMISS_KEY = "aevum-install-dismissed";
+const DISMISS_KEY = "aevum-install-dismissed-2";
 
-function installed(): boolean {
-  return window.matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone === true;
+type Device = "installed" | "ios" | "mac-safari" | "other";
+
+function device(): Device {
+  if (window.matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone === true) return "installed";
+  const ua = navigator.userAgent;
+  if (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return "ios";
+  if (/macintosh/i.test(ua) && /safari/i.test(ua) && !/chrome|chromium|edg|firefox/i.test(ua)) return "mac-safari";
+  return "other";
 }
 
-/** "Install Aevum" on Android and desktop Chrome; Add to Home Screen steps on iPhone. Hidden once installed. */
-export function InstallApp() {
+const steps: Record<Exclude<Device, "installed">, string> = {
+  ios: "In Safari, tap the Share button, then Add to Home Screen.",
+  "mac-safari": "In Safari's menu bar, choose File, then Add to Dock.",
+  other: "Open your browser's menu and choose Install app or Add to Home Screen. On iPhone, use Safari.",
+};
+
+/**
+ * "Install Aevum" where the browser supports it, otherwise the steps for this
+ * device. Hidden once installed. `page` shows it in full on /app, without "Not now".
+ */
+export function InstallApp({ page = false }: { page?: boolean }) {
   const [prompt, setPrompt] = useState<InstallEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
-  const client = useSyncExternalStore(
+  const snapshot = useSyncExternalStore(
     () => () => undefined,
     () => {
+      let stored = "";
       try {
-        return `${installed()}|${/iphone|ipad|ipod/i.test(navigator.userAgent)}|${localStorage.getItem(DISMISS_KEY) ?? ""}`;
+        stored = localStorage.getItem(DISMISS_KEY) ?? "";
       } catch {
-        return `${installed()}|false|`;
+        // Storage blocked.
       }
+      return `${device()}|${stored}`;
     },
-    () => "true|false|",
+    () => "installed|",
   );
-  const [isInstalled, isIos, stored] = client.split("|");
+  const [kind, stored] = snapshot.split("|") as [Device, string];
 
   useEffect(() => {
     const capture = (event: Event) => {
@@ -36,7 +53,10 @@ export function InstallApp() {
     return () => window.removeEventListener("beforeinstallprompt", capture);
   }, []);
 
-  if (isInstalled === "true" || stored || dismissed || (!prompt && isIos !== "true")) return null;
+  if (kind === "installed") {
+    return page ? <p className="text-mute">You&apos;re using the Aevum app. Nothing more to do.</p> : null;
+  }
+  if (!page && (stored || dismissed)) return null;
 
   function dismiss() {
     setDismissed(true);
@@ -51,9 +71,7 @@ export function InstallApp() {
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-pine/40 bg-sheet px-4 py-3 text-sm">
       <p>
         <span className="font-medium">Get the Aevum app.</span>{" "}
-        <span className="text-mute">
-          {prompt ? "Opens full-screen from your home screen and works on a bad connection." : "Tap the Share button in Safari, then Add to Home Screen."}
-        </span>
+        <span className="text-mute">{prompt ? "Opens full-screen from your home screen and works on a bad connection." : steps[kind]}</span>
       </p>
       <div className="flex items-center gap-3">
         {prompt ? (
@@ -69,9 +87,11 @@ export function InstallApp() {
             Install Aevum
           </button>
         ) : null}
-        <button type="button" onClick={dismiss} className="text-xs text-mute hover:text-ink">
-          Not now
-        </button>
+        {page ? null : (
+          <button type="button" onClick={dismiss} className="text-xs text-mute hover:text-ink">
+            Not now
+          </button>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ export function Footer() {
           .
         </p>
         <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-mute">
+          <Link href="/app" className="text-mute no-underline hover:text-ink">Get the app</Link>
           <Link href="/privacy" className="text-mute no-underline hover:text-ink">Privacy</Link>
           <Link href="/terms" className="text-mute no-underline hover:text-ink">Terms</Link>
           <Link href="/account" className="text-mute no-underline hover:text-ink">Account</Link>
