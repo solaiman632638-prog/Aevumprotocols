@@ -1,7 +1,9 @@
 import { guides } from "@/lib/data/guides";
+import { library } from "@/lib/data/library";
 
 /**
- * Same-syringe compatibility for every injectable peptide with a protocol.
+ * Same-syringe compatibility for every compound on the site: the injectable
+ * protocols plus every Pepipedia monograph in the library.
  * There is almost no published stability data for mixing research peptides,
  * so most of this is community practice or drug class. Anything no rule covers
  * stays "unknown" rather than guessed.
@@ -24,11 +26,19 @@ export type MixPeptide = { slug: string; name: string };
 /** Blend vials; their parts are listed on their own. */
 const blends = new Set(["glow", "klow", "wolverine-stack", "cjc-1295", "semax-selank-blend"]);
 
-/** Single-compound injectables, A–Z. Nasal sprays and blend vials are out. */
-export const mixPeptides: MixPeptide[] = guides
-  .filter((guide) => /subcutaneous|intramuscular/i.test(guide.route) && !blends.has(guide.slug))
-  .map((guide) => ({ slug: guide.slug, name: guide.name }))
-  .sort((a, b) => a.name.localeCompare(b.name));
+/** Library slugs that duplicate a protocol under another slug. */
+const libraryDuplicates = new Set(["igf-1-des-1-3"]);
+
+const injectableGuides = guides.filter((guide) => /subcutaneous|intramuscular/i.test(guide.route) && !blends.has(guide.slug));
+const guideSlugs = new Set(injectableGuides.map((guide) => guide.slug));
+
+/** Every single compound, A–Z. Blend vials are out; their parts are in. */
+export const mixPeptides: MixPeptide[] = [
+  ...injectableGuides.map((guide) => ({ slug: guide.slug, name: guide.name })),
+  ...library
+    .filter((entry) => !guideSlugs.has(entry.slug) && !blends.has(entry.slug) && !libraryDuplicates.has(entry.slug))
+    .map((entry) => ({ slug: entry.slug, name: entry.name })),
+].sort((a, b) => a.name.localeCompare(b.name));
 
 type Entry = { status: MixStatus; note: string };
 
@@ -55,11 +65,31 @@ function pairsWithin(slugs: string[]): [string, string][] {
 const key = (a: string, b: string) => [a, b].sort().join("|");
 const table = new Map(pairs.map(([a, b, entry]) => [key(a, b), entry]));
 
-const glp1 = new Set(["tirzepatide", "retatrutide", "semaglutide", "mazdutide", "survodutide", "cagrilintide"]);
-const ghrh = new Set(["tesamorelin", "sermorelin", "cjc-1295-no-dac", "cjc-1295-dac"]);
-const ghrp = new Set(["ipamorelin", "ghrp-2", "ghrp-6"]);
-const igf = new Set(["igf-1-lr3", "igf-1-des"]);
-const melanocortin = new Set(["melanotan-1", "melanotan-2", "pt-141"]);
+const glp1 = new Set([
+  "tirzepatide", "retatrutide", "semaglutide", "mazdutide", "survodutide", "cagrilintide",
+  "dapiglutide", "dulaglutide", "ecnoglutide", "efinopegdutide", "exenatide", "liraglutide",
+  "maridebart-cafraglutide", "pemvidutide", "pramlintide", "ct-388", "vk-2735",
+]);
+const ghrh = new Set(["tesamorelin", "sermorelin", "cjc-1295-no-dac", "cjc-1295-dac", "growth-hormone-releasing-hormone"]);
+const ghrp = new Set(["ipamorelin", "ghrp-2", "ghrp-6", "hexarelin"]);
+const igf = new Set(["igf-1-lr3", "igf-1-des", "mgf-mechano-growth-factor", "peg-mgf"]);
+const melanocortin = new Set(["melanotan-1", "melanotan-2", "pt-141", "setmelanotide"]);
+
+/** Compounds that never go in a syringe, by how they are taken. */
+const notInjected = new Map<string, string>([
+  ...["orforglipron", "oral-amycretin", "mk-677", "larazotide-acetate", "linaclotide", "plecanatide", "odevixibat", "dihexa", "trofinetide", "voclosporin"].map((slug): [string, string] => [slug, "taken by mouth"]),
+  ...["semax", "selank", "n-acetyl-semax-amidate", "n-acetyl-selank-amidate"].map((slug): [string, string] => [slug, "used as a nasal spray"]),
+  ...[
+    "ahk-cu", "argireline", "decapeptide-12", "ghk-basic", "keratin-peptides", "matrixyl", "nonapeptide-1", "pal-ahk", "pal-ghk",
+    "palmitoyl-dipeptide-6", "palmitoyl-hexapeptide-12", "palmitoyl-pentapeptide-4", "pentapeptide-18", "snap-8", "syn-ake",
+    "syn-coll", "tripeptide-29", "vialox-pentapeptide-3v",
+  ].map((slug): [string, string] => [slug, "applied to the skin"]),
+  ...["afamelanotide", "goserelin"].map((slug): [string, string] => [slug, "given as an implant"]),
+]);
+
+/** Approved drugs with no protocol here: given by prescription, to their own label. */
+const prescription = new Set(library.filter((entry) => entry.status === "approved" && !guideSlugs.has(entry.slug)).map((entry) => entry.slug));
+const nameOf = new Map(mixPeptides.map((peptide) => [peptide.slug, peptide.name]));
 /** Need a co-solvent before bac water, so other peptides may not stay dissolved. */
 const ownMixing = new Set(guides.filter((guide) => guide.ownMixing).map((guide) => guide.slug));
 
@@ -68,11 +98,19 @@ export function checkPair(a: string, b: string): Entry {
   if (listed) return listed;
   const either = (set: Set<string>) => set.has(a) || set.has(b);
   const both = (set: Set<string>) => set.has(a) && set.has(b);
+  const oral = notInjected.has(a) ? a : notInjected.has(b) ? b : null;
+  if (oral) {
+    return { status: "never", note: `${nameOf.get(oral)} is ${notInjected.get(oral)}, not drawn into a syringe.` };
+  }
   if (either(glp1)) {
     return {
       status: "never",
       note: "Incretin and amylin drugs are buffered formulations. Their labels say never to mix them with insulin; nothing supports mixing with peptides either.",
     };
+  }
+  const drug = prescription.has(a) ? a : prescription.has(b) ? b : null;
+  if (drug) {
+    return { status: "never", note: `${nameOf.get(drug)} is a prescription or clinic drug made to its own label. Do not mix it with anything.` };
   }
   if (a === "ghk-cu" || b === "ghk-cu") {
     return { status: "separate", note: "Free copper can oxidize or bind other peptides outside the tested blends." };

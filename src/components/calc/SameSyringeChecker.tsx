@@ -51,7 +51,7 @@ export function SameSyringeChecker() {
       <div className="space-y-5 p-4">
         <div>
           <div className="mb-2 flex items-baseline justify-between gap-4">
-            <p className="text-sm text-ink">Pick 2–5 peptides</p>
+            <p className="text-sm text-ink">Pick 2–5 compounds</p>
             {picked.length ? (
               <button
                 type="button"
@@ -66,11 +66,11 @@ export function SameSyringeChecker() {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={`Search ${mixPeptides.length} peptides`}
-            aria-label="Search peptides"
+            placeholder={`Search ${mixPeptides.length} compounds`}
+            aria-label="Search compounds"
             className="mb-3 w-full rounded-xl border border-rule bg-paper px-3 py-2 text-sm outline-none focus:border-pine sm:w-72"
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex max-h-72 flex-wrap gap-2 overflow-y-auto pr-1">
             {shown.map((peptide) => {
               const on = picked.includes(peptide.slug);
               const full = !on && picked.length >= MAX;
