@@ -250,6 +250,9 @@ function CompoundItem({ compound }: { compound: CompoundCard }) {
             <li key={question}>{question}</li>
           ))}
         </ol>
+        <Link href="/book" className="mt-3 inline-block text-sm text-ink no-underline hover:underline">
+          Book a call with our expert →
+        </Link>
       </details>
 
       <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-5">

@@ -100,6 +100,26 @@ create table if not exists public.aevum_heart_readings (
 create index if not exists aevum_heart_readings_user_idx
   on public.aevum_heart_readings (user_id, measured_at desc);
 
+-- ─── Expert call bookings ───────────────────────────────────────────────────
+-- One row per booked call. Written and read only by the server with the
+-- service key; the unique index means two people can never hold one slot.
+create table if not exists public.aevum_bookings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  starts_at timestamptz not null,
+  name text not null,
+  email text not null,
+  note text,
+  status text not null default 'booked' check (status in ('booked', 'cancelled')),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists aevum_bookings_slot_idx
+  on public.aevum_bookings (starts_at) where status = 'booked';
+
+create index if not exists aevum_bookings_user_idx
+  on public.aevum_bookings (user_id, starts_at desc);
+
 -- ─── Row-level security ─────────────────────────────────────────────────────
 -- Without this, any signed-in user could read every other user's health data.
 alter table public.aevum_profiles          enable row level security;
@@ -109,6 +129,7 @@ alter table public.ai_messages       enable row level security;
 alter table public.aevum_workouts        enable row level security;
 alter table public.aevum_health_keys     enable row level security;
 alter table public.aevum_heart_readings  enable row level security;
+alter table public.aevum_bookings        enable row level security;
 
 drop policy if exists "Users manage their own workouts" on public.aevum_workouts;
 create policy "Users manage their own workouts" on public.aevum_workouts
@@ -116,7 +137,7 @@ create policy "Users manage their own workouts" on public.aevum_workouts
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
 
--- Keys have no policy at all: only the server reaches them.
+-- Keys and bookings have no policy at all: only the server reaches them.
 drop policy if exists "Users read their own heart readings" on public.aevum_heart_readings;
 create policy "Users read their own heart readings" on public.aevum_heart_readings
   for select to authenticated
@@ -187,6 +208,7 @@ as $$
   delete from public.aevum_workouts where user_id = (select auth.uid());
   delete from public.aevum_heart_readings where user_id = (select auth.uid());
   delete from public.aevum_health_keys where user_id = (select auth.uid());
+  delete from public.aevum_bookings where user_id = (select auth.uid());
   delete from public.aevum_profiles where user_id = (select auth.uid());
 $$;
 

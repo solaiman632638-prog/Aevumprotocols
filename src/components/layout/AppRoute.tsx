@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 
 /** Screens people use once signed up, as opposed to the site that explains Aevum. */
-const appRoutes = ["/today", "/dashboard", "/train", "/ai", "/account"];
+const appRoutes = ["/today", "/dashboard", "/train", "/ai", "/account", "/book"];
 
 export function useAppRoute(): boolean {
   const pathname = usePathname();

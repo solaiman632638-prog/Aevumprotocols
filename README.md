@@ -18,6 +18,7 @@ Next.js 16 · TypeScript · Tailwind v4. No component library.
 ```
 /                      Home
 /today                 Daily check-in, scores, recommendations, and history
+/book                  Book a call with the expert (signed in); hours in src/lib/booking/slots.ts
 /account               Optional sign-in and sync; export and delete data
 /privacy, /terms       Legal pages (review with a lawyer before relying on them)
 /monitor               Devices: optional Whoop (live with keys) / Google Fit (demo)
@@ -53,6 +54,14 @@ sign-in and cross-device sync:
 3. Supabase → Authentication → URL configuration: set the Site URL to the
    production domain and add `https://<domain>/account` as a redirect URL.
 4. Redeploy.
+
+## Expert call booking
+
+`/book` lists open 30-minute slots and saves bookings to `aevum_bookings`
+(in `supabase/schema.sql`). Each booking emails the admins and the person
+through Resend. Set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain
+verified in Resend) in Vercel; `BOOKING_NOTIFY_EMAIL` overrides who is told
+about bookings (default: `ADMIN_EMAILS`). Upcoming calls also show on `/admin`.
 
 ## Live Whoop data
 

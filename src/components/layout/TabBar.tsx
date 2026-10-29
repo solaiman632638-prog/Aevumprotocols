@@ -23,6 +23,7 @@ const tabs = [
 ];
 
 const moreLinks = [
+  { href: "/book", label: "Book a call" },
   { href: "/supplements", label: "Supplements" },
   { href: "/calculator", label: "Calculator" },
   { href: "/stacks", label: "Stacks" },
