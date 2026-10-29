@@ -1,78 +1,27 @@
 import Link from "next/link";
+import { Figure, scoreColour, TickMeter } from "@/components/today/Readout";
 import type { CompoundCard, DailyReport, Driver, Recommendation, Score } from "@/lib/today/types";
 
-const toneText: Record<Score["tone"], string> = {
-  good: "text-brass",
-  neutral: "text-pine-deep",
-  caution: "text-warn",
-  missing: "text-mute",
-};
-
-const toneFill: Record<Score["tone"], string> = {
-  good: "bg-brass",
-  neutral: "bg-pine",
-  caution: "bg-warn",
-  missing: "bg-rule",
-};
+/** App-scale section heading, shared by every block below the scores. */
+export const sectionHeading = "font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl";
 
 export function Dashboard({ report, peptides }: { report: DailyReport; peptides?: React.ReactNode }) {
   return (
-    <div className="space-y-14">
-      <section aria-labelledby="scores-heading">
-        <h2 id="scores-heading" className="sr-only">Today&apos;s scores</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {report.scores.map((score) => (
-            <li key={score.label} className="flex flex-col rounded-3xl border border-rule bg-sheet p-5">
-              <p className="eyebrow !text-mute">{score.label}</p>
-              <p
-                className={`mt-3 font-display font-light tracking-[-0.03em] ${toneText[score.tone]} ${
-                  score.numeric != null ? "text-5xl" : score.tone === "missing" ? "text-xl" : "text-3xl"
-                }`}
-              >
-                {score.numeric != null ? (
-                  <>
-                    {score.numeric}
-                    <span className="text-lg text-mute">/100</span>
-                  </>
-                ) : (
-                  score.value
-                )}
-              </p>
-              {score.detail ? <p className="mt-1 text-sm text-mute">{score.detail}</p> : null}
-              {score.numeric != null ? (
-                <div
-                  className="mt-3 h-1.5 overflow-hidden rounded-full bg-rule"
-                  role="meter"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={score.numeric}
-                  aria-label={score.label}
-                >
-                  <div className={`h-full rounded-full ${toneFill[score.tone]}`} style={{ width: `${score.numeric}%` }} />
-                </div>
-              ) : null}
-              <div className="mt-auto pt-4">
-                <Why drivers={score.why} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+    <div className="space-y-12 sm:space-y-16">
+      <ScoreBoard scores={report.scores} />
 
       {peptides}
 
-      <RecList id="lifestyle" title="Recommended today" eyebrow="Lifestyle" items={report.lifestyle} />
+      <RecList id="lifestyle" title="Recommended today" items={report.lifestyle} />
       <RecList
         id="supplements"
         title="Supplements to review"
-        eyebrow="Supplements"
         items={report.supplements}
         footnote="General guidance for healthy adults. Check new supplements against your medications with a pharmacist."
       />
 
       <section aria-labelledby="compounds-heading">
-        <p className="eyebrow">Picked for your goals</p>
-        <h2 id="compounds-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
+        <h2 id="compounds-heading" className={sectionHeading}>
           Peptides for you
         </h2>
         <p className="mt-3 max-w-2xl text-mute">
@@ -111,32 +60,109 @@ export function Dashboard({ report, peptides }: { report: DailyReport; peptides?
   );
 }
 
+/**
+ * Today's readout: the first numeric score leads as the instrument, other
+ * numeric scores sit beside it, and the categorical calls read as one list.
+ */
+function ScoreBoard({ scores }: { scores: Score[] }) {
+  const numeric = scores.filter((score) => score.numeric != null);
+  const [lead, ...rest] = numeric;
+  const calls = scores.filter((score) => score.numeric == null);
+  return (
+    <section aria-labelledby="scores-heading" className="grid gap-3 lg:grid-cols-12">
+      <h2 id="scores-heading" className="sr-only">Today&apos;s scores</h2>
+      {lead ? (
+        <div
+          className="relative flex flex-col overflow-hidden rounded-3xl border border-rule bg-sheet p-5 sm:p-7 lg:col-span-7"
+          style={{ backgroundImage: `radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, ${scoreColour(lead)} 14%, transparent), transparent 60%)` }}
+        >
+          <ScoreName score={lead} />
+          <div className="mt-6">
+            <Figure score={lead} size="lead" />
+          </div>
+          {lead.detail ? <p className="mt-3 max-w-md text-mute">{lead.detail}</p> : null}
+          <div className="mt-auto pt-6">
+            <TickMeter value={lead.numeric!} colour={scoreColour(lead)} label={lead.label} className="h-10" />
+            <div className="mt-5">
+              <Why drivers={lead.why} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="grid gap-3 lg:col-span-5">
+        {rest.map((score) => (
+          <div key={score.label} className="rounded-3xl border border-rule bg-sheet p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <ScoreName score={score} />
+              <Figure score={score} size="compact" />
+            </div>
+            {score.detail ? <p className="mt-2 text-sm text-mute">{score.detail}</p> : null}
+            <TickMeter value={score.numeric!} colour={scoreColour(score)} label={score.label} ticks={24} className="mt-4 h-6" />
+            <div className="mt-4">
+              <Why drivers={score.why} />
+            </div>
+          </div>
+        ))}
+
+        {calls.length > 0 ? (
+          <ul className="divide-y divide-rule rounded-3xl border border-rule bg-sheet">
+            {calls.map((score) => (
+              <li key={score.label} className="px-5 py-4 sm:px-6">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-sm text-mute">{score.label}</p>
+                  <p
+                    className={`text-right font-display font-light tracking-[-0.02em] ${score.tone === "missing" ? "text-base" : "text-2xl"}`}
+                    style={{ color: score.tone === "missing" ? "var(--color-mute)" : scoreColour(score) }}
+                  >
+                    {score.value}
+                  </p>
+                </div>
+                {score.detail ? <p className="mt-1 text-sm text-mute">{score.detail}</p> : null}
+                <div className="mt-2">
+                  <Why drivers={score.why} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function ScoreName({ score }: { score: Score }) {
+  return (
+    <p className="flex items-center gap-2.5 text-base text-ink">
+      <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: scoreColour(score) }} />
+      {score.label}
+    </p>
+  );
+}
+
 function RecList({
   id,
   title,
-  eyebrow,
   items,
   footnote,
 }: {
   id: string;
   title: string;
-  eyebrow: string;
   items: Recommendation[];
   footnote?: string;
 }) {
   if (items.length === 0) return null;
   return (
     <section aria-labelledby={`${id}-heading`}>
-      <p className="eyebrow">{eyebrow}</p>
-      <h2 id={`${id}-heading`} className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
+      <h2 id={`${id}-heading`} className={sectionHeading}>
         {title}
       </h2>
       <ul className="mt-6 divide-y divide-rule overflow-hidden rounded-3xl border border-rule bg-sheet">
         {items.map((item) => (
-          <li key={item.id} className="grid gap-2 px-5 py-5 sm:grid-cols-12 sm:gap-6">
+          <li key={item.id} className="grid gap-1 px-5 py-4 sm:grid-cols-12 sm:gap-6 sm:py-5">
             <p className="text-sm text-mute sm:col-span-3 sm:pt-1.5">{item.title}</p>
             <div className="sm:col-span-9">
-              <p className="font-display text-2xl font-light tracking-[-0.02em]">{item.value}</p>
+              <p className="font-display text-2xl font-light tracking-[-0.02em] tabular-nums">{item.value}</p>
               <p className="mt-1 text-sm text-mute">{item.detail}</p>
               {item.caution ? <p className="mt-2 text-sm text-warn">{item.caution}</p> : null}
               <div className="mt-3">
@@ -154,8 +180,8 @@ function RecList({
 function CompoundItem({ compound }: { compound: CompoundCard }) {
   return (
     <li className="flex flex-col rounded-3xl border border-rule bg-sheet p-5 sm:p-6">
-      <p className="eyebrow">For {compound.goal.toLowerCase()}</p>
-      <h3 className="mt-2 font-display text-3xl font-light tracking-[-0.03em]">{compound.name}</h3>
+      <h3 className="font-display text-3xl font-light tracking-[-0.03em]">{compound.name}</h3>
+      <p className="mt-1 text-sm text-mute">For {compound.goal.toLowerCase()}</p>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>
           <dt className="text-xs text-mute">Research status</dt>

@@ -16,6 +16,8 @@ import { buildReport } from "@/lib/today/engine";
 import { projectWeight, type WeightProjection } from "@/lib/today/projection";
 import { keys, readRaw, subscribe, todayIso } from "@/lib/today/storage";
 import type { DayState, Score, UserContext } from "@/lib/today/types";
+import { Figure, scoreColour, TickMeter } from "@/components/today/Readout";
+import { greeting, shiftDays, streak } from "@/lib/today/streak";
 
 const card = "rounded-3xl border border-rule bg-sheet p-5 sm:p-6";
 const heading = "font-display text-2xl font-light tracking-[-0.02em] sm:text-3xl";
@@ -40,30 +42,12 @@ function useHydrated(): boolean {
   );
 }
 
-function shiftDays(iso: string, by: number): string {
-  const d = new Date(`${iso}T00:00:00`);
-  d.setDate(d.getDate() + by);
-  const offset = d.getTimezoneOffset() * 60_000;
-  return new Date(d.getTime() - offset).toISOString().slice(0, 10);
-}
-
 function longDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
 }
 
 function shortDate(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-/** Consecutive logged days ending today, or yesterday if today is not in yet. */
-function streak(dates: Set<string>, today: string): number {
-  let day = dates.has(today) ? today : shiftDays(today, -1);
-  let count = 0;
-  while (dates.has(day)) {
-    count += 1;
-    day = shiftDays(day, -1);
-  }
-  return count;
 }
 
 /**
@@ -146,14 +130,13 @@ export function MemberDashboard() {
     <MotionConfig reducedMotion="user">
       <div className="space-y-5 sm:space-y-6">
         <header className="pb-2">
-          <p className="eyebrow">{longDate(date)}</p>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-3 font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl"
+            className="font-display text-[2.6rem] font-light leading-[1] tracking-[-0.035em] sm:text-6xl"
           >
-            {session.isNew ? "Welcome" : "Welcome back"}
+            {session.isNew ? "Welcome" : greeting()}
             {session.name ? "," : ""}
             {session.name ? (
               <>
@@ -161,6 +144,7 @@ export function MemberDashboard() {
               </>
             ) : null}
           </motion.h1>
+          <p className="mt-3 text-mute">{longDate(date)}</p>
           {session.name ? null : <NameForm />}
         </header>
 
@@ -195,8 +179,7 @@ export function MemberDashboard() {
             <section className={`${card} lg:col-span-7`} aria-labelledby="today-heading">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="eyebrow">Today</p>
-                  <h2 id="today-heading" className={`mt-2 ${heading}`}>
+                  <h2 id="today-heading" className={heading}>
                     {today ? "Checked in" : "Not checked in yet"}
                   </h2>
                 </div>
@@ -206,12 +189,14 @@ export function MemberDashboard() {
               </div>
 
               {today && report ? (
-                <div className="mt-6 grid grid-cols-3 gap-3">
-                  <Ring score={recovery} colour="var(--color-recovery)" />
-                  <Ring score={sleep} colour="var(--color-sleep)" />
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <p className="font-display text-2xl font-light sm:text-3xl">{readiness?.value ?? "—"}</p>
-                    <p className="mt-2 font-mono text-[0.6rem] uppercase tracking-[0.14em] text-mute">Readiness</p>
+                <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5">
+                  <Mini score={recovery} />
+                  <Mini score={sleep} />
+                  <div className="col-span-2 flex items-baseline justify-between border-t border-rule pt-4">
+                    <p className="text-sm text-mute">Training readiness</p>
+                    <p className="font-display text-2xl font-light" style={readiness ? { color: scoreColour(readiness) } : undefined}>
+                      {readiness?.value ?? "—"}
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -227,8 +212,7 @@ export function MemberDashboard() {
 
             {/* Due today */}
             <section className={`${card} lg:col-span-5`} aria-labelledby="due-heading">
-              <p className="eyebrow">From your log</p>
-              <h2 id="due-heading" className={`mt-2 ${heading}`}>
+              <h2 id="due-heading" className={heading}>
                 Due today
               </h2>
               {due.length === 0 ? (
@@ -262,8 +246,7 @@ export function MemberDashboard() {
             <section className={`${card} lg:col-span-7`} aria-labelledby="regimen-heading">
               <div className="flex items-baseline justify-between gap-4">
                 <div>
-                  <p className="eyebrow">Regimen</p>
-                  <h2 id="regimen-heading" className={`mt-2 ${heading}`}>
+                  <h2 id="regimen-heading" className={heading}>
                     Your protocol
                   </h2>
                 </div>
@@ -291,8 +274,7 @@ export function MemberDashboard() {
 
             {/* Goal */}
             <section className={`${card} lg:col-span-5`} aria-labelledby="goal-heading">
-              <p className="eyebrow">Goal · from your weigh-ins</p>
-              <h2 id="goal-heading" className={`mt-2 ${heading}`}>
+              <h2 id="goal-heading" className={heading}>
                 Target weight
               </h2>
               {projection ? <GoalProjection projection={projection} imperial={profile.units === "imperial"} runs={runs} /> : null}
@@ -300,8 +282,7 @@ export function MemberDashboard() {
 
             {/* Sites */}
             <section className={`${card} lg:col-span-5`} aria-labelledby="sites-heading">
-              <p className="eyebrow">Rotation</p>
-              <h2 id="sites-heading" className={`mt-2 ${heading}`}>
+              <h2 id="sites-heading" className={heading}>
                 Injection sites
               </h2>
               <div className="mt-4">
@@ -313,8 +294,7 @@ export function MemberDashboard() {
             <section className={`${card} lg:col-span-7`} aria-labelledby="trends-heading">
               <div className="flex items-baseline justify-between gap-4">
                 <div>
-                  <p className="eyebrow">Two weeks</p>
-                  <h2 id="trends-heading" className={`mt-2 ${heading}`}>
+                  <h2 id="trends-heading" className={heading}>
                     Trends
                   </h2>
                 </div>
@@ -494,33 +474,15 @@ function GoalProjection({ projection, imperial, runs }: { projection: WeightProj
   );
 }
 
-function Ring({ score, colour }: { score?: Score; colour: string }) {
-  const value = score?.numeric;
+function Mini({ score }: { score?: Score }) {
+  if (!score || score.numeric == null) return <p className="text-mute">{score?.label ?? "—"}: no data</p>;
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative aspect-square w-full max-w-24">
-        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90" aria-hidden>
-          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--color-rule)" strokeWidth="7" />
-          {value != null ? (
-            <motion.circle
-              cx="50"
-              cy="50"
-              r="42"
-              fill="none"
-              stroke={colour}
-              strokeWidth="7"
-              strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: value / 100 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            />
-          ) : null}
-        </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-2xl tabular-nums" style={{ fontFamily: "var(--font-readout)" }}>
-          {value ?? "—"}
-        </span>
+    <div>
+      <p className="text-sm text-mute">{score.label.split(" ")[0]}</p>
+      <div className="mt-2">
+        <Figure score={score} size="compact" />
       </div>
-      <p className="mt-2 font-mono text-[0.6rem] uppercase tracking-[0.14em] text-mute">{score?.label.split(" ")[0] ?? "—"}</p>
+      <TickMeter value={score.numeric} colour={scoreColour(score)} label={score.label} ticks={20} className="mt-3 h-5" />
     </div>
   );
 }
@@ -531,7 +493,7 @@ function Stat({ label, value }: { label: string; value: number }) {
       <dd className="text-3xl tabular-nums" style={{ fontFamily: "var(--font-readout)" }}>
         {value}
       </dd>
-      <dt className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-mute">{label}</dt>
+      <dt className="mt-1 text-xs text-mute">{label}</dt>
     </div>
   );
 }
@@ -632,8 +594,8 @@ function AccountCard({ email }: { email: string }) {
   return (
     <section className={`${card} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`} aria-label="Account">
       <div className="min-w-0">
-        <p className="eyebrow">Signed in</p>
-        <p className="mt-1 truncate">{email}</p>
+        <p className="text-sm text-mute">Signed in as</p>
+        <p className="mt-0.5 truncate">{email}</p>
         <p className="mt-1 text-xs text-mute">{status ?? "Your profile and check-ins sync to your account automatically."}</p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">

@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { TabBar } from "@/components/layout/TabBar";
+import { DesktopOnInApp } from "@/components/layout/AppRoute";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +11,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <main id="main" className="flex-1">
         {children}
       </main>
-      <Footer />
+      <DesktopOnInApp>
+        <Footer />
+      </DesktopOnInApp>
       <TabBar />
     </div>
   );

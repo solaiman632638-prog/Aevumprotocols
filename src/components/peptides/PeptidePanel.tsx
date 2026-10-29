@@ -78,8 +78,7 @@ export function PeptidePanel({
   if (report.urgent) {
     return (
       <section aria-labelledby="urgent-heading" className="rounded-3xl border-2 border-warn bg-warn-tint p-6 text-warn sm:p-8">
-        <p className="eyebrow !text-warn">Get medical care</p>
-        <h2 id="urgent-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em]">
+        <h2 id="urgent-heading" className="font-display text-4xl font-light tracking-[-0.03em]">
           Stop and get checked
         </h2>
         <p className="mt-4 max-w-prose">
@@ -98,8 +97,7 @@ export function PeptidePanel({
   return (
     <section aria-labelledby="peptides-heading" className="space-y-6">
       <div>
-        <p className="eyebrow">Peptides</p>
-        <h2 id="peptides-heading" className="mt-2 font-display text-4xl font-light tracking-[-0.03em] sm:text-5xl">
+        <h2 id="peptides-heading" className="font-display text-3xl font-light tracking-[-0.03em] sm:text-4xl">
           Aevum risk review
         </h2>
       </div>
@@ -131,7 +129,7 @@ export function PeptidePanel({
             <Stat label="Mechanism overlap" value={review.overlap} tone={levelTone[review.overlap]} />
             <Stat label="Combination evidence" value={review.combinationEvidence} tone={levelTone[review.combinationEvidence]} />
           </dl>
-          <p className="eyebrow mt-6">Risk-minimising recommendation</p>
+          <p className="mt-6 text-sm text-mute">Risk-minimising recommendation</p>
           <p className="mt-2 max-w-prose text-lg">{review.recommendation}</p>
           <p className="mt-5 text-xs font-semibold uppercase tracking-[0.08em] text-mute">Why</p>
           <ul className="mt-2 space-y-1 text-sm text-mute">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AccountLink } from "@/components/layout/AccountLink";
+import { SiteOnly } from "@/components/layout/AppRoute";
 
 const links = [
   { href: "/today", label: "Today" },
@@ -43,9 +44,11 @@ export function Header() {
           </svg>
           <span aria-hidden>evum</span>
         </Link>
-        <Link href="/today" className="btn-primary !min-h-0 !px-5 !py-2.5 lg:order-last">
-          Start today
-        </Link>
+        <SiteOnly>
+          <Link href="/today" className="btn-primary !min-h-0 !px-5 !py-2.5 lg:order-last">
+            Start today
+          </Link>
+        </SiteOnly>
         <nav
           aria-label="Primary"
           className="hidden w-full flex-wrap items-center gap-x-5 gap-y-1 md:flex lg:w-auto lg:gap-x-8"

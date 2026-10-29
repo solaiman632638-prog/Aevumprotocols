@@ -108,10 +108,18 @@ export function TabBar() {
                 <Link
                   href={tab.href}
                   aria-current={on ? "page" : undefined}
-                  className={`flex h-16 flex-col items-center justify-center gap-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] no-underline ${
-                    on ? "text-ink" : "text-dim active:text-mute"
+                  className={`relative flex h-16 flex-col items-center justify-center gap-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] no-underline transition-colors ${
+                    on ? "text-ink" : "text-mute active:text-ink"
                   }`}
                 >
+                  {on ? (
+                    <motion.span
+                      layoutId="tab-active"
+                      aria-hidden
+                      className="absolute top-0 h-0.5 w-8 rounded-full bg-ink"
+                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    />
+                  ) : null}
                   <Icon d={tab.icon} />
                   {tab.label}
                 </Link>
@@ -125,7 +133,7 @@ export function TabBar() {
               aria-controls="more-menu"
               onClick={() => setOpen((value) => !value)}
               className={`flex h-16 w-full flex-col items-center justify-center gap-1 text-[0.65rem] font-semibold uppercase tracking-[0.06em] ${
-                open || moreActive ? "text-ink" : "text-dim active:text-mute"
+                open || moreActive ? "text-ink" : "text-mute active:text-ink"
               }`}
             >
               <Icon d={icons.more} />

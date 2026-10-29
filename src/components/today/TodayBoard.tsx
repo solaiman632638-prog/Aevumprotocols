@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { motion, MotionConfig } from "motion/react";
 import { CheckinForm } from "@/components/today/CheckinForm";
 import { AccountPrompt } from "@/components/today/AccountPrompt";
 import { DailyReminder } from "@/components/today/DailyReminder";
@@ -24,6 +25,7 @@ import type { DayState, UserContext } from "@/lib/today/types";
 import { latestReading, localDate, type HeartReading } from "@/lib/health/heart";
 import { isNativeApp, nativeHealthLinked, syncNativeHealth } from "@/lib/health/native";
 import { useSession } from "@/lib/sync/useSession";
+import { greeting, streak } from "@/lib/today/streak";
 
 function useStored<T>(key: string): T | null {
   const raw = useSyncExternalStore(subscribe, () => readRaw(key), () => null);
@@ -119,6 +121,7 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
   if (!profile || editing === "profile") {
     return (
       <div className="space-y-10">
+        {profile ? null : <Welcome />}
         {profile ? null : <InstallApp />}
         <ProfileForm
           initial={profile}
@@ -132,84 +135,133 @@ export function TodayBoard({ pool }: { pool: CompoundSource[] }) {
     );
   }
 
+  const run = streak(new Set(checkins.map((day) => day.date)), date);
   const loggedLabel = `${checkins.length} day${checkins.length === 1 ? "" : "s"} logged`;
+  const longDate = new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
 
   return (
-    <div className="space-y-10">
-      <InstallApp />
-      <div className="flex gap-2" role="tablist" aria-label="Today or history">
-        {(["today", "history"] as const).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            role="tab"
-            aria-selected={view === tab}
-            onClick={() => setView(tab)}
-            className={`font-display text-2xl font-light tracking-[-0.02em] sm:text-3xl ${view === tab ? "text-ink underline decoration-pine decoration-2 underline-offset-8" : "text-mute hover:text-ink"} px-1`}
-          >
-            {tab === "today" ? "Today" : "History"}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-4 rounded-3xl border border-rule bg-sheet p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-mute">{loggedLabel}</p>
-        <div className="flex flex-wrap gap-2">
-          {checkedInToday && editing !== "checkin" ? (
-            <button type="button" onClick={() => setEditing("checkin")} className="btn-secondary !min-h-0 !px-4 !py-2">
-              Edit check-in
+    <MotionConfig reducedMotion="user">
+      <div className="space-y-8 sm:space-y-10">
+        <header className="sm:flex sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <h1 className="font-display text-[2.6rem] font-light leading-[1] tracking-[-0.035em] sm:text-6xl">
+              {greeting()}
+              {session.name ? <span className="text-mute">, {session.name}</span> : null}
+            </h1>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-mute">
+              <span>{longDate}</span>
+              <span aria-hidden className="h-1 w-1 rounded-full bg-dim" />
+              {run > 1 ? (
+                <span className="text-ink">
+                  <span className="tabular-nums">{run}</span>-day streak
+                </span>
+              ) : (
+                <span>{loggedLabel}</span>
+              )}
+            </p>
+          </div>
+          <div className="mt-4 flex shrink-0 gap-2 sm:mt-0 sm:pt-3">
+            {checkedInToday && editing !== "checkin" && view === "today" ? (
+              <button type="button" onClick={() => setEditing("checkin")} className={chip}>
+                Edit check-in
+              </button>
+            ) : null}
+            <button type="button" onClick={() => setEditing("profile")} className={chip}>
+              Profile
             </button>
-          ) : null}
-          <button type="button" onClick={() => setEditing("profile")} className="btn-secondary !min-h-0 !px-4 !py-2">
-            Edit profile
-          </button>
+          </div>
+        </header>
+
+        <InstallApp />
+
+        <div>
+          <div role="tablist" aria-label="Today or history" className="grid w-full grid-cols-2 rounded-full border border-rule bg-sheet p-1 sm:w-72">
+            {(["today", "history"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={view === tab}
+                onClick={() => setView(tab)}
+                className={`relative min-h-10 rounded-full text-sm font-semibold transition-colors ${view === tab ? "text-on-accent" : "text-mute hover:text-ink"}`}
+              >
+                {view === tab ? (
+                  <motion.span
+                    layoutId="today-view"
+                    aria-hidden
+                    className="absolute inset-0 rounded-full bg-ink"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                  />
+                ) : null}
+                <span className="relative">{tab === "today" ? "Today" : "History"}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {view === "history" ? (
-        <HistoryPanel
-          profile={profile}
-          history={checkins}
-          today={date}
-          siteSuggestion={peptides?.sites.suggestion}
-          onSaveDay={saveCheckin}
-        />
-      ) : !checkedInToday || editing === "checkin" ? (
-        <CheckinForm
-          key={`${date}-${editing}-${todaysReading?.measuredAt ?? ""}`}
-          date={date}
-          reading={todaysReading}
-          profile={profile}
-          siteSuggestion={peptides?.sites.suggestion}
-          previous={checkins.at(-1)}
-          due={due}
-          onSave={(day) => {
-            saveCheckin(day);
-            setEditing(null);
-          }}
-          onCancel={checkedInToday ? () => setEditing(null) : undefined}
-        />
-      ) : report ? (
-        <>
-          <AccountPrompt />
-          <Dashboard
-            report={report}
-            peptides={
-              peptides ? (
-                <PeptidePanel
-                  report={peptides}
-                  today={date}
-                  context={profile}
-                  activeSlugs={activeCompounds(checkins, date).map((model) => model.slug)}
-                />
-              ) : null
-            }
+        {view === "history" ? (
+          <HistoryPanel
+            profile={profile}
+            history={checkins}
+            today={date}
+            siteSuggestion={peptides?.sites.suggestion}
+            onSaveDay={saveCheckin}
           />
-          <DailyReminder />
-        </>
-      ) : null}
+        ) : !checkedInToday || editing === "checkin" ? (
+          <CheckinForm
+            key={`${date}-${editing}-${todaysReading?.measuredAt ?? ""}`}
+            date={date}
+            reading={todaysReading}
+            profile={profile}
+            siteSuggestion={peptides?.sites.suggestion}
+            previous={checkins.at(-1)}
+            due={due}
+            onSave={(day) => {
+              saveCheckin(day);
+              setEditing(null);
+            }}
+            onCancel={checkedInToday ? () => setEditing(null) : undefined}
+          />
+        ) : report ? (
+          <>
+            <AccountPrompt />
+            <Dashboard
+              report={report}
+              peptides={
+                peptides ? (
+                  <PeptidePanel
+                    report={peptides}
+                    today={date}
+                    context={profile}
+                    activeSlugs={activeCompounds(checkins, date).map((model) => model.slug)}
+                  />
+                ) : null
+              }
+            />
+            <DailyReminder />
+          </>
+        ) : null}
 
-      {view === "today" && session.email ? <HeartConnect reading={reading} onSynced={() => setRefresh((n) => n + 1)} /> : null}
-    </div>
+        {view === "today" && session.email ? <HeartConnect reading={reading} onSynced={() => setRefresh((n) => n + 1)} /> : null}
+      </div>
+    </MotionConfig>
+  );
+}
+
+const chip =
+  "inline-flex min-h-10 items-center rounded-full border border-rule px-4 text-sm text-ink transition-colors hover:border-mute active:bg-panel";
+
+/** First visit, before a profile exists: what Today does. */
+function Welcome() {
+  return (
+    <header>
+      <h1 className="font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl">Today</h1>
+      <p className="mt-4 max-w-2xl text-mute">
+        Log how you slept, how you feel, and the peptides you took. Get
+        recovery and sleep scores, protocol guidance for each peptide,
+        interaction warnings, and injection-site tracking. Every
+        recommendation shows the data behind it.
+      </p>
+    </header>
   );
 }
