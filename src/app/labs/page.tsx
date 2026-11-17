@@ -7,7 +7,7 @@ import { WaitlistForm } from "@/components/labs/WaitlistForm";
 export const metadata: Metadata = {
   title: "Labs",
   description:
-    "Aevum Labs is coming: a blood test built for performance, reviewed by a licensed practitioner who can prescribe regulated, Health Canada-approved peptides matched to your results. Join the waitlist.",
+    "Aevum Labs is coming: a blood test built for performance, reviewed by a licensed practitioner, with a plan made for your body. Join the waitlist.",
 };
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
@@ -53,7 +53,7 @@ const panels = [
 const steps = [
   { title: "Test", body: "One blood draw at a partner lab near you, ordered by a licensed practitioner." },
   { title: "Understand", body: "Every marker in plain words, with colour-coded ranges and what it means for training." },
-  { title: "Your prescription", body: "A licensed practitioner reviews your results and, where it fits, prescribes regulated, Health Canada-approved peptides." },
+  { title: "Your plan", body: "A licensed practitioner reviews your results and builds a plan around what your body needs." },
   { title: "Retest", body: "Test again in three to six months and see what actually changed." },
 ];
 
@@ -76,16 +76,12 @@ const faqs = [
     a: "Pricing isn't set yet. Waitlist members will see it first.",
   },
   {
-    q: "Will I get a prescription?",
-    a: "If it's right for you. A licensed practitioner reviews your bloodwork and health history and decides whether a peptide fits. Not everyone will need or qualify for one.",
-  },
-  {
-    q: "Which peptides can be prescribed?",
-    a: "Only regulated peptides approved by Health Canada, from licensed pharmacies. Never research chemicals, and never anything sold as not for human use.",
+    q: "What will my plan include?",
+    a: "That depends on your results. A licensed practitioner reviews your bloodwork and health history and decides what fits you. Waitlist members get the full details first, when Aevum Labs opens.",
   },
   {
     q: "Is this a DNA test?",
-    a: "No. It's a blood test. Your blood shows what's happening in your body right now and changes as you train. No genetic test can currently tell you which peptides you need.",
+    a: "No. It's a blood test. Your blood shows what's happening in your body right now and changes as you train. No genetic test can currently tell you what your body needs.",
   },
   {
     q: "Who sees my results?",
@@ -117,12 +113,12 @@ export default function LabsPage() {
               Aevum Labs · Coming soon
             </p>
             <h1 className="mt-6 font-display text-[3.2rem] font-normal leading-[0.95] tracking-[-0.045em] sm:text-7xl lg:text-[5.5rem]">
-              Peptides, prescribed for your body.
+              Prescribed for your body.
             </h1>
             <p className="mt-6 max-w-lg text-lg text-mute sm:mt-8 sm:text-xl">
               One blood test built for training and recovery. A licensed
-              practitioner reviews your results and, where it fits, prescribes
-              regulated peptides matched to what your body actually shows.
+              practitioner reviews your results and builds a plan around what
+              your body actually needs.
             </p>
             <div className="mt-8 sm:mt-10">
               <WaitlistForm id="join" />
