@@ -21,7 +21,7 @@ export function DesktopOnInApp({ children }: { children: React.ReactNode }) {
 }
 
 /** Pages drawn in the warm light theme. Everything else stays dark. */
-const lightRoutes = ["/"];
+const lightRoutes = ["/", "/labs"];
 
 /** The shell wrapper: switches on the light theme for the pages that use it. */
 export function ThemeScope({ className, children }: { className: string; children: React.ReactNode }) {

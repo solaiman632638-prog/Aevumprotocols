@@ -2,14 +2,13 @@ import Link from "next/link";
 import { AccountLink } from "@/components/layout/AccountLink";
 import { SiteOnly } from "@/components/layout/AppRoute";
 
+/** Peptide Protocols, with the calculator under it, sits after the first three. */
 const links = [
   { href: "/today", label: "Today" },
   { href: "/train", label: "Training" },
   { href: "/ai", label: "Aevum AI" },
-  { href: "/peptides", label: "Compounds" },
+  { href: "/labs", label: "Labs" },
   { href: "/supplements", label: "Supplements" },
-  { href: "/stacks", label: "Stacks" },
-  { href: "/calculator", label: "Calculator" },
   { href: "/app", label: "Get the app" },
 ];
 
@@ -53,7 +52,28 @@ export function Header() {
           aria-label="Primary"
           className="hidden w-full flex-wrap items-center gap-x-5 gap-y-1 md:flex lg:w-auto lg:gap-x-8"
         >
-          {links.map((link) => (
+          {links.slice(0, 3).map((link) => (
+            <Link key={link.href} href={link.href} className={navLink}>
+              {link.label}
+            </Link>
+          ))}
+          {/* Peptide Protocols opens on hover or keyboard focus; no script needed. */}
+          <div className="group relative">
+            <Link href="/peptides" className={navLink} aria-haspopup="true">
+              Peptide Protocols
+            </Link>
+            <div className="invisible absolute left-0 top-full z-50 pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+              <div className="min-w-52 rounded-2xl border border-rule bg-sheet p-2 shadow-lg">
+                <Link href="/peptides" className="block rounded-xl px-3 py-2.5 text-sm text-ink no-underline hover:bg-panel">
+                  All peptides
+                </Link>
+                <Link href="/calculator" className="block rounded-xl px-3 py-2.5 text-sm text-ink no-underline hover:bg-panel">
+                  Vial calculator
+                </Link>
+              </div>
+            </div>
+          </div>
+          {links.slice(3).map((link) => (
             <Link key={link.href} href={link.href} className={navLink}>
               {link.label}
             </Link>

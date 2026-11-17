@@ -516,13 +516,12 @@ const actions = [
   { href: "/today", label: "Check in", detail: "30 seconds" },
   { href: "/ai", label: "Ask Aevum AI", detail: "Evidence answers" },
   { href: "/calculator", label: "Vial calculator", detail: "Mixing, storage, math" },
-  { href: "/peptides", label: "Compounds", detail: "The full register" },
-  { href: "/stacks", label: "Stacks", detail: "Studied pairings" },
+  { href: "/peptides", label: "Peptide Protocols", detail: "The full register" },
 ];
 
 function QuickActions() {
   return (
-    <nav aria-label="Quick actions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <nav aria-label="Quick actions" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       {actions.map((action) => (
         <Link
           key={action.href}

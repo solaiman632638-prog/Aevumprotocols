@@ -100,6 +100,18 @@ create table if not exists public.aevum_heart_readings (
 create index if not exists aevum_heart_readings_user_idx
   on public.aevum_heart_readings (user_id, measured_at desc);
 
+-- Labs waitlist: people asking to hear when Aevum blood testing opens.
+-- Not tied to an account; written and read only by the server.
+create table if not exists public.aevum_labs_waitlist (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  goal text,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists aevum_labs_waitlist_email_idx
+  on public.aevum_labs_waitlist (lower(email));
+
 -- ─── Row-level security ─────────────────────────────────────────────────────
 -- Without this, any signed-in user could read every other user's health data.
 alter table public.aevum_profiles          enable row level security;
@@ -109,6 +121,8 @@ alter table public.ai_messages       enable row level security;
 alter table public.aevum_workouts        enable row level security;
 alter table public.aevum_health_keys     enable row level security;
 alter table public.aevum_heart_readings  enable row level security;
+-- No policies: only the server (service key) reaches the waitlist.
+alter table public.aevum_labs_waitlist   enable row level security;
 
 drop policy if exists "Users manage their own workouts" on public.aevum_workouts;
 create policy "Users manage their own workouts" on public.aevum_workouts

@@ -17,15 +17,14 @@ const icons = {
 
 const tabs = [
   { href: "/today", label: "Today", icon: icons.today },
-  { href: "/peptides", label: "Compounds", icon: icons.compounds },
+  { href: "/peptides", label: "Peptides", icon: icons.compounds },
   { href: "/ai", label: "AI", icon: icons.ai },
   { href: "/train", label: "Training", icon: icons.train },
 ];
 
 const moreLinks = [
+  { href: "/labs", label: "Labs" },
   { href: "/supplements", label: "Supplements" },
-  { href: "/calculator", label: "Calculator" },
-  { href: "/stacks", label: "Stacks" },
   { href: "/app", label: "Get the app" },
 ];
 

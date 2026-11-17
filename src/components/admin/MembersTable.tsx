@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Member } from "@/app/api/admin/members/route";
+import { labGoals, type WaitlistEntry } from "@/lib/labs";
 import { syncClient } from "@/lib/sync/client";
 import { useSession } from "@/lib/sync/useSession";
 
@@ -11,7 +12,7 @@ type State =
   | { kind: "forbidden" }
   | { kind: "setup" }
   | { kind: "error"; message: string }
-  | { kind: "ready"; members: Member[]; thisWeek: number };
+  | { kind: "ready"; members: Member[]; thisWeek: number; waitlist: WaitlistEntry[] };
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -40,7 +41,12 @@ export function MembersTable() {
       if (response.ok) {
         const members: Member[] = body.members;
         const weekAgo = Date.now() - WEEK_MS;
-        return setState({ kind: "ready", members, thisWeek: members.filter((m) => Date.parse(m.joined) > weekAgo).length });
+        return setState({
+          kind: "ready",
+          members,
+          thisWeek: members.filter((m) => Date.parse(m.joined) > weekAgo).length,
+          waitlist: body.waitlist ?? [],
+        });
       }
       if (body.error === "forbidden" || body.error === "setup") return setState({ kind: body.error });
       setState({ kind: "error", message: body.error ?? "Could not load members." });
@@ -89,7 +95,7 @@ export function MembersTable() {
     );
   }
 
-  const { members, thisWeek } = state;
+  const { members, thisWeek, waitlist } = state;
   const aevum = members.filter((m) => m.aevum).length;
 
   return (
@@ -134,6 +140,38 @@ export function MembersTable() {
           </tbody>
         </table>
       </div>
+
+      <section className="pt-6">
+        <h2 className="font-display text-3xl font-light tracking-[-0.02em]">
+          Labs waitlist <span className="text-mute tabular-nums">{waitlist.length}</span>
+        </h2>
+        {waitlist.length === 0 ? (
+          <p className="mt-3 text-sm text-mute">No one yet. Signups from /labs show up here.</p>
+        ) : (
+          <div className="mt-4 overflow-x-auto rounded-3xl border border-rule bg-sheet">
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead className="text-xs text-mute">
+                <tr className="border-b border-rule">
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Goal</th>
+                  <th className="px-4 py-3 font-medium">Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                {waitlist.map((entry) => (
+                  <tr key={entry.email} className="border-b border-rule last:border-0">
+                    <td className="px-4 py-3">{entry.email}</td>
+                    <td className="px-4 py-3 text-mute">
+                      {labGoals.find((goal) => goal.key === entry.goal)?.label ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-mute">{when(entry.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

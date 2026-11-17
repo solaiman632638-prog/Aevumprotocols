@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient, type User } from "@supabase/supabase-js";
+import type { WaitlistEntry } from "@/lib/labs";
 
 export const runtime = "nodejs";
 
@@ -70,5 +71,14 @@ export async function GET(request: Request) {
     .map((user) => member(user, aevumIds))
     .sort((a, b) => Date.parse(b.joined) - Date.parse(a.joined));
 
-  return NextResponse.json({ members }, { headers: { "Cache-Control": "no-store" } });
+  // Missing until the waitlist table is created; an empty list until then.
+  const { data: waitlist } = await admin
+    .from("aevum_labs_waitlist")
+    .select("email, goal, created_at")
+    .order("created_at", { ascending: false });
+
+  return NextResponse.json(
+    { members, waitlist: (waitlist ?? []) as WaitlistEntry[] },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LibraryIndex } from "@/components/library/LibraryIndex";
 import { compoundRows, counts } from "@/lib/data/compounds";
 
 export const metadata: Metadata = {
-  title: "Compounds",
+  title: "Peptide Protocols",
   description:
     "Every compound in one place: research evidence, dosing protocols, reconstitution math, and regulatory status.",
 };
@@ -13,7 +14,7 @@ export default function CompoundsPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <p className="eyebrow">Research · Protocols · Vial math</p>
       <h1 className="mt-3 font-display text-5xl font-light leading-[0.95] tracking-[-0.035em] sm:text-7xl">
-        Compounds
+        Peptide Protocols
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
         {counts.total} compounds, {counts.protocols} of them with a full dosing
@@ -22,6 +23,9 @@ export default function CompoundsPage() {
         or study gives one. Each page holds the evidence, the risks, and the
         dosing together.
       </p>
+      <Link href="/calculator" className="btn-secondary mt-6">
+        Vial calculator
+      </Link>
       <div className="mt-8">
         <LibraryIndex rows={compoundRows} />
       </div>

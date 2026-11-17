@@ -37,7 +37,7 @@ const features = [
     icon: "warn",
     title: "Interaction warnings",
     body: "Flags when what you run works against itself, shares a mechanism, or collides with your medication.",
-    href: "/stacks",
+    href: "/peptides",
   },
   {
     icon: "sites",
