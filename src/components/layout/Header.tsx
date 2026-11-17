@@ -6,7 +6,6 @@ const links = [
   { href: "/today", label: "Today" },
   { href: "/train", label: "Training" },
   { href: "/ai", label: "Aevum AI" },
-  { href: "/book", label: "Book a call" },
   { href: "/peptides", label: "Compounds" },
   { href: "/supplements", label: "Supplements" },
   { href: "/stacks", label: "Stacks" },
