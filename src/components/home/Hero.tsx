@@ -1,81 +1,77 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
-import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
-import { Heartbeat } from "@/components/home/Heartbeat";
+import { MotionConfig, motion } from "motion/react";
 import { Readiness } from "@/components/home/Readiness";
 
+const ease = [0.16, 1, 0.3, 1] as const;
+
+const promises = ["Free, no card", "Evidence-ranked", "Works on any phone"];
+
 /**
- * The headline drifts up and dims as the page moves under it, with the
- * heart-rate trace behind it travelling slower so the two separate. The
- * readiness panel beside it is the interactive half: pick a sport and the
- * sample athlete's day redraws.
+ * Warm, bright opening: a soft glow behind a big plain-spoken headline, and
+ * the live readiness card floating beside it as the product shot.
  */
 export function Hero({ compounds }: { compounds: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-
-  const headlineY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const headlineOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const gridY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  const gridOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.1]);
-  const sweepY = useTransform(scrollYProgress, [0, 1], ["0vh", "92vh"]);
-  const cueOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-
   return (
     <MotionConfig reducedMotion="user">
-      <section ref={ref} className="relative isolate overflow-hidden md:min-h-[92vh]">
-        <motion.div
-          aria-hidden
-          style={{ y: gridY, opacity: gridOpacity }}
-          className="pointer-events-none absolute inset-0 -z-10"
-        >
-          <Heartbeat />
-          <motion.div
-            style={{ y: sweepY }}
-            className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(to_right,transparent,rgba(232,237,242,0.35),transparent)]"
-          />
-        </motion.div>
+      <section className="relative isolate overflow-hidden">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -right-40 -top-40 h-[38rem] w-[38rem] rounded-full bg-glow/25 blur-3xl" />
+          <div className="absolute -left-32 top-1/3 h-[28rem] w-[28rem] rounded-full bg-[#ffc79a]/40 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 h-[22rem] w-[22rem] rounded-full bg-[#c9c4ff]/30 blur-3xl" />
+        </div>
 
-        <div
-          className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 md:min-h-[92vh] md:gap-14 md:py-28 lg:grid-cols-12 lg:gap-10"
-        >
-          {/* Only the headline drifts: on phones the panel sits below it and must stay readable. */}
-          <motion.div style={{ y: headlineY, opacity: headlineOpacity }} className="lg:col-span-7">
-            <p className="eyebrow">Peptides · Evidence · Performance</p>
-            <h1 className="mt-5 font-display text-[3.4rem] font-light leading-[0.92] tracking-[-0.045em] sm:text-8xl">
-              Peptides.
-              <br />
-              <span className="text-mute">Built for</span> performance.
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 md:pb-24 md:pt-20 lg:grid-cols-12 lg:gap-10 lg:pb-32">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease }}
+            className="lg:col-span-7"
+          >
+            <p className="inline-flex items-center gap-2 rounded-full border border-rule bg-sheet/70 px-3.5 py-1.5 text-sm text-mute backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-glow" />
+              {compounds} peptides, ranked by the evidence
+            </p>
+            <h1 className="mt-6 font-display text-[3.2rem] font-normal leading-[0.95] tracking-[-0.045em] sm:text-7xl lg:text-[5.5rem]">
+              Know what your peptides are really doing.
             </h1>
-            <p className="mt-6 max-w-md text-mute sm:mt-8 sm:text-lg">
-              {compounds} peptides and related compounds, with protocols and
-              published dosing, ranked by the evidence. Log every pin beside your
-              training and see what the research actually says about recovery,
-              strength, and endurance.
+            <p className="mt-6 max-w-lg text-lg text-mute sm:mt-8 sm:text-xl">
+              Log every pin beside your training, rotate your sites, and see what
+              the research actually says. One free app for recovery, strength and
+              endurance.
             </p>
             <div className="mt-8 grid gap-3 sm:mt-10 sm:flex sm:flex-wrap">
               <Link href="/today" className="btn-primary">
-                Start tracking
+                Start free
               </Link>
               <Link href="/peptides" className="btn-secondary">
                 Browse peptides
               </Link>
             </div>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-mute">
+              {promises.map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <svg aria-hidden viewBox="0 0 16 16" className="h-4 w-4 text-recovery" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 8.5 6.5 12 13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </motion.div>
 
-          <div className="lg:col-span-5">
-            <Readiness />
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease }}
+            className="lg:col-span-5"
+          >
+            <div className="rounded-3xl shadow-[0_30px_80px_-30px_rgba(60,40,20,0.35)]">
+              <Readiness />
+            </div>
+          </motion.div>
         </div>
-
-        <motion.p
-          style={{ opacity: cueOpacity }}
-          className="pointer-events-none absolute inset-x-0 bottom-8 hidden text-center font-mono text-[0.65rem] md:block uppercase tracking-[0.2em] text-dim"
-        >
-          Scroll
-        </motion.p>
       </section>
     </MotionConfig>
   );

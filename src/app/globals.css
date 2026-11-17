@@ -22,6 +22,9 @@
   --color-warn: #ff6b6b;
   --color-warn-tint: #2a1414;
   --color-on-accent: #050505;
+  --color-pine-hover: #ffffff;
+  /* Warm highlight, used only by the light homepage. */
+  --color-glow: #ff7a1a;
 
   /* Metric identity on #1e1e1e panels. Validated dark-mode categorical set;
      always paired with a text label, never color alone. */
@@ -55,7 +58,7 @@
   text-transform: uppercase;
   text-decoration: none;
   &:hover {
-    background-color: #ffffff;
+    background-color: var(--color-pine-hover);
   }
 }
 
@@ -135,6 +138,53 @@
   select:focus-visible {
     outline-offset: 0;
   }
+}
+
+/*
+ * Light theme, scoped to the homepage. The tokens above are CSS variables, so
+ * redefining them here turns every utility under .theme-light warm and bright
+ * while the signed-in app keeps the dark instrument look.
+ */
+.theme-light {
+  --color-paper: #f6f2eb;
+  --color-sheet: #fffdf9;
+  --color-panel: #f1ebe2;
+  --color-ink: #1c1915;
+  --color-mute: #6b645b;
+  --color-dim: #8f877c;
+  --color-pine: #1c1915;
+  --color-pine-deep: #1c1915;
+  --color-pine-hover: #000000;
+  --color-brass: #6b645b;
+  --color-rule: #e6dfd4;
+  --color-warn: #c0392b;
+  --color-warn-tint: #fbe9e6;
+  --color-on-accent: #ffffff;
+  --color-glow: #ff7a1a;
+  --color-recovery: #0b8f6b;
+  --color-sleep: #5560e8;
+  --color-strain: #c2701a;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  color-scheme: light;
+}
+
+/* Overscroll and the area behind the shell match the light page. */
+html:has(.theme-light),
+html:has(.theme-light) body {
+  background-color: #f6f2eb;
+  color-scheme: light;
+}
+
+.theme-light ::selection {
+  background: #1c1915;
+  color: #f6f2eb;
+}
+
+/* Softer, rounder buttons on the light homepage. */
+.theme-light .btn-primary,
+.theme-light .btn-secondary {
+  border-radius: 999px;
 }
 
 /* Endless logo slide: the track holds two copies, so moving it half its width loops seamlessly. */

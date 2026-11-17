@@ -98,7 +98,7 @@ export function TabBar() {
 
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-rule bg-paper/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
       >
         <ul className="grid grid-cols-5">
           {tabs.map((tab) => {

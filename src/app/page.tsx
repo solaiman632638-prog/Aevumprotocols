@@ -1,51 +1,120 @@
 import Link from "next/link";
+import { Faq } from "@/components/home/Faq";
 import { Figure } from "@/components/home/Figure";
 import { GoalExplorer, type Goal } from "@/components/home/GoalExplorer";
 import { Hero } from "@/components/home/Hero";
 import { Reveal } from "@/components/home/Reveal";
-import { Tiers } from "@/components/home/Tiers";
 import { Ticker } from "@/components/home/Ticker";
 import { Wearables } from "@/components/home/Wearables";
 import { compoundRows, counts } from "@/lib/data/compounds";
 import { sites } from "@/lib/peptides/catalog";
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
-const display = "font-display font-light tracking-[-0.04em]";
-const sectionHeading = `${display} text-[2.75rem] leading-[0.95] sm:text-7xl`;
+const display = "font-display font-normal tracking-[-0.04em]";
+const sectionHeading = `${display} text-[2.6rem] leading-[0.98] sm:text-6xl lg:text-7xl`;
 /** Section rhythm: tighter on phones, where every screen of scroll counts. */
 const band = "py-16 sm:py-24 lg:py-32";
+const card = "rounded-3xl border border-rule bg-sheet";
 
-const capabilities = [
+/** Small line icons, drawn in the current text colour. */
+const icons: Record<string, React.ReactNode> = {
+  register: <path d="M5 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z" />,
+  warn: <path d="M12 3 2.5 20h19L12 3Zm0 6v5m0 3v.5" />,
+  sites: <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Zm0-9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />,
+  train: <path d="M3 12h3m12 0h3M6 8v8m12-8v8M9 6v12m6-12v12M9 12h6" />,
+  ai: <path d="M12 3v3m0 12v3M3 12h3m12 0h3M6 6l2 2m8 8 2 2m0-12-2 2m-8 8-2 2M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />,
+  calc: <path d="M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm2 3h8v3H8V6Zm0 6h2m3 0h3m-8 3h2m3 0h3m-8 3h2m3 0h3" />,
+};
+
+const features = [
   {
-    title: "Protocol guidance",
-    body: "Reported exposure, how often it goes in, and how long a run lasts before a break, so a cycle fits around your training block.",
+    icon: "register",
+    title: "The evidence register",
+    body: `${counts.total} compounds, each ranked on how much human evidence stands behind it and what hazards are known.`,
+    href: "/peptides",
   },
   {
+    icon: "warn",
     title: "Interaction warnings",
     body: "Flags when what you run works against itself, shares a mechanism, or collides with your medication.",
+    href: "/stacks",
   },
   {
-    title: "Injection mapping",
-    body: "Sites across the front and back of the body, rotated so the same spot is never hit twice running.",
+    icon: "sites",
+    title: "Injection site rotation",
+    body: `${sites.length} sites across the front and back of the body, rotated so the same spot is never hit twice running.`,
+    href: "/today",
   },
   {
-    title: "Recovery trends",
-    body: "Sleep, soreness, and side effects logged beside your sessions, so overreaching shows up as a pattern before it shows up as an injury.",
+    icon: "train",
+    title: "Training and recovery",
+    body: "Sessions, sleep, soreness and side effects side by side, so overreaching shows up before it becomes an injury.",
+    href: "/train",
+  },
+  {
+    icon: "ai",
+    title: "Aevum AI",
+    body: "Ask in plain words. Answers come straight from the register, with the evidence behind them.",
+    href: "/ai",
+  },
+  {
+    icon: "calc",
+    title: "Vial calculator",
+    body: "Reconstitution math and same-syringe checks, worked out for you instead of on the back of a box.",
+    href: "/calculator",
   },
 ];
 
 const steps = [
   {
-    title: "Log the peptide",
-    body: "What you took, where you pinned it, and how training went, in thirty seconds. Tomorrow it is already filled in.",
+    title: "Tell Aevum your goal",
+    body: "Recovery, strength, endurance, sleep or making weight. Aevum shows what the research covers for it.",
   },
   {
-    title: "Read the evidence",
-    body: "Aevum ranks what you run by human evidence, warns on interactions, and says when to hold or take a break.",
+    title: "Log in thirty seconds",
+    body: "What you took, where you pinned it, and how training went. Tomorrow it is already filled in.",
   },
   {
     title: "Watch the block",
-    body: "Sites, side effects, and recovery over weeks, so you see what a training block is doing to you, not just one morning.",
+    body: "Sites, side effects and recovery over weeks, so you see what a training block is really doing to you.",
+  },
+];
+
+const tiers = [
+  { name: "Best evidenced", body: "Approved human dosing and a trial base.", colour: "bg-recovery" },
+  { name: "Reasonable evidence", body: "Human trials, with hazards worth weighing.", colour: "bg-sleep" },
+  { name: "Limited evidence", body: "Widely used, mostly animal data.", colour: "bg-strain" },
+  { name: "Most uncertain", body: "Known hazards, little known.", colour: "bg-warn" },
+];
+
+const faqs = [
+  {
+    q: "Is Aevum really free?",
+    a: "Yes. Every feature is free and there is no card to enter. Your log works straight away in your browser, and a free account saves your history so you can see it on any device.",
+  },
+  {
+    q: "Does Aevum tell me how much to take?",
+    a: "Aevum shows what is published in the research for each compound, and says plainly when no established human dosing exists. It never works out an amount from your own daily numbers. It is educational, not medical advice.",
+  },
+  {
+    q: "How is the evidence ranked?",
+    a: "Every compound sits in one of four tiers, from best evidenced to most uncertain, based on how much human evidence stands behind it and what hazards are known. Popular does not mean safe, and the register says so.",
+  },
+  {
+    q: "Can I use it on my phone?",
+    a: (
+      <>
+        Yes. Aevum installs from the website onto your home screen and opens full-screen like any other app.{" "}
+        <Link href="/app" className="text-ink underline decoration-rule underline-offset-4">
+          See how to install it
+        </Link>
+        .
+      </>
+    ),
+  },
+  {
+    q: "I compete in tested sport. Is that a problem?",
+    a: "Most of these compounds are on the WADA Prohibited List. Check the list for your sport before you run anything.",
   },
 ];
 
@@ -119,66 +188,55 @@ export default function HomePage() {
         </dl>
       </section>
 
-      <section id="goals" className={`${wrap} scroll-mt-28 ${band}`} aria-labelledby="goals-heading">
+      <section className={`${wrap} ${band}`} aria-labelledby="features-heading">
         <Reveal>
-          <p className="eyebrow">Peptides by goal</p>
-          <h2 id="goals-heading" className={`mt-6 ${sectionHeading}`}>
-            Peptides for
-            <br />
-            every goal.
+          <p className="eyebrow">What you get</p>
+          <h2 id="features-heading" className={`mt-5 max-w-3xl ${sectionHeading}`}>
+            Everything you run, in one place.
           </h2>
         </Reveal>
-        <GoalExplorer goals={goals} />
-        <p className="mt-8 max-w-2xl text-sm text-dim">
-          Evidence, not prescriptions: Aevum shows research status and what is
-          known, never an amount for your goal. Competing in tested sport? Most of
-          these are on the WADA Prohibited List.
-        </p>
-      </section>
-
-      <Tiers />
-
-      <section className={`${wrap} ${band}`} aria-labelledby="capabilities-heading">
-        <Reveal>
-          <h2 id="capabilities-heading" className={sectionHeading}>
-            Every peptide.
-            <br />
-            Every protocol.
-          </h2>
-        </Reveal>
-        <ul className="mt-10 grid gap-px overflow-hidden rounded-3xl bg-rule sm:mt-16 lg:grid-cols-2">
-          {capabilities.map((item, index) => (
-            <li key={item.title} className="bg-paper">
-              <Reveal delay={index * 90} className="h-full">
-                <div className="flex h-full flex-col justify-between bg-sheet p-6 sm:min-h-56 sm:p-8 lg:p-10">
-                  <p className="font-mono text-xs uppercase tracking-[0.18em] text-dim">
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
-                  <div className="mt-6 sm:mt-10">
-                    <h3 className={`${display} text-2xl sm:text-4xl`}>{item.title}</h3>
-                    <p className="mt-4 max-w-md text-mute">{item.body}</p>
-                  </div>
-                </div>
+        <ul className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((item, index) => (
+            <li key={item.title}>
+              <Reveal delay={index * 70} className="h-full">
+                <Link
+                  href={item.href}
+                  className={`group flex h-full flex-col ${card} p-6 no-underline transition-shadow hover:shadow-[0_20px_50px_-25px_rgba(60,40,20,0.3)] sm:p-8`}
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-panel text-ink">
+                    <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      {icons[item.icon]}
+                    </svg>
+                  </span>
+                  <h3 className="mt-8 text-2xl tracking-[-0.02em]">{item.title}</h3>
+                  <p className="mt-3 text-mute">{item.body}</p>
+                  <span aria-hidden className="mt-auto pt-6 text-dim transition-transform group-hover:translate-x-1 group-hover:text-ink">
+                    →
+                  </span>
+                </Link>
               </Reveal>
             </li>
           ))}
         </ul>
       </section>
 
-      <section id="how" className="scroll-mt-28 border-t border-rule">
+      <section id="how" className="scroll-mt-28 bg-sheet">
         <div className={`${wrap} ${band}`}>
           <Reveal>
-            <h2 className={sectionHeading}>Thirty seconds after training.</h2>
+            <p className="eyebrow">How it works</p>
+            <h2 className={`mt-5 ${sectionHeading}`}>Three steps. Thirty seconds a day.</h2>
           </Reveal>
-          <ol className="mt-10 grid gap-8 sm:mt-16 sm:gap-12 lg:grid-cols-3">
+          <ol className="mt-10 grid gap-4 sm:mt-14 lg:grid-cols-3">
             {steps.map((step, index) => (
               <li key={step.title}>
-                <Reveal delay={index * 100}>
-                  <p className="text-5xl font-light text-dim" style={{ fontFamily: "var(--font-readout)" }}>
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
-                  <h3 className="mt-6 text-2xl">{step.title}</h3>
-                  <p className="mt-3 max-w-sm text-mute">{step.body}</p>
+                <Reveal delay={index * 100} className="h-full">
+                  <div className="h-full rounded-3xl bg-paper p-6 sm:p-8">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-semibold text-on-accent">
+                      {index + 1}
+                    </span>
+                    <h3 className="mt-8 text-2xl tracking-[-0.02em]">{step.title}</h3>
+                    <p className="mt-3 text-mute">{step.body}</p>
+                  </div>
                 </Reveal>
               </li>
             ))}
@@ -186,27 +244,57 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="goals" className={`${wrap} scroll-mt-28 ${band}`} aria-labelledby="goals-heading">
+        <Reveal>
+          <p className="eyebrow">Peptides by goal</p>
+          <h2 id="goals-heading" className={`mt-5 ${sectionHeading}`}>
+            Start with your goal.
+          </h2>
+        </Reveal>
+        <GoalExplorer goals={goals} />
+        <p className="mt-8 max-w-2xl text-sm text-dim">
+          Evidence, not prescriptions. Competing in tested sport? Most of these
+          are on the WADA Prohibited List.
+        </p>
+      </section>
+
       <section className="border-t border-rule">
         <div className={`${wrap} grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-center ${band}`}>
           <Reveal>
-            <h2 className={sectionHeading}>
-              Every claim,
-              <br />
-              sourced.
-            </h2>
-            <p className="mt-8 max-w-md text-lg text-mute">
-              No compound is called safe because it is popular. Where human
-              dosing does not exist, Aevum says so and shows reported research
-              exposure instead of inventing a number.
+            <p className="eyebrow">Your results, explained</p>
+            <h2 className={`mt-5 ${sectionHeading}`}>Every claim, sourced.</h2>
+            <p className="mt-6 max-w-md text-lg text-mute">
+              No compound is called safe because it is popular. Each one is
+              ranked in four plain tiers, and where human dosing does not exist,
+              Aevum says so instead of inventing a number.
             </p>
+            <ul className="mt-8 space-y-4">
+              {tiers.map((tier) => (
+                <li key={tier.name} className="flex items-start gap-4">
+                  <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${tier.colour}`} />
+                  <p>
+                    {tier.name}
+                    <span className="text-mute"> · {tier.body}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
             <Link href="/peptides" className="btn-secondary mt-10">
               Read the register
             </Link>
           </Reveal>
           <Reveal delay={150}>
-            <figure className="rounded-3xl border border-rule bg-sheet p-8 sm:p-10">
-              <figcaption className="eyebrow">Sample entry</figcaption>
-              <p className={`mt-4 ${display} text-4xl`}>BPC-157</p>
+            <figure className={`${card} p-6 shadow-[0_30px_80px_-30px_rgba(60,40,20,0.3)] sm:p-10`}>
+              <div className="flex items-center justify-between gap-4">
+                <figcaption className="eyebrow">Sample entry</figcaption>
+                <span className="rounded-full bg-strain/15 px-3 py-1 text-xs text-strain">Limited evidence</span>
+              </div>
+              <p className={`mt-4 ${display} text-5xl`}>BPC-157</p>
+              <div className="mt-6 grid grid-cols-4 gap-1.5" aria-hidden>
+                {tiers.map((tier, index) => (
+                  <span key={tier.name} className={`h-2 rounded-full ${index === 2 ? tier.colour : "bg-rule"}`} />
+                ))}
+              </div>
               <dl className="mt-8 divide-y divide-rule text-sm">
                 {[
                   ["Evidence", "No established dosing"],
@@ -227,31 +315,54 @@ export default function HomePage() {
 
       <Wearables wrap={wrap} heading={sectionHeading} />
 
-      <section className="border-t border-rule">
-        <div className={`${wrap} py-20 text-center sm:py-28 lg:py-40`}>
-          <Reveal>
-            <h2 className={`${display} text-5xl leading-[0.95] sm:text-8xl`}>
-              Peptides.
-              <br />
-              Built for performance.
+      <section className={`${wrap} ${band}`} aria-labelledby="faq-heading">
+        <div className="grid gap-10 lg:grid-cols-12">
+          <Reveal className="lg:col-span-4">
+            <p className="eyebrow">Questions</p>
+            <h2 id="faq-heading" className={`mt-5 ${sectionHeading}`}>
+              Good to know.
             </h2>
-            <div className="mt-12 flex flex-wrap justify-center gap-3">
-              <Link href="/today" className="btn-primary">
-                Start tracking
+          </Reveal>
+          <div className="lg:col-span-8">
+            <Faq items={faqs} />
+          </div>
+        </div>
+      </section>
+
+      <section className={`${wrap} pb-16 sm:pb-24`}>
+        <Reveal>
+          <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-ink px-6 py-16 text-center text-on-accent sm:px-12 sm:py-24">
+            <div aria-hidden className="absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-glow/40 blur-3xl" />
+            <div aria-hidden className="absolute -bottom-32 -left-24 -z-10 h-80 w-80 rounded-full bg-[#c9c4ff]/25 blur-3xl" />
+            <h2 className={`${display} text-5xl leading-[0.98] sm:text-7xl`}>
+              Peptides, built for performance.
+            </h2>
+            <p className="mx-auto mt-6 max-w-md text-lg text-on-accent/70">
+              Free to start, every feature included. Your first log takes thirty seconds.
+            </p>
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/today"
+                className="inline-flex min-h-11 items-center rounded-full bg-on-accent px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-paper"
+              >
+                Start free
               </Link>
-              <Link href="/peptides" className="btn-secondary">
+              <Link
+                href="/peptides"
+                className="inline-flex min-h-11 items-center rounded-full border border-on-accent/30 px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.1em] text-on-accent no-underline hover:border-on-accent"
+              >
                 Browse peptides
               </Link>
             </div>
-            <p className="mt-10 text-sm text-dim">
-              Educational only. Not medical advice.{" "}
-              <Link href="/disclaimer" className="underline decoration-rule underline-offset-4">
-                Full disclaimer
-              </Link>
-              .
-            </p>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
+        <p className="mt-8 text-center text-sm text-dim">
+          Educational only. Not medical advice.{" "}
+          <Link href="/disclaimer" className="underline decoration-rule underline-offset-4">
+            Full disclaimer
+          </Link>
+          .
+        </p>
       </section>
     </div>
   );

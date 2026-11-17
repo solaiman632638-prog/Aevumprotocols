@@ -17,7 +17,7 @@ const navLink = "text-[0.8rem] font-semibold uppercase tracking-[0.02em] text-in
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/15 bg-black/40 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-rule bg-paper/70 backdrop-blur-md">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:bg-sheet focus:px-3 focus:py-2"
