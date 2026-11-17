@@ -7,7 +7,7 @@ import { WaitlistForm } from "@/components/labs/WaitlistForm";
 export const metadata: Metadata = {
   title: "Labs",
   description:
-    "Aevum Labs is coming: a blood panel built for performance and recovery, explained in plain words, with evidence-ranked peptide protocols to match. Join the waitlist.",
+    "Aevum Labs is coming: a blood test built for performance, reviewed by a licensed practitioner who can prescribe regulated, Health Canada-approved peptides matched to your results. Join the waitlist.",
 };
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
@@ -53,7 +53,7 @@ const panels = [
 const steps = [
   { title: "Test", body: "One blood draw at a partner lab near you, ordered by a licensed practitioner." },
   { title: "Understand", body: "Every marker in plain words, with colour-coded ranges and what it means for training." },
-  { title: "Your protocol", body: "Your markers point to goals, and your goals to peptides ranked by the evidence." },
+  { title: "Your prescription", body: "A licensed practitioner reviews your results and, where it fits, prescribes regulated, Health Canada-approved peptides." },
   { title: "Retest", body: "Test again in three to six months and see what actually changed." },
 ];
 
@@ -76,8 +76,12 @@ const faqs = [
     a: "Pricing isn't set yet. Waitlist members will see it first.",
   },
   {
-    q: "Will it tell me which peptides to take?",
-    a: "Your markers point to goals, like recovery or metabolic health, and Aevum shows the peptides ranked by evidence for those goals, with their published protocols. Prescription-only compounds are flagged to discuss with a prescriber. It's educational, not a prescription.",
+    q: "Will I get a prescription?",
+    a: "If it's right for you. A licensed practitioner reviews your bloodwork and health history and decides whether a peptide fits. Not everyone will need or qualify for one.",
+  },
+  {
+    q: "Which peptides can be prescribed?",
+    a: "Only regulated peptides approved by Health Canada, from licensed pharmacies. Never research chemicals, and never anything sold as not for human use.",
   },
   {
     q: "Is this a DNA test?",
@@ -113,12 +117,12 @@ export default function LabsPage() {
               Aevum Labs · Coming soon
             </p>
             <h1 className="mt-6 font-display text-[3.2rem] font-normal leading-[0.95] tracking-[-0.045em] sm:text-7xl lg:text-[5.5rem]">
-              Your blood, decoded for performance.
+              Peptides, prescribed for your body.
             </h1>
             <p className="mt-6 max-w-lg text-lg text-mute sm:mt-8 sm:text-xl">
-              One blood test built for training and recovery, every marker
-              explained in plain words, and peptide protocols matched to what
-              your results actually show.
+              One blood test built for training and recovery. A licensed
+              practitioner reviews your results and, where it fits, prescribes
+              regulated peptides matched to what your body actually shows.
             </p>
             <div className="mt-8 sm:mt-10">
               <WaitlistForm id="join" />
