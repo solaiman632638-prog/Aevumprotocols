@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "Aevum",
     type: "website",
   },
-  appleWebApp: { capable: true, title: "Aevum", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "Aevum", statusBarStyle: "default" },
   icons: {
     icon: "/favicon.svg",
     apple: "/app-icon/180",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#f6f2eb",
   // Lets the tab bar sit under the home indicator and pad itself with safe-area insets.
   viewportFit: "cover",
 };

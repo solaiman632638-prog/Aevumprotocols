@@ -185,7 +185,7 @@ const WEEK = "color-mix(in srgb, var(--color-strain) 45%, #cfd1d2)";
  * Front and back of the body as muscle sections, every one tappable. Standard
  * sites are bright; places that are not standard sites are a shade darker and
  * show why to think twice when picked. The chosen
- * site lights up with a marker on it, recent sites are tinted, and the
+ * site lights up orange with a marker on it, recent sites are tinted, and the
  * suggested next one pulses.
  */
 export function BodyMap({
@@ -215,7 +215,7 @@ export function BodyMap({
 
   const fillFor = (part: Part, index: number) => {
     if (!part.site) return INERT;
-    if (part.site === value) return "#ffffff";
+    if (part.site === value) return "var(--color-glow)";
     const age = ageOf(part.site);
     if (age != null && age <= 2) return "var(--color-strain)";
     if (age != null && age <= 7) return WEEK;
@@ -265,7 +265,7 @@ export function BodyMap({
           className="mx-auto block h-[28rem] w-auto max-w-full overflow-visible"
           role="group"
           aria-label={`${label}, ${view} of body`}
-          style={{ filter: "drop-shadow(0 0 24px rgb(255 255 255 / 0.07))" }}
+          style={{ filter: "drop-shadow(0 18px 30px rgb(60 40 20 / 0.12))" }}
         >
           <ellipse cx="210" cy="52" rx="34" ry="43" fill={SHADOW} stroke={OUTLINE} strokeWidth="2" />
           {silhouette().map((d) => (
@@ -280,7 +280,7 @@ export function BodyMap({
                 stroke={OUTLINE}
                 strokeWidth="2.3"
                 strokeLinejoin="round"
-                style={part.site === value ? { filter: "drop-shadow(0 0 8px rgb(255 255 255 / 0.6))" } : undefined}
+                style={part.site === value ? { filter: "drop-shadow(0 0 10px rgb(255 122 26 / 0.55))" } : undefined}
                 className="transition-[fill] duration-200"
               />
             );
@@ -327,7 +327,7 @@ export function BodyMap({
                     transition={{ duration: 2, ease: "easeOut", repeat: Infinity }}
                   />
                 )}
-                <circle r="9" fill="#090a0c" stroke={colour} strokeWidth="2.8" strokeDasharray={chosen ? undefined : "4 3"} />
+                <circle r="9" fill="var(--color-ink)" stroke={colour} strokeWidth="2.8" strokeDasharray={chosen ? undefined : "4 3"} />
                 <circle r="2.8" fill={colour} />
               </g>
             );

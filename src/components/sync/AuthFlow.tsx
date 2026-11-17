@@ -457,9 +457,8 @@ export function AuthFlow({
           border-radius: 1.5rem;
           transform-origin: top center;
           box-shadow:
-            inset 0 1px 0 0 rgb(255 255 255 / 0.04),
-            0 4px 14px -10px rgb(0 0 0 / 0.8),
-            0 8px 28px -10px rgb(0 0 0 / 0.6),
+            0 4px 14px -10px rgb(60 40 20 / 0.25),
+            0 20px 50px -20px rgb(60 40 20 / 0.25),
             0 0 0 1px var(--color-rule);
         }
         .auth__card--overlay { z-index: 10; }
@@ -498,7 +497,7 @@ export function AuthFlow({
           box-shadow: 0 0 0 1px var(--border-color), var(--ring);
         }
         .auth__field input::placeholder { color: var(--color-mute); }
-        .auth__field input:hover { --border-color: #3d3d3d; }
+        .auth__field input:hover { --border-color: var(--color-mute); }
         .auth__field input:focus-visible {
           --border-color: var(--color-pine);
           --ring: 0 0 0 3px color-mix(in srgb, var(--color-pine) 25%, transparent);

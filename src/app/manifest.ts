@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     categories: ["health", "fitness", "lifestyle"],
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#000000",
+    background_color: "#f6f2eb",
+    theme_color: "#f6f2eb",
     shortcuts: [
       { name: "Today's check-in", short_name: "Today", url: "/today" },
       { name: "Log a workout", short_name: "Training", url: "/train" },

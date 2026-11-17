@@ -69,7 +69,7 @@ export function TabBar() {
             <motion.button
               type="button"
               aria-label="Close menu"
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
