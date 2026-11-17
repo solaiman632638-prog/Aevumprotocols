@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f2eb",
+  themeColor: "#ffffff",
   // Lets the tab bar sit under the home indicator and pad itself with safe-area insets.
   viewportFit: "cover",
 };

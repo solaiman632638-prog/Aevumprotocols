@@ -6,11 +6,19 @@ import { labGoals } from "@/lib/labs";
 
 type Status = "idle" | "sending" | "done" | "error";
 
-const field =
-  "min-h-12 w-full rounded-full border border-rule bg-sheet px-5 text-base text-ink placeholder:text-dim focus:border-ink focus:outline-none";
+const fieldBase = "min-h-12 w-full rounded-full border px-5 text-base focus:outline-none";
+const fields = {
+  light: `${fieldBase} border-rule bg-sheet text-ink placeholder:text-dim focus:border-ink`,
+  dark: `${fieldBase} border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-white [&>option]:text-ink`,
+};
 
-/** Email plus an optional goal. One email when testing opens, nothing else. */
-export function WaitlistForm({ id }: { id?: string }) {
+/**
+ * Email plus an optional goal. One email when testing opens, nothing else.
+ * `dark` sits on the dark hero stage: translucent fields and a white button.
+ */
+export function WaitlistForm({ id, tone = "light" }: { id?: string; tone?: "light" | "dark" }) {
+  const dark = tone === "dark";
+  const field = fields[tone];
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
 
@@ -35,9 +43,9 @@ export function WaitlistForm({ id }: { id?: string }) {
 
   if (status === "done") {
     return (
-      <div id={id} className="rounded-3xl border border-rule bg-sheet p-6" role="status">
+      <div id={id} className={`rounded-3xl border p-6 ${dark ? "border-white/20 bg-white/10" : "border-rule bg-sheet"}`} role="status">
         <p className="text-xl">You&apos;re on the list.</p>
-        <p className="mt-2 text-mute">We&apos;ll email you once, the day Aevum Labs opens.</p>
+        <p className={`mt-2 ${dark ? "text-white/70" : "text-mute"}`}>We&apos;ll email you once, the day Aevum Labs opens.</p>
       </div>
     );
   }
@@ -61,17 +69,17 @@ export function WaitlistForm({ id }: { id?: string }) {
       </select>
       {/* Hidden from people; catches bots that fill every field. */}
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
-      <button type="submit" disabled={status === "sending"} className="btn-primary disabled:opacity-60">
+      <button type="submit" disabled={status === "sending"} className={`${dark ? "btn-light" : "btn-primary"} disabled:opacity-60`}>
         {status === "sending" ? "Joining…" : "Join the waitlist"}
       </button>
       {status === "error" && (
-        <p role="alert" className="text-sm text-warn">
+        <p role="alert" className={`text-sm ${dark ? "text-[#ff9b8f]" : "text-warn"}`}>
           {message}
         </p>
       )}
-      <p className="text-sm text-dim">
+      <p className={`text-sm ${dark ? "text-white/55" : "text-dim"}`}>
         One email when testing opens. No spam.{" "}
-        <Link href="/privacy" className="underline decoration-rule underline-offset-4">
+        <Link href="/privacy" className={`underline underline-offset-4 ${dark ? "decoration-white/30" : "decoration-rule"}`}>
           Privacy
         </Link>
       </p>

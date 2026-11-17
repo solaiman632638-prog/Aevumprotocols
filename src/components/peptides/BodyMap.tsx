@@ -265,7 +265,7 @@ export function BodyMap({
           className="mx-auto block h-[28rem] w-auto max-w-full overflow-visible"
           role="group"
           aria-label={`${label}, ${view} of body`}
-          style={{ filter: "drop-shadow(0 18px 30px rgb(60 40 20 / 0.12))" }}
+          style={{ filter: "drop-shadow(0 18px 30px rgb(0 0 0 / 0.12))" }}
         >
           <ellipse cx="210" cy="52" rx="34" ry="43" fill={SHADOW} stroke={OUTLINE} strokeWidth="2" />
           {silhouette().map((d) => (

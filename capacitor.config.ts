@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
   appId: "ca.aevumperformance.app",
   appName: "Aevum",
   webDir: "mobile",
-  backgroundColor: "#f6f2eb",
+  backgroundColor: "#ffffff",
   server: {
     url: "https://www.aevumperformance.ca/today",
     errorPath: "index.html",

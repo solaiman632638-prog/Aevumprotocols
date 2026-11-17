@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 
 const wrap = "mx-auto max-w-7xl px-4 sm:px-6";
 const display = "font-display font-normal tracking-[-0.04em]";
-const sectionHeading = `${display} text-[2.6rem] leading-[0.98] sm:text-6xl lg:text-7xl`;
-const band = "py-16 sm:py-24 lg:py-32";
-const card = "rounded-3xl border border-rule bg-sheet";
+const centeredHeading = `${display} text-center text-4xl leading-[1.02] sm:text-6xl`;
+const subhead = "mx-auto mt-4 max-w-xl text-center text-lg text-mute";
+const band = "py-16 sm:py-24 lg:py-28";
 
 /** Marker groups the panel is planned around. What each says, in plain words. */
 const panels = [
@@ -50,20 +50,23 @@ const panels = [
   },
 ];
 
-const steps = [
-  { title: "Test", body: "One blood draw at a partner lab near you, ordered by a licensed practitioner." },
-  { title: "Understand", body: "Every marker in plain words, with colour-coded ranges and what it means for training." },
-  { title: "Your plan", body: "A licensed practitioner reviews your results and builds a plan around what your body needs." },
-  { title: "Retest", body: "Test again in three to six months and see what actually changed." },
+/** Sample results for the mockups. Not a real person. */
+const sample = [
+  { name: "IGF-1", value: "182", unit: "ng/mL", position: 48, tone: "bg-recovery", label: "In range" },
+  { name: "hs-CRP", value: "2.4", unit: "mg/L", position: 72, tone: "bg-strain", label: "Watch" },
+  { name: "Vitamin D", value: "48", unit: "nmol/L", position: 22, tone: "bg-strain", label: "Low" },
+  { name: "HbA1c", value: "5.2", unit: "%", position: 40, tone: "bg-recovery", label: "In range" },
+  { name: "Ferritin", value: "96", unit: "µg/L", position: 55, tone: "bg-recovery", label: "In range" },
 ];
 
-/** Sample results for the preview card. Not a real person. */
-const sample = [
-  { name: "IGF-1", value: "182 ng/mL", position: 48, tone: "bg-recovery", label: "In range" },
-  { name: "hs-CRP", value: "2.4 mg/L", position: 72, tone: "bg-strain", label: "Watch" },
-  { name: "Vitamin D", value: "48 nmol/L", position: 22, tone: "bg-strain", label: "Low" },
-  { name: "HbA1c", value: "5.2 %", position: 40, tone: "bg-recovery", label: "In range" },
-  { name: "Ferritin", value: "96 µg/L", position: 55, tone: "bg-recovery", label: "In range" },
+const included = [
+  ["Performance blood panel", "Hormones, recovery, metabolic, heart, thyroid and nutrients"],
+  ["Practitioner review", "A licensed practitioner reads every result"],
+  ["Your plan", "Built around what your body actually needs"],
+  ["Results dashboard", "Every marker in plain words, with clear ranges"],
+  ["Training and recovery tracking", "Sessions, sleep and recovery beside your results"],
+  ["Aevum AI", "Ask questions anytime"],
+  ["Retesting", "See what changed every three to six months"],
 ];
 
 const faqs = [
@@ -97,154 +100,275 @@ const faqs = [
   },
 ];
 
+/** A marker's value as a dot on a range bar: amber at the edges, green in the healthy middle. */
+function RangeBar({ position, tone }: { position: number; tone: string }) {
+  return (
+    <div className="relative h-1.5 flex-1" aria-hidden>
+      <div className="absolute inset-0 rounded-full bg-[linear-gradient(to_right,var(--color-strain)_0%,var(--color-recovery)_30%,var(--color-recovery)_65%,var(--color-strain)_100%)] opacity-35" />
+      <span
+        className={`absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white ${tone}`}
+        style={{ left: `${position}%` }}
+      />
+    </div>
+  );
+}
+
+/** The Aevum results screen on a phone, as the hero's product shot. */
+function PhoneMock() {
+  return (
+    <div className="relative mx-auto w-[17.5rem] rotate-[4deg] rounded-[2.75rem] bg-[#1a1b1f] p-2.5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/15 sm:w-[19rem]">
+      <div className="overflow-hidden rounded-[2.25rem] bg-white text-ink">
+        <div className="flex items-center justify-between px-6 pb-1 pt-3 text-[0.65rem] font-semibold">
+          <span>9:41</span>
+          <span className="h-4 w-16 rounded-full bg-[#1a1b1f]" />
+          <span>100%</span>
+        </div>
+        <div className="px-5 pb-6 pt-3">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em]">Aevum</p>
+          <p className="mt-3 text-sm text-mute">Your results</p>
+          <div className="mt-2 flex items-end justify-between">
+            <p className="font-display text-5xl tracking-[-0.04em]">82</p>
+            <p className="pb-1.5 text-right text-xs text-mute">
+              Performance score
+              <br />
+              <span className="text-recovery">3 to improve</span>
+            </p>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-1.5 text-center text-[0.65rem]">
+            {[
+              ["17", "In range", "text-recovery"],
+              ["2", "Watch", "text-strain"],
+              ["1", "Low", "text-strain"],
+            ].map(([count, label, colour]) => (
+              <div key={label} className="rounded-xl bg-sheet py-2">
+                <p className={`text-base font-semibold ${colour}`}>{count}</p>
+                <p className="text-mute">{label}</p>
+              </div>
+            ))}
+          </div>
+          <ul className="mt-4 divide-y divide-rule">
+            {sample.map((marker) => (
+              <li key={marker.name} className="py-2.5">
+                <div className="flex items-baseline justify-between text-xs">
+                  <span className="font-medium">{marker.name}</span>
+                  <span className="tabular-nums text-mute">
+                    {marker.value} {marker.unit}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <RangeBar position={marker.position} tone={marker.tone} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const miniCard = "w-full max-w-[15rem] rounded-2xl bg-white p-4 shadow-[0_12px_30px_-12px_rgba(0,0,0,0.25)]";
+
+/** Small product moments shown at the top of each How it works card. */
+const stepVisuals: React.ReactNode[] = [
+  <div key="test" className={miniCard}>
+    <div className="flex items-center gap-3">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-recovery/15 text-recovery">
+        <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <path d="M3 8.5 6.5 12 13 4.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <div>
+        <p className="text-sm font-medium">Blood draw booked</p>
+        <p className="text-xs text-mute">Partner lab · 10 minutes</p>
+      </div>
+    </div>
+  </div>,
+  <div key="understand" className={miniCard}>
+    {sample.slice(0, 3).map((marker) => (
+      <div key={marker.name} className="py-1.5">
+        <div className="flex justify-between text-xs">
+          <span>{marker.name}</span>
+          <span className="text-mute">{marker.label}</span>
+        </div>
+        <div className="mt-1.5">
+          <RangeBar position={marker.position} tone={marker.tone} />
+        </div>
+      </div>
+    ))}
+  </div>,
+  <div key="plan" className={miniCard}>
+    <p className="text-xs text-mute">Reviewed by your practitioner</p>
+    <p className="mt-1 text-sm font-medium">Your plan is ready</p>
+    <ul className="mt-3 space-y-2 text-xs">
+      {["Recovery", "Sleep", "Nutrients"].map((item) => (
+        <li key={item} className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-ink" />
+          {item}
+        </li>
+      ))}
+    </ul>
+  </div>,
+  <div key="retest" className={miniCard}>
+    <p className="text-xs text-mute">Vitamin D</p>
+    <svg viewBox="0 0 200 70" className="mt-2 w-full" aria-hidden>
+      <path d="M8 58 C 60 54, 90 36, 192 14" fill="none" stroke="var(--color-recovery)" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="8" cy="58" r="4" fill="white" stroke="var(--color-strain)" strokeWidth="2.5" />
+      <circle cx="100" cy="34" r="4" fill="white" stroke="var(--color-recovery)" strokeWidth="2.5" />
+      <circle cx="192" cy="14" r="4" fill="var(--color-recovery)" />
+    </svg>
+    <div className="mt-1 flex justify-between text-[0.65rem] text-mute">
+      <span>Today</span>
+      <span>3 months</span>
+      <span>6 months</span>
+    </div>
+  </div>,
+];
+
+const steps = [
+  { title: "Get tested", body: "One quick blood draw at a partner lab near you, ordered by a licensed practitioner." },
+  { title: "See what matters", body: "Your dashboard shows what's working, what needs attention, and where to focus first." },
+  { title: "Get your plan", body: "A licensed practitioner reviews your results and builds a plan around what your body needs." },
+  { title: "Track and retest", body: "Test again in three to six months and watch the numbers move." },
+];
+
 export default function LabsPage() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -right-40 -top-40 h-[38rem] w-[38rem] rounded-full bg-glow/25 blur-3xl" />
-          <div className="absolute -left-32 top-1/3 h-[28rem] w-[28rem] rounded-full bg-[#ffc79a]/40 blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 h-[22rem] w-[22rem] rounded-full bg-[#c9c4ff]/30 blur-3xl" />
-        </div>
-        <div className={`${wrap} grid items-center gap-12 pb-16 pt-12 md:pb-24 md:pt-20 lg:grid-cols-12 lg:gap-10 lg:pb-32`}>
-          <div className="lg:col-span-7">
-            <p className="inline-flex items-center gap-2 rounded-full border border-rule bg-sheet/70 px-3.5 py-1.5 text-sm text-mute backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-glow" />
-              Aevum Labs · Coming soon
-            </p>
-            <h1 className="mt-6 font-display text-[3.2rem] font-normal leading-[0.95] tracking-[-0.045em] sm:text-7xl lg:text-[5.5rem]">
-              Prescribed for your body.
-            </h1>
-            <p className="mt-6 max-w-lg text-lg text-mute sm:mt-8 sm:text-xl">
-              One blood test built for training and recovery. A licensed
-              practitioner reviews your results and builds a plan around what
-              your body actually needs.
-            </p>
-            <div className="mt-8 sm:mt-10">
-              <WaitlistForm id="join" />
-            </div>
-          </div>
-
-          <div className="lg:col-span-5">
-            <figure className={`${card} p-6 shadow-[0_30px_80px_-30px_rgba(60,40,20,0.35)] sm:p-8`}>
-              <div className="flex items-center justify-between gap-4">
-                <figcaption className="eyebrow">Your results · sample</figcaption>
-                <span className="rounded-full bg-panel px-3 py-1 text-xs text-mute">Not a real person</span>
+      {/* Hero: a dark rounded stage with the results screen as the product shot. */}
+      <section className="px-2 pt-2 sm:px-3 sm:pt-3">
+        <div className="stage relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem]">
+          <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-14 sm:px-10 sm:py-20 lg:min-h-[80vh] lg:grid-cols-12 lg:py-16">
+            <div className="lg:col-span-6">
+              <p className="text-sm text-white/70">Aevum Labs · Coming soon</p>
+              <h1 className="mt-5 font-display text-[2.9rem] font-normal leading-[1] tracking-[-0.04em] sm:text-6xl lg:text-7xl">
+                Prescribed for your body.
+              </h1>
+              <p className="mt-6 max-w-md text-lg text-white/70">
+                One blood test built for training and recovery. A licensed
+                practitioner reviews your results and builds a plan around what
+                your body actually needs.
+              </p>
+              <div className="mt-8">
+                <WaitlistForm id="join" tone="dark" />
               </div>
-              <ul className="mt-6 divide-y divide-rule">
-                {sample.map((marker) => (
-                  <li key={marker.name} className="py-4">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <span>{marker.name}</span>
-                      <span className="tabular-nums text-mute">{marker.value}</span>
-                    </div>
-                    <div className="mt-3 flex items-center gap-3">
-                      {/* Range bar: amber at the edges, green in the healthy middle, a dot for this result. */}
-                      <div className="relative h-1.5 flex-1" aria-hidden>
-                        <div className="absolute inset-0 rounded-full bg-[linear-gradient(to_right,var(--color-strain)_0%,var(--color-recovery)_30%,var(--color-recovery)_65%,var(--color-strain)_100%)] opacity-40" />
-                        <span
-                          className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-sheet ${marker.tone}`}
-                          style={{ left: `${marker.position}%` }}
-                        />
-                      </div>
-                      <span className="w-16 text-right text-xs text-mute">{marker.label}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </figure>
+            </div>
+            <div className="lg:col-span-6">
+              <PhoneMock />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className={`${wrap} ${band}`} aria-labelledby="panel-heading">
+      <section className={`${wrap} ${band}`} aria-labelledby="how-heading">
         <Reveal>
-          <p className="eyebrow">What we&apos;ll test</p>
-          <h2 id="panel-heading" className={`mt-5 max-w-3xl ${sectionHeading}`}>
-            The markers that matter for training.
+          <h2 id="how-heading" className={centeredHeading}>
+            How it works
           </h2>
+          <p className={subhead}>One blood draw, then a plan that keeps up with you.</p>
         </Reveal>
-        <ul className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
-          {panels.map((panel, index) => (
-            <li key={panel.title}>
-              <Reveal delay={index * 70} className="h-full">
-                <div className={`h-full ${card} p-6 sm:p-8`}>
-                  <h3 className="text-2xl tracking-[-0.02em]">{panel.title}</h3>
-                  <p className="mt-3 text-mute">{panel.body}</p>
-                  <ul className="mt-6 flex flex-wrap gap-2">
-                    {panel.markers.map((marker) => (
-                      <li key={marker} className="rounded-full bg-panel px-3 py-1 text-sm">
-                        {marker}
-                      </li>
-                    ))}
-                  </ul>
+        <ol className="mt-12 grid gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, index) => (
+            <li key={step.title}>
+              <Reveal delay={index * 90}>
+                <div className="relative flex aspect-[4/3.4] items-center justify-center overflow-hidden rounded-3xl bg-sheet p-5">
+                  <span className="absolute left-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-semibold shadow-sm">
+                    {index + 1}
+                  </span>
+                  {stepVisuals[index]}
                 </div>
+                <h3 className="mt-5 text-xl tracking-[-0.01em]">{step.title}</h3>
+                <p className="mt-2 text-mute">{step.body}</p>
               </Reveal>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
-      <section className="bg-sheet">
+      <section className="bg-sheet" aria-labelledby="panel-heading">
         <div className={`${wrap} ${band}`}>
           <Reveal>
-            <p className="eyebrow">How it will work</p>
-            <h2 className={`mt-5 ${sectionHeading}`}>From blood draw to protocol.</h2>
+            <h2 id="panel-heading" className={centeredHeading}>
+              What we&apos;ll test
+            </h2>
+            <p className={subhead}>The markers that matter for training, across six areas of your health.</p>
           </Reveal>
-          <ol className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-4">
-            {steps.map((step, index) => (
-              <li key={step.title}>
-                <Reveal delay={index * 100} className="h-full">
-                  <div className="h-full rounded-3xl bg-paper p-6 sm:p-8">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-semibold text-on-accent">
-                      {index + 1}
-                    </span>
-                    <h3 className="mt-8 text-2xl tracking-[-0.02em]">{step.title}</h3>
-                    <p className="mt-3 text-mute">{step.body}</p>
+          <ul className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            {panels.map((panel, index) => (
+              <li key={panel.title}>
+                <Reveal delay={index * 70} className="h-full">
+                  <div className="h-full rounded-3xl bg-white p-6 sm:p-8">
+                    <h3 className="text-xl tracking-[-0.01em]">{panel.title}</h3>
+                    <p className="mt-3 text-mute">{panel.body}</p>
+                    <ul className="mt-6 flex flex-wrap gap-2">
+                      {panel.markers.map((marker) => (
+                        <li key={marker} className="rounded-full bg-sheet px-3 py-1 text-sm">
+                          {marker}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </Reveal>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       </section>
 
-      <section className={`${wrap} ${band}`} aria-labelledby="labs-faq-heading">
-        <div className="grid gap-10 lg:grid-cols-12">
-          <Reveal className="lg:col-span-4">
-            <p className="eyebrow">Questions</p>
-            <h2 id="labs-faq-heading" className={`mt-5 ${sectionHeading}`}>
-              Good to know.
-            </h2>
+      <section className={`${wrap} ${band}`} aria-labelledby="included-heading">
+        <Reveal>
+          <p className="text-center text-mute">Aevum Labs membership</p>
+          <h2 id="included-heading" className={`mt-3 ${centeredHeading}`}>
+            Everything that&apos;s included
+          </h2>
+        </Reveal>
+        <dl className="mx-auto mt-12 max-w-2xl overflow-hidden rounded-2xl">
+          {included.map(([name, detail], index) => (
+            <div
+              key={name}
+              className={`grid gap-1 px-5 py-3.5 sm:grid-cols-[1fr_1.4fr] sm:gap-6 ${index % 2 === 0 ? "bg-sheet" : ""}`}
+            >
+              <dt>{name}</dt>
+              <dd className="text-mute">{detail}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-6 text-center text-sm text-mute">Pricing announced at launch.</p>
+        <div className="mt-8 flex justify-center">
+          <a href="#join" className="btn-primary">
+            Join the waitlist
+          </a>
+        </div>
+      </section>
+
+      <section className="border-t border-rule">
+        <div className={`${wrap} ${band}`}>
+          <Reveal>
+            <h2 className={centeredHeading}>Questions</h2>
           </Reveal>
-          <div className="lg:col-span-8">
+          <div className="mx-auto mt-10 max-w-3xl">
             <Faq items={faqs} />
           </div>
         </div>
       </section>
 
-      <section className={`${wrap} pb-16 sm:pb-24`}>
-        <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-ink px-6 py-16 text-center text-on-accent sm:px-12 sm:py-24">
-          <div aria-hidden className="absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-glow/40 blur-3xl" />
-          <div aria-hidden className="absolute -bottom-32 -left-24 -z-10 h-80 w-80 rounded-full bg-[#c9c4ff]/25 blur-3xl" />
-          <h2 className={`${display} text-5xl leading-[0.98] sm:text-7xl`}>Be first in line.</h2>
-          <p className="mx-auto mt-6 max-w-md text-lg text-on-accent/70">
+      <section className="px-2 pb-2 sm:px-3 sm:pb-3">
+        <div className="stage rounded-[2rem] px-6 py-20 text-center sm:rounded-[2.5rem] sm:py-28">
+          <h2 className={`${display} text-5xl leading-[1] sm:text-7xl`}>Be first in line.</h2>
+          <p className="mx-auto mt-6 max-w-md text-lg text-white/70">
             Join the waitlist and we&apos;ll email you once, the day Aevum Labs opens.
           </p>
-          <a
-            href="#join"
-            className="mt-10 inline-flex min-h-11 items-center rounded-full bg-on-accent px-7 py-3.5 text-[0.8rem] font-bold uppercase tracking-[0.1em] text-ink no-underline hover:bg-paper"
-          >
+          <a href="#join" className="btn-light mt-10">
             Join the waitlist
           </a>
+          <p className="mt-10 text-sm text-white/50">
+            Educational only. Not medical advice.{" "}
+            <Link href="/disclaimer" className="underline decoration-white/30 underline-offset-4">
+              Full disclaimer
+            </Link>
+            .
+          </p>
         </div>
-        <p className="mt-8 text-center text-sm text-dim">
-          Educational only. Not medical advice.{" "}
-          <Link href="/disclaimer" className="underline decoration-rule underline-offset-4">
-            Full disclaimer
-          </Link>
-          .
-        </p>
       </section>
     </div>
   );

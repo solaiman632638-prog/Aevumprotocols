@@ -201,7 +201,7 @@ export default function HomePage() {
               <Reveal delay={index * 70} className="h-full">
                 <Link
                   href={item.href}
-                  className={`group flex h-full flex-col ${card} p-6 no-underline transition-shadow hover:shadow-[0_20px_50px_-25px_rgba(60,40,20,0.3)] sm:p-8`}
+                  className={`group flex h-full flex-col ${card} p-6 no-underline transition-shadow hover:shadow-[0_20px_50px_-25px_rgba(0,0,0,0.3)] sm:p-8`}
                 >
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-panel text-ink">
                     <svg aria-hidden viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -284,7 +284,7 @@ export default function HomePage() {
             </Link>
           </Reveal>
           <Reveal delay={150}>
-            <figure className={`${card} p-6 shadow-[0_30px_80px_-30px_rgba(60,40,20,0.3)] sm:p-10`}>
+            <figure className={`${card} p-6 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.3)] sm:p-10`}>
               <div className="flex items-center justify-between gap-4">
                 <figcaption className="eyebrow">Sample entry</figcaption>
                 <span className="rounded-full bg-strain/15 px-3 py-1 text-xs text-strain">Limited evidence</span>
@@ -331,13 +331,11 @@ export default function HomePage() {
 
       <section className={`${wrap} pb-16 sm:pb-24`}>
         <Reveal>
-          <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-ink px-6 py-16 text-center text-on-accent sm:px-12 sm:py-24">
-            <div aria-hidden className="absolute -right-24 -top-24 -z-10 h-80 w-80 rounded-full bg-glow/40 blur-3xl" />
-            <div aria-hidden className="absolute -bottom-32 -left-24 -z-10 h-80 w-80 rounded-full bg-[#c9c4ff]/25 blur-3xl" />
+          <div className="stage overflow-hidden rounded-[2.5rem] px-6 py-16 text-center sm:px-12 sm:py-24">
             <h2 className={`${display} text-5xl leading-[0.98] sm:text-7xl`}>
               Peptides, built for performance.
             </h2>
-            <p className="mx-auto mt-6 max-w-md text-lg text-on-accent/70">
+            <p className="mx-auto mt-6 max-w-md text-lg text-white/70">
               Free to start, every feature included. Your first log takes thirty seconds.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-3">

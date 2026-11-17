@@ -457,8 +457,8 @@ export function AuthFlow({
           border-radius: 1.5rem;
           transform-origin: top center;
           box-shadow:
-            0 4px 14px -10px rgb(60 40 20 / 0.25),
-            0 20px 50px -20px rgb(60 40 20 / 0.25),
+            0 4px 14px -10px rgb(0 0 0 / 0.25),
+            0 20px 50px -20px rgb(0 0 0 / 0.25),
             0 0 0 1px var(--color-rule);
         }
         .auth__card--overlay { z-index: 10; }

@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 /**
- * Aevum — warm light tokens, used across the whole site and app.
+ * Aevum — clean light tokens, used across the whole site and app.
  *
- * Cream paper, near-white cards, warm near-black type. Token names predate
+ * White paper, soft grey cards, near-black type. Token names predate
  * the palette: "pine" is the primary fill, "pine-deep" the same as text,
  * "brass" a signal colour kept for meaning (evidence tiers, legends), and
  * "glow" the warm highlight behind heroes.
  */
 @theme {
-  --color-paper: #f6f2eb;
-  --color-sheet: #fffdf9;
-  --color-panel: #f1ebe2;
-  --color-ink: #1c1915;
-  --color-mute: #6b645b;
-  --color-dim: #8f877c;
-  --color-pine: #1c1915;
-  --color-pine-deep: #1c1915;
+  --color-paper: #ffffff;
+  --color-sheet: #f6f6f4;
+  --color-panel: #ebebe8;
+  --color-ink: #111111;
+  --color-mute: #63635e;
+  --color-dim: #95958f;
+  --color-pine: #111111;
+  --color-pine-deep: #111111;
   --color-pine-hover: #000000;
-  --color-brass: #6b645b;
-  --color-rule: #e6dfd4;
+  --color-brass: #63635e;
+  --color-rule: #e6e6e2;
   --color-warn: #c0392b;
   --color-warn-tint: #fbe9e6;
   --color-on-accent: #ffffff;
-  --color-glow: #ff7a1a;
+  --color-glow: #ff6a1a;
 
   /* Metric identity. Always paired with a text label, never colour alone. */
   --color-recovery: #0b8f6b;
@@ -77,6 +77,35 @@
   &:hover {
     border-color: var(--color-ink);
   }
+}
+
+/* White pill button for dark panels. */
+@utility btn-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  background-color: #ffffff;
+  color: #111111;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  &:hover {
+    background-color: #ececec;
+  }
+}
+
+/* Dark rounded stage behind hero sections. */
+@utility stage {
+  background-color: #0b0c0f;
+  background-image:
+    radial-gradient(ellipse 70% 60% at 75% 45%, rgb(70 82 110 / 0.55), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 10% 100%, rgb(40 44 56 / 0.6), transparent 70%);
+  color: #ffffff;
 }
 
 /* Small uppercase label above headings and in table groups. */
